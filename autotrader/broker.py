@@ -25,6 +25,7 @@ class Account:
     cash: float
     equity: float
     positions: dict[str, Position] = field(default_factory=dict)
+    pending_buys: set[str] = field(default_factory=set)  # simbolos con ordenes de compra abiertas
 
 
 class Broker(Protocol):
@@ -153,7 +154,8 @@ class AlpacaBroker:
             p["symbol"]: Position(p["symbol"], int(float(p["qty"])), float(p["avg_entry_price"]))
             for p in self._get("/v2/positions")
         }
-        return Account(cash=float(acct["cash"]), equity=float(acct["equity"]), positions=positions)
+        pending = {o["symbol"] for o in self._get("/v2/orders", status="open") if o.get("side") == "buy"}
+        return Account(cash=float(acct["cash"]), equity=float(acct["equity"]), positions=positions, pending_buys=pending)
 
     def is_market_open(self) -> bool:
         return bool(self._get("/v2/clock")["is_open"])

@@ -112,7 +112,7 @@ def main(argv: list[str] | None = None) -> int:
     r.add_argument("--loop", action="store_true", help="repetir indefinidamente")
     r.add_argument("--interval", type=int, default=3600, help="segundos entre ciclos en modo --loop")
     r.add_argument("--dry-run", action="store_true", help="decidir sin enviar ordenes")
-    r.add_argument("--force", action="store_true", help="operar aunque el mercado este cerrado (solo sim)")
+    r.add_argument("--force", action="store_true", help="operar aunque el mercado este cerrado (en Alpaca las ordenes quedan en cola hasta la apertura)")
     r.set_defaults(func=cmd_run)
 
     st = sub.add_parser("status", help="muestra cuenta y posiciones")

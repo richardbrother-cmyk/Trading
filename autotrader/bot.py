@@ -62,9 +62,12 @@ def run_cycle(settings: Settings, broker: Broker, provider: DataProvider, dry_ru
     if halted:
         summary["skipped"].append(f"limite de perdida diaria alcanzado ({account.equity:.2f} vs {day_start:.2f})")
 
-    open_slots = risk.max_positions - len(account.positions)
+    open_slots = risk.max_positions - len(account.positions) - len(account.pending_buys)
     for symbol, df in data.items():
         pos = account.positions.get(symbol)
+        if pos is None and symbol in account.pending_buys:
+            summary["skipped"].append(f"{symbol}: orden de compra pendiente de ejecucion")
+            continue
         decision = latest_decision(df, strategy, in_position=pos is not None)
         price = prices[symbol]
         if pos is not None and stop_hit(pos.avg_price, price, risk):
