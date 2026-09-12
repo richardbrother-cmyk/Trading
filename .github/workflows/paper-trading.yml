@@ -28,9 +28,18 @@ jobs:
           BROKER: ${{ secrets.ALPACA_API_KEY != '' && 'alpaca' || 'sim' }}
           DATA_PROVIDER: yahoo
         run: python -m autotrader.cli --env /dev/null run
+      - name: Regenerar panel
+        if: always()
+        env:
+          ALPACA_API_KEY: ${{ secrets.ALPACA_API_KEY }}
+          ALPACA_SECRET_KEY: ${{ secrets.ALPACA_SECRET_KEY }}
+          BROKER: ${{ secrets.ALPACA_API_KEY != '' && 'alpaca' || 'sim' }}
+        run: python scripts/dashboard.py --out reports/dashboard.html
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: run-log-${{ github.run_id }}
-          path: state/
+          name: run-${{ github.run_id }}
+          path: |
+            state/
+            reports/dashboard.html
           if-no-files-found: ignore

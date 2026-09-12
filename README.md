@@ -20,6 +20,7 @@ descarga datos reales, calcula una señal, gestiona el riesgo y envía órdenes 
 | `autotrader/ctrader_auth.py` | Tokens OAuth de cTrader: intercambio, renovación y carga. |
 | `autotrader/bot.py` | Un ciclo: datos → decisión → orden → registro en `state/run_log.jsonl`. |
 | `autotrader/cli.py` | Comandos `backtest`, `run`, `status`. |
+| `scripts/dashboard.py` | Genera el panel HTML (`reports/dashboard.html`) con backtests, cuenta y órdenes. |
 | `.github/workflows/paper-trading.yml` | Ejecuta un ciclo cada hora en horario de mercado desde GitHub Actions (Alpaca). |
 | `.github/workflows/ctrader-demo.yml` | Igual, contra la cuenta demo de cTrader. |
 
@@ -138,6 +139,24 @@ Diferencias con acciones:
 - `EXPOSURE_LEVERAGE` permite que la exposición nominal supere el equity (p.ej. 3 = hasta 3x),
   pero el riesgo por operación sigue siendo `RISK_PER_TRADE` del equity: el apalancamiento
   amplía el tamaño, no la pérdida máxima aceptada por operación.
+
+## Panel visual
+
+`scripts/dashboard.py` genera `reports/dashboard.html`, una página autocontenida con:
+
+- las curvas de capital de los tres universos en backtest, con métricas comparadas;
+- el estado real de la cuenta paper de Alpaca: capital, efectivo, posiciones y órdenes en cola;
+- las decisiones del último ciclo del bot, símbolo a símbolo;
+- el resultado por activo y la lista completa de operaciones del backtest activo.
+
+```bash
+python scripts/dashboard.py            # con cuenta (requiere claves en .env)
+python scripts/dashboard.py --no-live  # solo backtests
+```
+
+Hay una copia estática en `docs/dashboard.html`; activando GitHub Pages sobre la carpeta `docs/`
+queda publicada en una URL. El workflow de Alpaca la regenera en cada ciclo y la adjunta como
+artefacto de la ejecución.
 
 ## Estructura de estado
 

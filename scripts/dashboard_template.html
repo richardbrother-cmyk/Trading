@@ -1,0 +1,255 @@
+<title>Cuaderno del bot</title>
+<meta name="description" content="Panel del experimento de trading automático: backtests comparados, cuenta paper y órdenes en cola.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+:root {
+  color-scheme: light;
+  --plane: #f4f6f9; --surface: #ffffff; --ink: #14171c; --ink-2: #545b68; --muted: #8a919e;
+  --grid: #e5e8ee; --axis: #c9ced8; --ring: rgba(20,23,28,.10);
+  --accent: #2a78d6; --accent-soft: rgba(42,120,214,.10);
+  --s1: #2a78d6; --s2: #eb6834; --s3: #1baf7a;
+  --good: #006300; --good-mark: #0ca30c; --bad: #b32e2e; --bad-mark: #d03b3b; --warn: #8a5a00; --warn-mark: #fab219;
+  --tip-bg: #14171c; --tip-ink: #ffffff;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --plane: #0f1114; --surface: #181b20; --ink: #f2f3f5; --ink-2: #b8bec9; --muted: #8a919e;
+    --grid: #262a31; --axis: #363b44; --ring: rgba(255,255,255,.10);
+    --accent: #3987e5; --accent-soft: rgba(57,135,229,.14);
+    --s1: #3987e5; --s2: #d95926; --s3: #199e70;
+    --good: #3ec13e; --good-mark: #0ca30c; --bad: #ef6b6b; --bad-mark: #d03b3b; --warn: #fab219; --warn-mark: #fab219;
+    --tip-bg: #f2f3f5; --tip-ink: #14171c;
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --plane: #0f1114; --surface: #181b20; --ink: #f2f3f5; --ink-2: #b8bec9; --muted: #8a919e;
+  --grid: #262a31; --axis: #363b44; --ring: rgba(255,255,255,.10);
+  --accent: #3987e5; --accent-soft: rgba(57,135,229,.14);
+  --s1: #3987e5; --s2: #d95926; --s3: #199e70;
+  --good: #3ec13e; --good-mark: #0ca30c; --bad: #ef6b6b; --bad-mark: #d03b3b; --warn: #fab219; --warn-mark: #fab219;
+  --tip-bg: #f2f3f5; --tip-ink: #14171c;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--plane); color: var(--ink); font: 15px/1.5 "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif; padding-inline: clamp(16px, 4vw, 40px); padding-block: 28px 56px; }
+.wrap { max-width: 1180px; margin: 0 auto; display: grid; gap: 22px; }
+.mono { font-family: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace; }
+header { display: flex; flex-wrap: wrap; align-items: end; justify-content: space-between; gap: 12px 24px; }
+header h1 { margin: 0; font-size: 26px; font-weight: 600; letter-spacing: -.01em; text-wrap: balance; }
+header p { margin: 4px 0 0; color: var(--ink-2); max-width: 62ch; }
+.eyebrow { font-size: 11.5px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); font-weight: 500; }
+.pill { display: inline-flex; align-items: center; gap: 8px; padding: 6px 12px; border-radius: 999px; background: var(--surface); box-shadow: 0 0 0 1px var(--ring); font-size: 13px; color: var(--ink-2); white-space: nowrap; }
+.pill .dot { width: 9px; height: 9px; border-radius: 50%; background: var(--warn-mark); }
+.pill.open .dot { background: var(--good-mark); }
+.kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 12px; }
+.tile { background: var(--surface); box-shadow: 0 0 0 1px var(--ring); border-radius: 10px; padding: 14px 16px 12px; display: grid; gap: 4px; }
+.tile .label { font-size: 12.5px; color: var(--ink-2); }
+.tile .value { font-size: 28px; font-weight: 600; letter-spacing: -.01em; line-height: 1.15; }
+.tile .sub { font-size: 12.5px; color: var(--muted); }
+.tile .sub.good { color: var(--good); } .tile .sub.bad { color: var(--bad); }
+section { background: var(--surface); box-shadow: 0 0 0 1px var(--ring); border-radius: 12px; padding: 18px 20px 16px; }
+section h2 { margin: 0; font-size: 16px; font-weight: 600; }
+section .lede { margin: 2px 0 0; color: var(--ink-2); font-size: 13.5px; max-width: 70ch; }
+.sec-head { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 8px 20px; margin-bottom: 12px; }
+.legend { display: flex; flex-wrap: wrap; gap: 6px 18px; font-size: 13px; color: var(--ink-2); }
+.legend span { display: inline-flex; align-items: center; gap: 7px; }
+.legend i { display: inline-block; width: 18px; height: 0; border-top: 3px solid; border-radius: 2px; }
+.chart-wrap { position: relative; }
+svg.chart { width: 100%; height: auto; display: block; overflow: visible; }
+svg.chart text { font-family: "IBM Plex Sans", system-ui, sans-serif; font-size: 11.5px; fill: var(--muted); font-variant-numeric: tabular-nums; }
+svg.chart .endlab { fill: var(--ink-2); font-weight: 500; font-size: 12px; }
+.tip { position: absolute; pointer-events: none; background: var(--tip-bg); color: var(--tip-ink); padding: 8px 10px; border-radius: 8px; font-size: 12.5px; line-height: 1.4; display: none; min-width: 190px; box-shadow: 0 6px 20px rgba(0,0,0,.18); }
+.tip b { font-weight: 600; } .tip .row { display: flex; justify-content: space-between; gap: 14px; } .tip .row i { display: inline-block; width: 9px; height: 9px; border-radius: 2px; margin-right: 6px; vertical-align: 0; }
+.two { display: grid; grid-template-columns: 1.15fr 1fr; gap: 22px; }
+@media (max-width: 820px) { .two { grid-template-columns: 1fr; } }
+.tbl-wrap { overflow-x: auto; }
+table { border-collapse: collapse; width: 100%; font-size: 13.5px; }
+th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--grid); vertical-align: top; }
+th { font-size: 11.5px; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); font-weight: 500; white-space: nowrap; }
+td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
+tr.active td { background: var(--accent-soft); }
+.sw { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 8px; vertical-align: -1px; }
+.pos { color: var(--good); } .neg { color: var(--bad); }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.chip { display: inline-flex; align-items: center; gap: 8px; padding: 6px 10px; border-radius: 8px; background: var(--plane); box-shadow: 0 0 0 1px var(--ring); font-size: 13px; }
+.chip .k { font-weight: 500; }
+.chip .act { font-size: 11px; letter-spacing: .06em; text-transform: uppercase; padding: 2px 6px; border-radius: 4px; background: var(--surface); box-shadow: 0 0 0 1px var(--ring); color: var(--ink-2); }
+.chip.buy .act { color: var(--good); } .chip.sell .act { color: var(--bad); }
+.chip .m { color: var(--muted); font-size: 12px; }
+details summary { cursor: pointer; color: var(--accent); font-weight: 500; font-size: 13.5px; list-style: none; }
+details summary::-webkit-details-marker { display: none; }
+details summary:focus-visible, button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 4px; }
+.bars { display: grid; gap: 6px; }
+.bar-row { display: grid; grid-template-columns: 62px 1fr 74px; align-items: center; gap: 10px; font-size: 13px; }
+.bar-track { position: relative; height: 18px; }
+.bar-track .zero { position: absolute; top: 0; bottom: 0; width: 1px; background: var(--axis); }
+.bar-track .fill { position: absolute; top: 3px; height: 12px; }
+.bar-row .v { text-align: right; font-variant-numeric: tabular-nums; }
+footer { color: var(--muted); font-size: 12.5px; }
+@media (prefers-reduced-motion: no-preference) { .tip { transition: opacity .12s; } }
+</style>
+<div class="wrap">
+  <header>
+    <div>
+      <div class="eyebrow">Experimento de trading automático · cuenta paper</div>
+      <h1>Cuaderno del bot</h1>
+      <p>Lo que la estrategia habría hecho en dos años, y lo que está haciendo ahora mismo en la cuenta simulada de Alpaca.</p>
+    </div>
+    <div id="market-pill" class="pill"><span class="dot"></span><span id="market-text">Mercado</span></div>
+  </header>
+
+  <div class="kpis" id="kpis"></div>
+
+  <section>
+    <div class="sec-head">
+      <div><h2>Evolución del capital en backtest</h2><p class="lede">Mismo motor, misma estrategia, tres universos de activos. 100.000 USD iniciales, del 12 sep 2024 al 11 sep 2026.</p></div>
+      <div class="legend" id="legend"></div>
+    </div>
+    <div class="chart-wrap"><svg class="chart" id="eq" viewBox="0 0 1100 380" role="img" aria-label="Curvas de capital de tres backtests"></svg><div class="tip" id="tip"></div></div>
+  </section>
+
+  <div class="two">
+    <section>
+      <div class="sec-head"><div><h2>Métricas comparadas</h2><p class="lede">La fila resaltada es la configuración que opera hoy.</p></div></div>
+      <div class="tbl-wrap"><table id="metrics"></table></div>
+    </section>
+    <section>
+      <div class="sec-head"><div><h2 id="live-title">Cuenta paper</h2><p class="lede" id="live-lede"></p></div></div>
+      <div class="tbl-wrap"><table id="live-table"></table></div>
+    </section>
+  </div>
+
+  <section>
+    <div class="sec-head"><div><h2>Última decisión del bot</h2><p class="lede" id="run-lede"></p></div></div>
+    <div class="chips" id="decisions"></div>
+  </section>
+
+  <section>
+    <div class="sec-head"><div><h2>Resultado por activo en el backtest combinado</h2><p class="lede">Beneficio neto acumulado de todas las operaciones cerradas por símbolo.</p></div></div>
+    <div class="bars" id="bars"></div>
+    <details style="margin-top:14px"><summary id="trades-summary">Ver todas las operaciones</summary><div class="tbl-wrap" style="margin-top:10px"><table id="trades"></table></div></details>
+  </section>
+
+  <footer>Generado el __GENERATED_AT__ · Datos históricos de Yahoo Finance · Estrategia: cruce SMA con filtro RSI, stop 5 %, riesgo 2 % por operación. No es asesoramiento financiero.</footer>
+</div>
+<script>
+const D = /*__DATA__*/null;
+const fmtUSD = n => new Intl.NumberFormat("es-ES", {style:"currency", currency:"USD", maximumFractionDigits:0}).format(n);
+const fmtUSD2 = n => new Intl.NumberFormat("es-ES", {style:"currency", currency:"USD", minimumFractionDigits:2, maximumFractionDigits:2}).format(n);
+const pct = (x, d=1) => (x>0?"+":"") + (x*100).toFixed(d).replace(".", ",") + " %";
+const esc = s => String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const SERIES = ["var(--s1)","var(--s2)","var(--s3)"];
+const active = D.backtests.findIndex(b => b.name.includes("activo"));
+
+// --- KPIs ---
+const live = D.live, kp = [];
+if (live.available) {
+  const pending = live.orders.filter(o => o.status !== "filled");
+  const committed = pending.reduce((a,o)=>a+o.qty*(D.last_run?.decisions.find(d=>d.symbol===o.symbol)?.close||0),0);
+  kp.push({label:"Capital de la cuenta", value: fmtUSD(live.equity), sub: live.broker});
+  kp.push({label:"Efectivo disponible", value: fmtUSD(live.cash), sub: committed ? `${fmtUSD(committed)} comprometidos en órdenes` : "sin órdenes en cola"});
+  kp.push({label:"Posiciones abiertas", value: String(live.positions.length), sub: live.positions.length ? "P&L " + fmtUSD2(live.positions.reduce((a,p)=>a+p.pnl,0)) : "aún sin ejecutar"});
+  kp.push({label:"Órdenes en cola", value: String(pending.length), sub: pending.length ? "se ejecutan en la apertura" : "nada pendiente"});
+  const open = live.is_open, pill = document.getElementById("market-pill");
+  pill.classList.toggle("open", open);
+  const nextOpen = new Date(live.next_open);
+  document.getElementById("market-text").textContent = open ? "Mercado abierto" : "Mercado cerrado · abre " + nextOpen.toLocaleString("es-ES", {weekday:"short", day:"numeric", month:"short", hour:"2-digit", minute:"2-digit", timeZone:"America/New_York"}) + " ET";
+} else {
+  const m = D.backtests[active].metrics;
+  kp.push({label:"Capital final (backtest)", value: fmtUSD(m.final_equity), sub: pct(m.total_return) + " en dos años"});
+  document.getElementById("market-text").textContent = "Sin conexión con la cuenta";
+}
+document.getElementById("kpis").innerHTML = kp.map(k => `<div class="tile"><div class="label">${esc(k.label)}</div><div class="value">${esc(k.value)}</div><div class="sub ${k.cls||""}">${esc(k.sub)}</div></div>`).join("");
+
+// --- Equity chart ---
+(function(){
+  const W=1100, H=380, P={t:18, r:150, b:34, l:64};
+  const svg = document.getElementById("eq");
+  const series = D.backtests.map((b,i)=>({name:b.name, color:SERIES[i], pts:b.equity}));
+  const dates = [...new Set(series.flatMap(s=>s.pts.map(p=>p[0])))].sort();
+  const x0 = new Date(dates[0]).getTime(), x1 = new Date(dates[dates.length-1]).getTime();
+  const vals = series.flatMap(s=>s.pts.map(p=>p[1]));
+  let lo = Math.min(...vals), hi = Math.max(...vals);
+  const step = niceStep((hi-lo)/5); lo = Math.floor(lo/step)*step; hi = Math.ceil(hi/step)*step;
+  const X = t => P.l + (t-x0)/(x1-x0)*(W-P.l-P.r);
+  const Y = v => P.t + (hi-v)/(hi-lo)*(H-P.t-P.b);
+  let g = "";
+  for (let v=lo; v<=hi+1e-9; v+=step) g += `<line x1="${P.l}" x2="${W-P.r}" y1="${Y(v).toFixed(1)}" y2="${Y(v).toFixed(1)}" stroke="var(--grid)" stroke-width="1"/><text x="${P.l-8}" y="${(Y(v)+4).toFixed(1)}" text-anchor="end">${(v/1000).toFixed(0)} k</text>`;
+  const months = []; for (let d=new Date(x0); d.getTime()<=x1; d.setMonth(d.getMonth()+3)) months.push(new Date(d));
+  for (const d of months) g += `<text x="${X(d.getTime()).toFixed(1)}" y="${H-P.b+18}" text-anchor="middle">${d.toLocaleString("es-ES",{month:"short",year:"2-digit"})}</text>`;
+  g += `<line x1="${P.l}" x2="${W-P.r}" y1="${Y(D.settings.initial_cash).toFixed(1)}" y2="${Y(D.settings.initial_cash).toFixed(1)}" stroke="var(--axis)" stroke-width="1"/>`;
+  const ends = [];
+  series.forEach((s,i)=>{
+    const d = s.pts.map((p,j)=>(j?"L":"M")+X(new Date(p[0]).getTime()).toFixed(1)+" "+Y(p[1]).toFixed(1)).join("");
+    g += `<path d="${d}" fill="none" stroke="${s.color}" stroke-width="${i===active?2.5:2}" stroke-linejoin="round" stroke-linecap="round" opacity="${i===active?1:.85}"/>`;
+    const last = s.pts[s.pts.length-1]; ends.push({y:Y(last[1]), label:s.name, v:last[1], color:s.color});
+  });
+  ends.sort((a,b)=>a.y-b.y); for (let i=1;i<ends.length;i++) if (ends[i].y-ends[i-1].y<16) ends[i].y = ends[i-1].y+16;
+  for (const e of ends) g += `<circle cx="${W-P.r}" cy="${Y(e.v).toFixed(1)}" r="4.5" fill="${e.color}" stroke="var(--surface)" stroke-width="2"/><text class="endlab" x="${W-P.r+12}" y="${(e.y+4).toFixed(1)}">${esc(e.label.replace(" (activo)",""))} · ${fmtUSD(e.v)}</text>`;
+  g += `<g id="cross" style="display:none"><line id="cx" y1="${P.t}" y2="${H-P.b}" stroke="var(--axis)" stroke-width="1"/>${series.map((s,i)=>`<circle id="cd${i}" r="4.5" fill="${s.color}" stroke="var(--surface)" stroke-width="2"/>`).join("")}</g>`;
+  g += `<rect id="hit" x="${P.l}" y="${P.t}" width="${W-P.l-P.r}" height="${H-P.t-P.b}" fill="transparent"/>`;
+  svg.innerHTML = g;
+  const tip = document.getElementById("tip"), cross = svg.querySelector("#cross"), wrap = svg.parentElement;
+  const byDate = series.map(s => Object.fromEntries(s.pts));
+  svg.querySelector("#hit").addEventListener("mousemove", ev => {
+    const r = svg.getBoundingClientRect(); const sx = (ev.clientX-r.left)*W/r.width;
+    const t = x0 + (sx-P.l)/(W-P.l-P.r)*(x1-x0);
+    let k = dates.findIndex(d => new Date(d).getTime()>=t); if (k<0) k = dates.length-1; if (k>0 && Math.abs(new Date(dates[k-1]).getTime()-t) < Math.abs(new Date(dates[k]).getTime()-t)) k--;
+    const dt = dates[k], px = X(new Date(dt).getTime());
+    cross.style.display = ""; svg.querySelector("#cx").setAttribute("x1", px); svg.querySelector("#cx").setAttribute("x2", px);
+    let rows = "";
+    series.forEach((s,i)=>{ const v = byDate[i][dt]; const c = svg.querySelector("#cd"+i); if (v==null){c.style.display="none";return;} c.style.display=""; c.setAttribute("cx",px); c.setAttribute("cy",Y(v)); rows += `<div class="row"><span><i style="background:${s.color}"></i>${esc(s.name.replace(" (activo)",""))}</span><span>${fmtUSD(v)}</span></div>`; });
+    tip.innerHTML = `<b>${new Date(dt).toLocaleDateString("es-ES",{day:"numeric",month:"short",year:"numeric"})}</b>${rows}`;
+    tip.style.display = "block";
+    const left = (ev.clientX-r.left) + 14, maxLeft = wrap.clientWidth - tip.offsetWidth - 8;
+    tip.style.left = Math.min(left, maxLeft) + "px"; tip.style.top = Math.max(0, (ev.clientY-r.top) - tip.offsetHeight - 12) + "px";
+  });
+  svg.querySelector("#hit").addEventListener("mouseleave", ()=>{ tip.style.display="none"; cross.style.display="none"; });
+  document.getElementById("legend").innerHTML = series.map((s,i)=>`<span><i style="border-color:${s.color}"></i>${esc(s.name)}</span>`).join("");
+  function niceStep(r){ const p = Math.pow(10, Math.floor(Math.log10(r))); const m = r/p; return (m<1.5?1:m<3.5?2:m<7.5?5:10)*p; }
+})();
+
+// --- Metrics table ---
+(function(){
+  const rows = [["Retorno total", b=>pct(b.metrics.total_return)], ["Rentabilidad anual", b=>pct(b.metrics.cagr)], ["Sharpe", b=>b.metrics.sharpe.toFixed(2)], ["Caída máxima", b=>pct(b.metrics.max_drawdown)], ["Operaciones", b=>b.metrics.trades], ["Acierto", b=>(b.metrics.win_rate*100).toFixed(0)+" %"], ["Profit factor", b=>b.metrics.profit_factor.toFixed(2)], ["Máx. posiciones", b=>b.max_positions+" × "+(b.max_position_pct*100)+" %"]];
+  let h = `<thead><tr><th>Métrica</th>${D.backtests.map((b,i)=>`<th class="num"><span class="sw" style="background:${SERIES[i]}"></span>${esc(b.name.replace(" (activo)",""))}</th>`).join("")}</tr></thead><tbody>`;
+  for (const [lab, f] of rows) h += `<tr><td>${lab}</td>${D.backtests.map(b=>`<td class="num">${f(b)}</td>`).join("")}</tr>`;
+  document.getElementById("metrics").innerHTML = h + "</tbody>";
+})();
+
+// --- Live table ---
+(function(){
+  const t = document.getElementById("live-table"), lede = document.getElementById("live-lede");
+  if (!live.available) { lede.textContent = "El panel se generó sin acceso a la cuenta."; t.innerHTML = ""; return; }
+  if (live.positions.length) {
+    document.getElementById("live-title").textContent = "Posiciones abiertas";
+    lede.textContent = "Precio medio de entrada y resultado no realizado.";
+    t.innerHTML = `<thead><tr><th>Activo</th><th class="num">Cant.</th><th class="num">Entrada</th><th class="num">Actual</th><th class="num">P&L</th></tr></thead><tbody>` + live.positions.map(p=>`<tr><td class="mono">${esc(p.symbol)}</td><td class="num">${p.qty}</td><td class="num">${fmtUSD2(p.avg)}</td><td class="num">${fmtUSD2(p.price)}</td><td class="num ${p.pnl>=0?"pos":"neg"}">${fmtUSD2(p.pnl)}</td></tr>`).join("") + "</tbody>";
+  } else {
+    document.getElementById("live-title").textContent = "Órdenes en cola";
+    lede.textContent = live.orders.length ? "Aceptadas por el broker; se ejecutan a precio de mercado en la próxima apertura." : "No hay órdenes pendientes.";
+    t.innerHTML = `<thead><tr><th>Activo</th><th>Lado</th><th class="num">Cant.</th><th class="num">Ref. cierre</th><th>Enviada</th></tr></thead><tbody>` + live.orders.map(o=>{ const px = D.last_run?.decisions.find(d=>d.symbol===o.symbol)?.close; return `<tr><td class="mono">${esc(o.symbol)}</td><td>${o.side==="buy"?"Compra":"Venta"}</td><td class="num">${o.qty}</td><td class="num">${px?fmtUSD2(px):"—"}</td><td class="mono" style="font-size:12px">${esc(o.submitted_at)}</td></tr>`; }).join("") + "</tbody>";
+  }
+})();
+
+// --- Decisions ---
+(function(){
+  const r = D.last_run, box = document.getElementById("decisions"), lede = document.getElementById("run-lede");
+  if (!r) { lede.textContent = "Aún no hay ciclos registrados."; return; }
+  lede.textContent = `Ciclo del ${new Date(r.timestamp).toLocaleString("es-ES",{day:"numeric",month:"short",hour:"2-digit",minute:"2-digit",timeZone:"UTC"})} UTC. Compra si la SMA rápida supera la lenta con RSI < ${D.settings.rsi_max_entry}; vende si el cruce se invierte.`;
+  box.innerHTML = r.decisions.map(d=>`<span class="chip ${d.action.toLowerCase()}"><span class="k mono">${esc(d.symbol)}</span><span class="act">${d.action==="BUY"?"Comprar":d.action==="SELL"?"Vender":"Esperar"}</span><span class="m">RSI ${d.rsi?.toFixed(0)} · ${d.trend_up?"tendencia alcista":"tendencia bajista"}</span></span>`).join("");
+})();
+
+// --- Per-symbol bars + trades ---
+(function(){
+  const b = D.backtests[active]; const agg = {};
+  for (const t of b.trades) agg[t.symbol] = (agg[t.symbol]||0) + t.pnl;
+  const items = Object.entries(agg).sort((a,c)=>c[1]-a[1]); const m = Math.max(...items.map(i=>Math.abs(i[1])));
+  document.getElementById("bars").innerHTML = items.map(([s,v])=>{ const w = Math.abs(v)/m*50; const left = v>=0 ? 50 : 50-w; return `<div class="bar-row"><span class="mono">${esc(s)}</span><div class="bar-track"><span class="zero" style="left:50%"></span><span class="fill" style="left:${left}%;width:${w}%;background:${v>=0?"var(--s1)":"var(--bad-mark)"};border-radius:${v>=0?"0 4px 4px 0":"4px 0 0 4px"}"></span></div><span class="v ${v>=0?"pos":"neg"}">${fmtUSD(v)}</span></div>`; }).join("");
+  document.getElementById("trades-summary").textContent = `Ver las ${b.trades.length} operaciones del backtest combinado`;
+  const reason = {signal:"señal", stop:"stop loss", open_at_end:"abierta al final"};
+  document.getElementById("trades").innerHTML = `<thead><tr><th>Activo</th><th>Entrada</th><th>Salida</th><th class="num">Cant.</th><th class="num">Precio entrada</th><th class="num">Precio salida</th><th class="num">P&L</th><th class="num">Retorno</th><th>Cierre</th></tr></thead><tbody>` + b.trades.map(t=>`<tr><td class="mono">${esc(t.symbol)}</td><td>${t.entry}</td><td>${t.exit}</td><td class="num">${t.qty}</td><td class="num">${fmtUSD2(t.entry_price)}</td><td class="num">${fmtUSD2(t.exit_price)}</td><td class="num ${t.pnl>=0?"pos":"neg"}">${fmtUSD2(t.pnl)}</td><td class="num ${t.ret>=0?"pos":"neg"}">${pct(t.ret)}</td><td>${reason[t.reason]||t.reason}</td></tr>`).join("") + "</tbody>";
+})();
+</script>
