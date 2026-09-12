@@ -54,7 +54,16 @@ def collect(no_live: bool) -> dict:
         clock = b._get("/v2/clock")
         orders = b._get("/v2/orders", status="open")
         positions = b._get("/v2/positions")
+        hist = b._get("/v2/account/portfolio/history", period="3M", timeframe="1D")
+        history = [[datetime.fromtimestamp(t, tz=timezone.utc).strftime("%Y-%m-%d"), round(float(e), 2)]
+                   for t, e in zip(hist.get("timestamp", []), hist.get("equity", [])) if e and float(e) > 0]
+        all_orders = b._get("/v2/orders", status="all", limit=100, direction="desc")
         live = {
+            "history": history,
+            "orders_all": [{"symbol": o["symbol"], "side": o["side"], "qty": int(float(o["qty"])), "type": o["type"],
+                            "tif": o["time_in_force"], "status": o["status"],
+                            "filled_price": float(o["filled_avg_price"]) if o.get("filled_avg_price") else None,
+                            "at": (o.get("filled_at") or o.get("canceled_at") or o["submitted_at"])[:16].replace("T", " ")} for o in all_orders],
             "available": True, "broker": "Alpaca paper", "equity": float(acct["equity"]), "cash": float(acct["cash"]),
             "buying_power": float(acct["buying_power"]), "is_open": clock["is_open"], "next_open": clock["next_open"],
             "orders": [{"symbol": o["symbol"], "side": o["side"], "qty": int(float(o["qty"])), "status": o["status"],
@@ -63,19 +72,26 @@ def collect(no_live: bool) -> dict:
                            "price": float(p["current_price"]), "pnl": float(p["unrealized_pl"])} for p in positions],
         }
     last_run = None
+    cycles = []
     log = os.path.join(s.state_dir, "run_log.jsonl")
     if os.path.exists(log):
         with open(log, encoding="utf-8") as fh:
             lines = [ln for ln in fh if ln.strip()]
-        for ln in reversed(lines):
+        for ln in lines:
             rec = json.loads(ln)
-            if rec.get("broker", "").startswith("alpaca"):
-                last_run = rec
-                break
+            if not rec.get("broker", "").startswith("alpaca"):
+                continue
+            last_run = rec
+            cycles.append({"at": rec["timestamp"][:16].replace("T", " "), "equity": rec["equity"], "positions": len(rec["positions"]),
+                           "buys": sum(1 for o in rec["orders"] if o["side"] == "buy" and not str(o["status"]).startswith("error")),
+                           "sells": sum(1 for o in rec["orders"] if o["side"] == "sell" and not str(o["status"]).startswith("error")),
+                           "errors": sum(1 for o in rec["orders"] if str(o["status"]).startswith("error")),
+                           "note": (rec["skipped"][0][:60] + (f" (+{len(rec['skipped']) - 1})" if len(rec["skipped"]) > 1 else "")) if rec["skipped"] else ("sin cambios" if not rec["orders"] else "")})
+        cycles = cycles[-30:]
     return {"generated_at": datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC"), "settings": {
         "fast_sma": s.fast_sma, "slow_sma": s.slow_sma, "rsi_max_entry": s.rsi_max_entry, "risk_per_trade": s.risk_per_trade,
         "stop_loss_pct": s.stop_loss_pct, "max_daily_loss_pct": s.max_daily_loss_pct, "initial_cash": s.initial_cash},
-        "backtests": backtests, "live": live, "last_run": last_run}
+        "backtests": backtests, "live": live, "last_run": last_run, "cycles": cycles}
 
 
 def render(d: dict) -> str:

@@ -88,6 +88,9 @@ details summary:focus-visible, button:focus-visible { outline: 2px solid var(--a
 .bar-track .fill { position: absolute; top: 3px; height: 12px; }
 .bar-row .v { text-align: right; font-variant-numeric: tabular-nums; }
 footer { color: var(--muted); font-size: 12.5px; }
+.empty { margin: 8px 0 0; color: var(--ink-2); font-size: 13.5px; padding: 12px 14px; background: var(--plane); border-radius: 8px; }
+.status { display: inline-block; font-size: 11px; letter-spacing: .06em; text-transform: uppercase; padding: 2px 7px; border-radius: 4px; box-shadow: 0 0 0 1px var(--ring); color: var(--ink-2); }
+.status.filled { color: var(--good); } .status.canceled, .status.rejected, .status.expired { color: var(--muted); } .status.accepted, .status.new { color: var(--warn); }
 @media (prefers-reduced-motion: no-preference) { .tip { transition: opacity .12s; } }
 </style>
 <div class="wrap">
@@ -124,6 +127,24 @@ footer { color: var(--muted); font-size: 12.5px; }
   <section>
     <div class="sec-head"><div><h2>Última decisión del bot</h2><p class="lede" id="run-lede"></p></div></div>
     <div class="chips" id="decisions"></div>
+  </section>
+
+  <section>
+    <div class="sec-head">
+      <div><h2>Seguimiento de la cuenta</h2><p class="lede" id="track-lede">Capital real de la cuenta paper, día a día, según el broker.</p></div>
+    </div>
+    <div class="chart-wrap" id="track-wrap"><svg class="chart" id="track" viewBox="0 0 1100 220" role="img" aria-label="Capital de la cuenta paper por día"></svg><div class="tip" id="tip2"></div></div>
+    <p class="empty" id="track-empty" hidden>Todavía no hay recorrido: las primeras órdenes se ejecutan en la próxima apertura y a partir de ahí esta curva se dibuja sola.</p>
+    <div class="two" style="margin-top:16px">
+      <div>
+        <div class="eyebrow" style="margin-bottom:8px">Historial de órdenes</div>
+        <div class="tbl-wrap"><table id="orders-all"></table></div>
+      </div>
+      <div>
+        <div class="eyebrow" style="margin-bottom:8px">Ciclos del bot</div>
+        <div class="tbl-wrap"><table id="cycles"></table></div>
+      </div>
+    </div>
   </section>
 
   <section>
@@ -226,7 +247,8 @@ document.getElementById("kpis").innerHTML = kp.map(k => `<div class="tile"><div 
   if (live.positions.length) {
     document.getElementById("live-title").textContent = "Posiciones abiertas";
     lede.textContent = "Precio medio de entrada y resultado no realizado.";
-    t.innerHTML = `<thead><tr><th>Activo</th><th class="num">Cant.</th><th class="num">Entrada</th><th class="num">Actual</th><th class="num">P&L</th></tr></thead><tbody>` + live.positions.map(p=>`<tr><td class="mono">${esc(p.symbol)}</td><td class="num">${p.qty}</td><td class="num">${fmtUSD2(p.avg)}</td><td class="num">${fmtUSD2(p.price)}</td><td class="num ${p.pnl>=0?"pos":"neg"}">${fmtUSD2(p.pnl)}</td></tr>`).join("") + "</tbody>";
+    lede.textContent = `Precio medio de entrada, resultado no realizado y nivel de stop (${(D.settings.stop_loss_pct*100).toFixed(0)} % bajo la entrada).`;
+    t.innerHTML = `<thead><tr><th>Activo</th><th class="num">Cant.</th><th class="num">Entrada</th><th class="num">Actual</th><th class="num">Stop</th><th class="num">P&L</th></tr></thead><tbody>` + live.positions.map(p=>{ const stop = p.avg*(1-D.settings.stop_loss_pct); return `<tr><td class="mono">${esc(p.symbol)}</td><td class="num">${p.qty}</td><td class="num">${fmtUSD2(p.avg)}</td><td class="num">${fmtUSD2(p.price)}</td><td class="num">${fmtUSD2(stop)}</td><td class="num ${p.pnl>=0?"pos":"neg"}">${fmtUSD2(p.pnl)} <span style="color:var(--muted)">(${pct(p.pnl/(p.avg*p.qty))})</span></td></tr>`; }).join("") + "</tbody>";
   } else {
     document.getElementById("live-title").textContent = "Órdenes en cola";
     lede.textContent = live.orders.length ? "Aceptadas por el broker; se ejecutan a precio de mercado en la próxima apertura." : "No hay órdenes pendientes.";
@@ -240,6 +262,48 @@ document.getElementById("kpis").innerHTML = kp.map(k => `<div class="tile"><div 
   if (!r) { lede.textContent = "Aún no hay ciclos registrados."; return; }
   lede.textContent = `Ciclo del ${new Date(r.timestamp).toLocaleString("es-ES",{day:"numeric",month:"short",hour:"2-digit",minute:"2-digit",timeZone:"UTC"})} UTC. Compra si la SMA rápida supera la lenta con RSI < ${D.settings.rsi_max_entry}; vende si el cruce se invierte.`;
   box.innerHTML = r.decisions.map(d=>`<span class="chip ${d.action.toLowerCase()}"><span class="k mono">${esc(d.symbol)}</span><span class="act">${d.action==="BUY"?"Comprar":d.action==="SELL"?"Vender":"Esperar"}</span><span class="m">RSI ${d.rsi?.toFixed(0)} · ${d.trend_up?"tendencia alcista":"tendencia bajista"}</span></span>`).join("");
+})();
+
+// --- Live tracking ---
+(function(){
+  const svg = document.getElementById("track"), empty = document.getElementById("track-empty"), wrap = document.getElementById("track-wrap");
+  const pts = live.available ? live.history : [];
+  if (pts.length < 2) { svg.hidden = true; wrap.hidden = true; empty.hidden = false; }
+  else {
+    const W=1100, H=220, P={t:14, r:110, b:30, l:64};
+    const x0 = new Date(pts[0][0]).getTime(), x1 = new Date(pts[pts.length-1][0]).getTime();
+    const vals = pts.map(p=>p[1]); let lo = Math.min(...vals, D.settings.initial_cash), hi = Math.max(...vals, D.settings.initial_cash);
+    const span = Math.max(hi-lo, D.settings.initial_cash*0.01); const stp = nice(span/4); lo = Math.floor((lo-span*0.05)/stp)*stp; hi = Math.ceil((hi+span*0.05)/stp)*stp;
+    const X = t => P.l + (x1===x0 ? 0 : (t-x0)/(x1-x0))*(W-P.l-P.r), Y = v => P.t + (hi-v)/(hi-lo)*(H-P.t-P.b);
+    let g = "";
+    for (let v=lo; v<=hi+1e-9; v+=stp) g += `<line x1="${P.l}" x2="${W-P.r}" y1="${Y(v).toFixed(1)}" y2="${Y(v).toFixed(1)}" stroke="var(--grid)"/><text x="${P.l-8}" y="${(Y(v)+4).toFixed(1)}" text-anchor="end">${fmtUSD(v)}</text>`;
+    const path = pts.map((p,i)=>(i?"L":"M")+X(new Date(p[0]).getTime()).toFixed(1)+" "+Y(p[1]).toFixed(1)).join("");
+    g += `<path d="${path} L${X(x1).toFixed(1)} ${Y(lo).toFixed(1)} L${X(x0).toFixed(1)} ${Y(lo).toFixed(1)} Z" fill="var(--s1)" opacity=".10"/>`;
+    g += `<line x1="${P.l}" x2="${W-P.r}" y1="${Y(D.settings.initial_cash).toFixed(1)}" y2="${Y(D.settings.initial_cash).toFixed(1)}" stroke="var(--axis)"/>`;
+    g += `<path d="${path}" fill="none" stroke="var(--s1)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>`;
+    const last = pts[pts.length-1];
+    g += `<circle cx="${X(x1).toFixed(1)}" cy="${Y(last[1]).toFixed(1)}" r="4.5" fill="var(--s1)" stroke="var(--surface)" stroke-width="2"/><text class="endlab" x="${W-P.r+12}" y="${(Y(last[1])+4).toFixed(1)}">${fmtUSD(last[1])} · ${pct(last[1]/D.settings.initial_cash-1)}</text>`;
+    const n = pts.length, every = Math.max(1, Math.round(n/8));
+    pts.forEach((p,i)=>{ if (i%every===0 || i===n-1) g += `<text x="${X(new Date(p[0]).getTime()).toFixed(1)}" y="${H-P.b+18}" text-anchor="middle">${new Date(p[0]).toLocaleDateString("es-ES",{day:"numeric",month:"short"})}</text>`; });
+    g += `<g id="cross2" style="display:none"><line id="cx2" y1="${P.t}" y2="${H-P.b}" stroke="var(--axis)"/><circle id="cd2" r="4.5" fill="var(--s1)" stroke="var(--surface)" stroke-width="2"/></g><rect id="hit2" x="${P.l}" y="${P.t}" width="${W-P.l-P.r}" height="${H-P.t-P.b}" fill="transparent"/>`;
+    svg.innerHTML = g;
+    const tip = document.getElementById("tip2"), cross = svg.querySelector("#cross2");
+    svg.querySelector("#hit2").addEventListener("mousemove", ev => {
+      const r = svg.getBoundingClientRect(); const sx = (ev.clientX-r.left)*W/r.width; const t = x0 + (sx-P.l)/(W-P.l-P.r)*(x1-x0);
+      let k = 0, best = Infinity; pts.forEach((p,i)=>{ const d = Math.abs(new Date(p[0]).getTime()-t); if (d<best){best=d;k=i;} });
+      const px = X(new Date(pts[k][0]).getTime()), py = Y(pts[k][1]);
+      cross.style.display=""; svg.querySelector("#cx2").setAttribute("x1",px); svg.querySelector("#cx2").setAttribute("x2",px); svg.querySelector("#cd2").setAttribute("cx",px); svg.querySelector("#cd2").setAttribute("cy",py);
+      tip.innerHTML = `<b>${new Date(pts[k][0]).toLocaleDateString("es-ES",{day:"numeric",month:"short",year:"numeric"})}</b><div class="row"><span>Capital</span><span>${fmtUSD2(pts[k][1])}</span></div><div class="row"><span>Desde el inicio</span><span>${pct(pts[k][1]/D.settings.initial_cash-1, 2)}</span></div>`;
+      tip.style.display="block"; const left=(ev.clientX-r.left)+14, maxLeft = wrap.clientWidth - tip.offsetWidth - 8; tip.style.left=Math.min(left,maxLeft)+"px"; tip.style.top=Math.max(0,(ev.clientY-r.top)-tip.offsetHeight-12)+"px";
+    });
+    svg.querySelector("#hit2").addEventListener("mouseleave", ()=>{ tip.style.display="none"; cross.style.display="none"; });
+  }
+  function nice(r){ const p = Math.pow(10, Math.floor(Math.log10(r))); const m = r/p; return (m<1.5?1:m<3.5?2:m<7.5?5:10)*p; }
+  const st = s => ({filled:"ejecutada", canceled:"cancelada", accepted:"en cola", new:"en cola", rejected:"rechazada", expired:"expirada", partially_filled:"parcial"}[s]||s);
+  const oa = document.getElementById("orders-all");
+  oa.innerHTML = live.available && live.orders_all.length ? `<thead><tr><th>Cuándo (UTC)</th><th>Activo</th><th>Lado</th><th class="num">Cant.</th><th class="num">Precio</th><th>Estado</th></tr></thead><tbody>` + live.orders_all.map(o=>`<tr><td class="mono" style="font-size:12px">${esc(o.at)}</td><td class="mono">${esc(o.symbol)}</td><td>${o.side==="buy"?"Compra":"Venta"}</td><td class="num">${o.qty}</td><td class="num">${o.filled_price?fmtUSD2(o.filled_price):"mercado"}</td><td><span class="status ${esc(o.status)}">${st(o.status)}</span></td></tr>`).join("") + "</tbody>" : `<tbody><tr><td class="empty">Sin órdenes todavía.</td></tr></tbody>`;
+  const cy = document.getElementById("cycles");
+  cy.innerHTML = D.cycles.length ? `<thead><tr><th>Ciclo (UTC)</th><th class="num">Capital</th><th class="num">Pos.</th><th class="num">Compras</th><th class="num">Ventas</th><th>Nota</th></tr></thead><tbody>` + [...D.cycles].reverse().map(c=>`<tr><td class="mono" style="font-size:12px">${esc(c.at)}</td><td class="num">${fmtUSD(c.equity)}</td><td class="num">${c.positions}</td><td class="num">${c.buys||""}</td><td class="num">${c.sells||""}</td><td style="color:var(--ink-2);font-size:12.5px">${esc(c.note)}${c.errors?` · ${c.errors} error(es)`:""}</td></tr>`).join("") + "</tbody>" : `<tbody><tr><td class="empty">Sin ciclos registrados.</td></tr></tbody>`;
 })();
 
 // --- Per-symbol bars + trades ---
