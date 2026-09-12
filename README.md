@@ -154,8 +154,8 @@ python scripts/dashboard.py            # con cuenta (requiere claves en .env)
 python scripts/dashboard.py --no-live  # solo backtests
 ```
 
-Hay una copia estática en `docs/dashboard.html`; activando GitHub Pages sobre la carpeta `docs/`
-queda publicada en una URL. El workflow de Alpaca la regenera en cada ciclo y la adjunta como
+Hay una copia estática en `docs/index.html`, publicada con GitHub Pages en
+<https://richardbrother-cmyk.github.io/Trading/>. El workflow de Alpaca la regenera en cada ciclo y la adjunta como
 artefacto de la ejecución.
 
 ## Estructura de estado
