@@ -8,6 +8,8 @@ from dataclasses import dataclass, field
 from dotenv import load_dotenv
 
 PAPER_URL = "https://paper-api.alpaca.markets"
+# Acciones/ETFs de indice + ETFs de metales con respaldo fisico (replican el precio contado)
+DEFAULT_SYMBOLS = ["SPY", "QQQ", "AAPL", "MSFT", "NVDA", "GLD", "SLV", "PPLT", "PALL"]
 
 
 class ConfigError(ValueError):
@@ -23,15 +25,15 @@ def _env(name: str, default: str) -> str:
 class Settings:
     broker: str = "sim"
     data_provider: str = "yahoo"
-    symbols: list[str] = field(default_factory=lambda: ["SPY", "QQQ", "AAPL", "MSFT", "NVDA"])
+    symbols: list[str] = field(default_factory=lambda: DEFAULT_SYMBOLS.copy())
     fast_sma: int = 20
     slow_sma: int = 50
     rsi_period: int = 14
     rsi_max_entry: float = 70.0
     initial_cash: float = 100_000.0
     risk_per_trade: float = 0.02
-    max_positions: int = 5
-    max_position_pct: float = 0.25
+    max_positions: int = 8
+    max_position_pct: float = 0.15
     max_daily_loss_pct: float = 0.03
     stop_loss_pct: float = 0.05
     state_dir: str = "state"
@@ -42,7 +44,7 @@ class Settings:
     @classmethod
     def from_env(cls, dotenv_path: str | None = None) -> "Settings":
         load_dotenv(dotenv_path, override=False)
-        symbols = [s.strip().upper() for s in _env("SYMBOLS", "SPY,QQQ,AAPL,MSFT,NVDA").split(",") if s.strip()]
+        symbols = [s.strip().upper() for s in _env("SYMBOLS", ",".join(DEFAULT_SYMBOLS)).split(",") if s.strip()]
         settings = cls(
             broker=_env("BROKER", "sim").lower(),
             data_provider=_env("DATA_PROVIDER", "yahoo").lower(),
@@ -53,8 +55,8 @@ class Settings:
             rsi_max_entry=float(_env("RSI_MAX_ENTRY", "70")),
             initial_cash=float(_env("INITIAL_CASH", "100000")),
             risk_per_trade=float(_env("RISK_PER_TRADE", "0.02")),
-            max_positions=int(_env("MAX_POSITIONS", "5")),
-            max_position_pct=float(_env("MAX_POSITION_PCT", "0.25")),
+            max_positions=int(_env("MAX_POSITIONS", "8")),
+            max_position_pct=float(_env("MAX_POSITION_PCT", "0.15")),
             max_daily_loss_pct=float(_env("MAX_DAILY_LOSS_PCT", "0.03")),
             stop_loss_pct=float(_env("STOP_LOSS_PCT", "0.05")),
             state_dir=_env("STATE_DIR", "state"),
