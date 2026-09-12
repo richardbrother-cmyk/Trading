@@ -41,7 +41,7 @@ def run_cycle(settings: Settings, broker: Broker, provider: DataProvider, dry_ru
     """Ejecuta un ciclo completo y devuelve un resumen serializable."""
     strategy = StrategyParams(settings.fast_sma, settings.slow_sma, settings.rsi_period, settings.rsi_max_entry)
     risk = RiskParams(settings.risk_per_trade, settings.max_positions, settings.max_position_pct,
-                      settings.max_daily_loss_pct, settings.stop_loss_pct)
+                      settings.max_daily_loss_pct, settings.stop_loss_pct, settings.exposure_leverage)
     log_path = _log_path(settings.state_dir)
     ts = datetime.now(timezone.utc).isoformat(timespec="seconds")
 
@@ -81,7 +81,8 @@ def run_cycle(settings: Settings, broker: Broker, provider: DataProvider, dry_ru
             if open_slots <= 0:
                 summary["skipped"].append(f"{symbol}: sin huecos libres (max {risk.max_positions})")
                 continue
-            qty = position_size(account.equity, account.cash, price, risk)
+            step = broker.qty_step(symbol) if hasattr(broker, "qty_step") else 1.0
+            qty = position_size(account.equity, account.cash, price, risk, step=step)
             if qty <= 0:
                 summary["skipped"].append(f"{symbol}: tamano de posicion 0")
                 continue

@@ -172,4 +172,13 @@ class AlpacaBroker:
 def build_broker(settings) -> Broker:
     if settings.broker == "alpaca":
         return AlpacaBroker(settings.alpaca_api_key, settings.alpaca_secret_key, settings.alpaca_base_url)
+    if settings.broker == "ctrader":
+        from .ctrader import CTraderBroker, CTraderSession
+        from .ctrader_auth import load_access_token
+
+        token = load_access_token(os.path.join(settings.state_dir, "ctrader_tokens.json"), settings.ctrader_client_id,
+                                  settings.ctrader_client_secret, settings.ctrader_access_token, settings.ctrader_refresh_token)
+        session = CTraderSession(settings.ctrader_client_id, settings.ctrader_client_secret, token,
+                                 settings.ctrader_account_login or None, demo=settings.ctrader_demo)
+        return CTraderBroker(session, settings.symbols, stop_loss_pct=settings.stop_loss_pct)
     return SimulatedBroker(initial_cash=settings.initial_cash, state_dir=settings.state_dir)

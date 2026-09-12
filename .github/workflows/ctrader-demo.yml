@@ -1,0 +1,49 @@
+name: ctrader-demo
+
+# Ciclo del bot contra la cuenta DEMO de cTrader (Fusion Markets), cada hora de domingo noche a viernes.
+# Secrets necesarios: CTRADER_CLIENT_ID, CTRADER_CLIENT_SECRET, CTRADER_REFRESH_TOKEN, CTRADER_ACCOUNT_LOGIN.
+# Los servidores de cTrader usan el puerto 5035, alcanzable desde los runners de GitHub.
+on:
+  schedule:
+    - cron: "5 * * * 0-5"
+  workflow_dispatch:
+    inputs:
+      check_only:
+        description: "Solo verificar conexion y simbolos (sin operar)"
+        type: boolean
+        default: false
+
+jobs:
+  cycle:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    if: ${{ vars.CTRADER_ENABLED == 'true' || github.event_name == 'workflow_dispatch' }}
+    env:
+      BROKER: ctrader
+      DATA_PROVIDER: ctrader
+      CTRADER_DEMO: "true"
+      CTRADER_CLIENT_ID: ${{ secrets.CTRADER_CLIENT_ID }}
+      CTRADER_CLIENT_SECRET: ${{ secrets.CTRADER_CLIENT_SECRET }}
+      CTRADER_REFRESH_TOKEN: ${{ secrets.CTRADER_REFRESH_TOKEN }}
+      CTRADER_ACCOUNT_LOGIN: ${{ secrets.CTRADER_ACCOUNT_LOGIN }}
+      SYMBOLS: ${{ vars.CTRADER_SYMBOLS || 'XAUUSD,XAGUSD' }}
+      EXPOSURE_LEVERAGE: ${{ vars.EXPOSURE_LEVERAGE || '1' }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install -r requirements.txt
+      - name: Tests
+        run: pytest -q
+      - name: Verificar conexion y simbolos
+        run: python -m autotrader.cli --env /dev/null ctrader-check
+      - name: Ciclo de trading (demo)
+        if: ${{ !inputs.check_only }}
+        run: python -m autotrader.cli --env /dev/null run
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: ctrader-log-${{ github.run_id }}
+          path: state/run_log.jsonl
+          if-no-files-found: ignore

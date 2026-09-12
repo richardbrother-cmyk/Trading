@@ -16,9 +16,12 @@ descarga datos reales, calcula una señal, gestiona el riesgo y envía órdenes 
 | `autotrader/risk.py` | Tamaño de posición por riesgo, máximo de posiciones, stop loss y límite de pérdida diaria. |
 | `autotrader/backtest.py` | Backtester multi-símbolo con ejecución en la apertura siguiente, slippage y stops intradía. |
 | `autotrader/broker.py` | `SimulatedBroker` (cuenta local persistida en `state/`) y `AlpacaBroker` (solo paper). |
+| `autotrader/ctrader.py` | `CTraderBroker` sobre la Open API de Spotware (solo cuentas demo), con barras diarias del propio broker. |
+| `autotrader/ctrader_auth.py` | Tokens OAuth de cTrader: intercambio, renovación y carga. |
 | `autotrader/bot.py` | Un ciclo: datos → decisión → orden → registro en `state/run_log.jsonl`. |
 | `autotrader/cli.py` | Comandos `backtest`, `run`, `status`. |
-| `.github/workflows/paper-trading.yml` | Ejecuta un ciclo cada hora en horario de mercado desde GitHub Actions. |
+| `.github/workflows/paper-trading.yml` | Ejecuta un ciclo cada hora en horario de mercado desde GitHub Actions (Alpaca). |
+| `.github/workflows/ctrader-demo.yml` | Igual, contra la cuenta demo de cTrader. |
 
 ## Instalación
 
@@ -99,6 +102,42 @@ Alpaca no ofrece futuros ni contado de materias primas; la exposición se obtien
 Dos años con un mercado alcista en metales favorecen mucho al segundo grupo; no hay que
 leerlo como rendimiento esperado. La iteración (otros parámetros, otras señales, otros
 universos) se hace con `backtest` antes de cambiar lo que opera en `run`.
+
+## cTrader (Fusion Markets y otros brokers de CFDs)
+
+El mismo bot puede operar una cuenta **demo** de cTrader a través de la Open API de Spotware.
+Sirve para brokers como Fusion Markets, que ofrecen oro, plata, petróleo e índices como CFD
+con apalancamiento alto. El bot rechaza cuentas reales (`CTRADER_DEMO` debe ser `true`).
+
+Pasos:
+
+1. Crea un cTrader ID en id.ctrader.com y vincula tu cuenta demo del broker.
+2. Registra una app en openapi.ctrader.com. Queda en estado *Submitted* hasta que Spotware la
+   activa (24 a 48 h). Copia el Client ID y el Client Secret al `.env`.
+3. Autoriza y guarda los tokens (el código de autorización caduca en 60 segundos):
+   ```bash
+   python scripts/ctrader_token.py --url            # abre el enlace y autoriza la cuenta demo
+   python scripts/ctrader_token.py "<URL con code=...>"
+   ```
+4. Verifica conexión, saldo y símbolos disponibles, y luego opera:
+   ```bash
+   python -m autotrader.cli --broker ctrader --provider ctrader --symbols XAUUSD,XAGUSD ctrader-check
+   python -m autotrader.cli --broker ctrader --provider ctrader --symbols XAUUSD,XAGUSD run
+   ```
+
+Los servidores de trading de cTrader usan el puerto 5035, no HTTPS, así que hace falta una red
+sin restricciones: tu ordenador, un VPS o los runners de GitHub Actions. El workflow
+`ctrader-demo.yml` corre un ciclo cada hora con los secrets `CTRADER_CLIENT_ID`,
+`CTRADER_CLIENT_SECRET`, `CTRADER_REFRESH_TOKEN` y `CTRADER_ACCOUNT_LOGIN`, y se activa con la
+variable de repositorio `CTRADER_ENABLED=true`.
+
+Diferencias con acciones:
+
+- Los tamaños son fraccionarios y se redondean al paso mínimo del símbolo (p.ej. 0.01 lotes).
+- El stop loss se envía al servidor con la orden, además de la vigilancia del bot.
+- `EXPOSURE_LEVERAGE` permite que la exposición nominal supere el equity (p.ej. 3 = hasta 3x),
+  pero el riesgo por operación sigue siendo `RISK_PER_TRADE` del equity: el apalancamiento
+  amplía el tamaño, no la pérdida máxima aceptada por operación.
 
 ## Estructura de estado
 

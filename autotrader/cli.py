@@ -32,9 +32,15 @@ def _settings(args) -> Settings:
     return s
 
 
+def _provider(s: Settings, broker=None, days: int = 500) -> DataProvider:
+    bars_fn = getattr(broker, "bars", None) if s.data_provider == "ctrader" else None
+    return DataProvider(s.data_provider, s.alpaca_api_key, s.alpaca_secret_key, days=days, bars_fn=bars_fn)
+
+
 def cmd_backtest(args) -> int:
     s = _settings(args)
-    provider = DataProvider(s.data_provider, s.alpaca_api_key, s.alpaca_secret_key, days=args.days)
+    broker = build_broker(s) if s.data_provider == "ctrader" else None
+    provider = _provider(s, broker, days=args.days)
     data = provider.bars_many(s.symbols)
     if not data:
         print("Sin datos; abortando", file=sys.stderr)
@@ -42,7 +48,7 @@ def cmd_backtest(args) -> int:
     result = run_backtest(
         data,
         StrategyParams(s.fast_sma, s.slow_sma, s.rsi_period, s.rsi_max_entry),
-        RiskParams(s.risk_per_trade, s.max_positions, s.max_position_pct, s.max_daily_loss_pct, s.stop_loss_pct),
+        RiskParams(s.risk_per_trade, s.max_positions, s.max_position_pct, s.max_daily_loss_pct, s.stop_loss_pct, s.exposure_leverage),
         initial_cash=s.initial_cash,
     )
     m = result.metrics()
@@ -68,7 +74,7 @@ def cmd_run(args) -> int:
 
     s = _settings(args)
     broker = build_broker(s)
-    provider = DataProvider(s.data_provider, s.alpaca_api_key, s.alpaca_secret_key)
+    provider = _provider(s, broker)
     print(f"Broker: {broker.name} | datos: {s.data_provider} | simbolos: {','.join(s.symbols)} | dry_run={args.dry_run}")
     while True:
         summary = run_cycle(s, broker, provider, dry_run=args.dry_run, force=args.force)
@@ -95,12 +101,42 @@ def cmd_status(args) -> int:
     return 0
 
 
+def cmd_ctrader_check(args) -> int:
+    """Verifica autorizacion, cuenta y simbolos de cTrader sin operar."""
+    s = _settings(args)
+    s.broker = "ctrader"
+    s.validate()
+    from .ctrader import CTraderSession
+    from .ctrader_auth import load_access_token
+
+    token = load_access_token(os.path.join(s.state_dir, "ctrader_tokens.json"), s.ctrader_client_id,
+                              s.ctrader_client_secret, s.ctrader_access_token, s.ctrader_refresh_token)
+    session = CTraderSession(s.ctrader_client_id, s.ctrader_client_secret, token, s.ctrader_account_login or None, demo=s.ctrader_demo)
+    balance, digits, leverage = session.trader()
+    print(f"Cuenta {s.ctrader_account_login} ({'demo' if s.ctrader_demo else 'live'}) id={session.account_id}")
+    print(f"  balance: {balance:,.2f}   apalancamiento: 1:{leverage:.0f}   PnL abierto: {session.unrealized_pnl():,.2f}")
+    names = session.all_symbol_names()
+    print(f"  simbolos disponibles: {len(names)}")
+    for key in ["XAU", "XAG", "XPT", "XPD", "XTI", "XBR", "BRENT", "WTI", "OIL", "NGAS", "US500", "SPX", "NAS", "US30", "COPPER"]:
+        hits = [n for n in names if key in n.upper()]
+        if hits:
+            print(f"    {key:>6}: {', '.join(hits[:8])}")
+    try:
+        info = session.load_symbols(s.symbols)
+        for name, i in info.items():
+            print(f"  {name:>8}: id={i.symbol_id} digits={i.digits} lote={i.lot_size / 100:g} min={i.min_volume / 100:g} paso={i.step_volume / 100:g}")
+    except ValueError as exc:
+        print(f"  [aviso] {exc}")
+    session.close()
+    return 0
+
+
 def main(argv: list[str] | None = None) -> int:
     p = argparse.ArgumentParser(prog="autotrader", description="Bot de trading automatico (paper trading)")
     p.add_argument("--env", default=".env", help="ruta al archivo .env")
     p.add_argument("--symbols", help="lista separada por comas, sobreescribe SYMBOLS")
-    p.add_argument("--provider", choices=["yahoo", "alpaca", "synthetic"], help="sobreescribe DATA_PROVIDER")
-    p.add_argument("--broker", choices=["sim", "alpaca"], help="sobreescribe BROKER")
+    p.add_argument("--provider", choices=["yahoo", "alpaca", "synthetic", "ctrader"], help="sobreescribe DATA_PROVIDER")
+    p.add_argument("--broker", choices=["sim", "alpaca", "ctrader"], help="sobreescribe BROKER")
     sub = p.add_subparsers(dest="cmd", required=True)
 
     b = sub.add_parser("backtest", help="simula la estrategia sobre historico")
@@ -117,6 +153,9 @@ def main(argv: list[str] | None = None) -> int:
 
     st = sub.add_parser("status", help="muestra cuenta y posiciones")
     st.set_defaults(func=cmd_status)
+
+    cc = sub.add_parser("ctrader-check", help="verifica autorizacion, cuenta y simbolos de cTrader")
+    cc.set_defaults(func=cmd_ctrader_check)
 
     args = p.parse_args(argv)
     return args.func(args)

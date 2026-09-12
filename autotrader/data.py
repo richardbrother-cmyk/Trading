@@ -103,14 +103,19 @@ def alpaca_bars(symbol: str, api_key: str, secret_key: str, days: int = 500, ses
 class DataProvider:
     """Fachada que elige el proveedor segun la configuracion."""
 
-    def __init__(self, provider: str, api_key: str = "", secret_key: str = "", days: int = 500):
+    def __init__(self, provider: str, api_key: str = "", secret_key: str = "", days: int = 500, bars_fn=None):
         self.provider = provider
         self.api_key = api_key
         self.secret_key = secret_key
         self.days = days
+        self.bars_fn = bars_fn  # p.ej. CTraderBroker.bars
         self.session = requests.Session()
 
     def bars(self, symbol: str) -> pd.DataFrame:
+        if self.provider == "ctrader":
+            if self.bars_fn is None:
+                raise ValueError("DATA_PROVIDER=ctrader requiere un broker cTrader")
+            return _validate(self.bars_fn(symbol), symbol)
         if self.provider == "synthetic":
             return synthetic_bars(symbol, days=self.days)
         if self.provider == "yahoo":
