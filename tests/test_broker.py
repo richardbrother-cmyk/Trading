@@ -42,3 +42,48 @@ def test_settings_defaults(monkeypatch):
         monkeypatch.delenv(k, raising=False)
     s = Settings.from_env(dotenv_path="/nonexistent")
     assert s.broker == "sim" and s.symbols[0] == "SPY"
+
+
+class _FakeResp:
+    def __init__(self, data, status=200):
+        self._data, self.status_code, self.text = data, status, str(data)
+
+    def json(self):
+        return self._data
+
+    def raise_for_status(self):
+        pass
+
+
+class _FakeSession:
+    def __init__(self, open_orders):
+        self.headers = {}
+        self.posted, self.deleted = [], []
+        self.open_orders = open_orders
+
+    def get(self, url, params=None, timeout=None):
+        return _FakeResp(self.open_orders if "/v2/orders" in url else {})
+
+    def post(self, url, json=None, timeout=None):
+        self.posted.append(json)
+        return _FakeResp({"id": "o1", "status": "accepted", **json})
+
+    def delete(self, url, timeout=None):
+        self.deleted.append(url)
+        return _FakeResp({}, 204)
+
+
+def test_alpaca_buy_attaches_oto_stop():
+    sess = _FakeSession([])
+    b = AlpacaBroker("k", "s", session=sess, stop_loss_pct=0.05)
+    b.submit_market_order("GLD", 10, "buy", price_hint=400.0)
+    p = sess.posted[0]
+    assert p["order_class"] == "oto" and p["stop_loss"] == {"stop_price": "380.00"} and p["type"] == "market"
+
+
+def test_alpaca_sell_cancels_open_orders_first():
+    sess = _FakeSession([{"id": "stop1", "symbol": "GLD", "side": "sell", "type": "stop"}])
+    b = AlpacaBroker("k", "s", session=sess, stop_loss_pct=0.05)
+    b.submit_market_order("GLD", 10, "sell", price_hint=390.0)
+    assert sess.deleted == [f"{PAPER_URL}/v2/orders/stop1"]
+    assert "order_class" not in sess.posted[0] and sess.posted[0]["side"] == "sell"

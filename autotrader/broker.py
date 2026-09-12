@@ -130,10 +130,12 @@ class AlpacaBroker:
 
     name = "alpaca-paper"
 
-    def __init__(self, api_key: str, secret_key: str, base_url: str = PAPER_URL, session: requests.Session | None = None):
+    def __init__(self, api_key: str, secret_key: str, base_url: str = PAPER_URL, session: requests.Session | None = None,
+                 stop_loss_pct: float | None = 0.05):
         if base_url.rstrip("/") != PAPER_URL:
             raise ValueError(f"AlpacaBroker solo acepta {PAPER_URL} (paper trading)")
         self.base_url = PAPER_URL
+        self.stop_loss_pct = stop_loss_pct  # None desactiva el stop en el broker
         self.session = session or requests.Session()
         self.session.headers.update({"APCA-API-KEY-ID": api_key, "APCA-API-SECRET-KEY": secret_key})
 
@@ -148,22 +150,48 @@ class AlpacaBroker:
             raise RuntimeError(f"Alpaca {resp.status_code}: {resp.text}")
         return resp.json()
 
+    def _delete(self, path: str):
+        resp = self.session.delete(f"{self.base_url}{path}", timeout=20)
+        if resp.status_code >= 400 and resp.status_code != 404:
+            raise RuntimeError(f"Alpaca {resp.status_code}: {resp.text}")
+        return resp
+
+    def cancel_symbol_orders(self, symbol: str) -> int:
+        """Cancela las ordenes abiertas de un simbolo (p.ej. el stop vinculado antes de vender por senal)."""
+        n = 0
+        for o in self._get("/v2/orders", status="open", symbols=symbol, nested="false"):
+            if o["symbol"] == symbol:
+                self._delete(f"/v2/orders/{o['id']}")
+                n += 1
+        return n
+
     def account(self, prices: dict[str, float] | None = None) -> Account:
         acct = self._get("/v2/account")
         positions = {
             p["symbol"]: Position(p["symbol"], int(float(p["qty"])), float(p["avg_entry_price"]))
             for p in self._get("/v2/positions")
         }
-        pending = {o["symbol"] for o in self._get("/v2/orders", status="open") if o.get("side") == "buy"}
+        pending = {o["symbol"] for o in self._get("/v2/orders", status="open", nested="false") if o.get("side") == "buy"}
         return Account(cash=float(acct["cash"]), equity=float(acct["equity"]), positions=positions, pending_buys=pending)
 
     def is_market_open(self) -> bool:
         return bool(self._get("/v2/clock")["is_open"])
 
     def submit_market_order(self, symbol: str, qty: int, side: str, price_hint: float | None = None) -> dict:
+        """Orden de mercado. Las compras llevan un stop loss vinculado (OTO) que el broker activa al ejecutarse.
+
+        Antes de vender se cancelan las ordenes abiertas del simbolo, porque el stop vinculado
+        retiene las acciones y la venta seria rechazada por cantidad insuficiente.
+        """
         if qty <= 0:
             raise ValueError("qty debe ser > 0")
-        payload = {"symbol": symbol, "qty": str(qty), "side": side.lower(), "type": "market", "time_in_force": "day"}
+        side = side.lower()
+        payload = {"symbol": symbol, "qty": str(qty), "side": side, "type": "market", "time_in_force": "day"}
+        if side == "buy" and self.stop_loss_pct and price_hint:
+            stop_price = round(price_hint * (1 - self.stop_loss_pct), 2)
+            payload.update({"order_class": "oto", "stop_loss": {"stop_price": f"{stop_price:.2f}"}})
+        elif side == "sell":
+            self.cancel_symbol_orders(symbol)
         order = self._post("/v2/orders", payload)
         order["broker"] = self.name
         return order
@@ -171,7 +199,8 @@ class AlpacaBroker:
 
 def build_broker(settings) -> Broker:
     if settings.broker == "alpaca":
-        return AlpacaBroker(settings.alpaca_api_key, settings.alpaca_secret_key, settings.alpaca_base_url)
+        return AlpacaBroker(settings.alpaca_api_key, settings.alpaca_secret_key, settings.alpaca_base_url,
+                            stop_loss_pct=settings.stop_loss_pct)
     if settings.broker == "ctrader":
         from .ctrader import CTraderBroker, CTraderSession
         from .ctrader_auth import load_access_token

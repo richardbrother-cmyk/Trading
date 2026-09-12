@@ -52,7 +52,15 @@ def collect(no_live: bool) -> dict:
         b = AlpacaBroker(s.alpaca_api_key, s.alpaca_secret_key)
         acct = b._get("/v2/account")
         clock = b._get("/v2/clock")
-        orders = b._get("/v2/orders", status="open")
+        orders = b._get("/v2/orders", status="open", nested="true")
+        stops = {}
+        for o in orders:
+            for leg in o.get("legs") or []:
+                if leg.get("type") == "stop" and leg.get("stop_price"):
+                    stops[o["symbol"]] = float(leg["stop_price"])
+            if o.get("type") == "stop" and o.get("side") == "sell" and o.get("stop_price"):
+                stops[o["symbol"]] = float(o["stop_price"])
+        orders = [o for o in orders if o.get("type") != "stop"]
         positions = b._get("/v2/positions")
         hist = b._get("/v2/account/portfolio/history", period="3M", timeframe="1D")
         history = [[datetime.fromtimestamp(t, tz=timezone.utc).strftime("%Y-%m-%d"), round(float(e), 2)]
@@ -61,13 +69,15 @@ def collect(no_live: bool) -> dict:
         live = {
             "history": history,
             "orders_all": [{"symbol": o["symbol"], "side": o["side"], "qty": int(float(o["qty"])), "type": o["type"],
+                            "stop_price": float(o["stop_price"]) if o.get("stop_price") else None,
                             "tif": o["time_in_force"], "status": o["status"],
                             "filled_price": float(o["filled_avg_price"]) if o.get("filled_avg_price") else None,
                             "at": (o.get("filled_at") or o.get("canceled_at") or o["submitted_at"])[:16].replace("T", " ")} for o in all_orders],
             "available": True, "broker": "Alpaca paper", "equity": float(acct["equity"]), "cash": float(acct["cash"]),
             "buying_power": float(acct["buying_power"]), "is_open": clock["is_open"], "next_open": clock["next_open"],
             "orders": [{"symbol": o["symbol"], "side": o["side"], "qty": int(float(o["qty"])), "status": o["status"],
-                        "submitted_at": o["submitted_at"][:16].replace("T", " ")} for o in orders],
+                        "stop": stops.get(o["symbol"]), "submitted_at": o["submitted_at"][:16].replace("T", " ")} for o in orders],
+            "stops": stops,
             "positions": [{"symbol": p["symbol"], "qty": int(float(p["qty"])), "avg": float(p["avg_entry_price"]),
                            "price": float(p["current_price"]), "pnl": float(p["unrealized_pl"])} for p in positions],
         }

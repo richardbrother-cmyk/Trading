@@ -77,6 +77,8 @@ y subirá el registro como artefacto.
 
 - **Entrada**: SMA rápida > SMA lenta y RSI < 70.
 - **Salida**: SMA rápida < SMA lenta, o precio ≤ precio de entrada × (1 − stop loss).
+  En Alpaca el stop viaja con la compra como orden vinculada (clase OTO), así que el broker lo
+  ejecuta aunque el bot no esté mirando; antes de vender por señal, el bot cancela ese stop.
 - **Tamaño**: `equity × riesgo_por_operación / (precio × stop_loss)`, acotado al 15 % del
   equity por posición y al efectivo disponible. Máximo 8 posiciones. El bot nunca usa
   margen: dimensiona sobre efectivo y equity, no sobre el *buying power* del broker.
