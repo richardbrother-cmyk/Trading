@@ -1,0 +1,36 @@
+name: paper-trading
+
+# Ejecuta un ciclo del bot en horario de mercado (lunes-viernes, 14:30-21:00 UTC ~ 9:30-16:00 ET).
+# Requiere los secrets ALPACA_API_KEY y ALPACA_SECRET_KEY de una cuenta PAPER.
+# Si no existen, el ciclo corre con el broker simulado y no persiste estado entre ejecuciones.
+on:
+  schedule:
+    - cron: "35 14-20 * * 1-5"
+  workflow_dispatch:
+
+jobs:
+  cycle:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install -r requirements.txt
+      - name: Tests
+        run: pytest -q
+      - name: Ciclo de trading (paper)
+        env:
+          ALPACA_API_KEY: ${{ secrets.ALPACA_API_KEY }}
+          ALPACA_SECRET_KEY: ${{ secrets.ALPACA_SECRET_KEY }}
+          ALPACA_BASE_URL: https://paper-api.alpaca.markets
+          BROKER: ${{ secrets.ALPACA_API_KEY != '' && 'alpaca' || 'sim' }}
+          DATA_PROVIDER: yahoo
+        run: python -m autotrader.cli --env /dev/null run
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: run-log-${{ github.run_id }}
+          path: state/
+          if-no-files-found: ignore
