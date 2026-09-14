@@ -16,11 +16,29 @@ on:
         type: boolean
         default: false
 
+env:
+  # Interruptor de los ciclos programados. Los lanzamientos manuales (workflow_dispatch) siempre corren.
+  SCHEDULE_ENABLED: "true"
+
 jobs:
+  gate:
+    runs-on: ubuntu-latest
+    outputs:
+      enabled: ${{ steps.check.outputs.enabled }}
+    steps:
+      - id: check
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ] || [ "$SCHEDULE_ENABLED" = "true" ] || [ "${{ vars.CTRADER_ENABLED }}" = "true" ]; then
+            echo "enabled=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "enabled=false" >> "$GITHUB_OUTPUT"
+          fi
+
   cycle:
+    needs: gate
+    if: ${{ needs.gate.outputs.enabled == 'true' }}
     runs-on: ubuntu-latest
     timeout-minutes: 10
-    if: ${{ vars.CTRADER_ENABLED == 'true' || github.event_name == 'workflow_dispatch' }}
     env:
       BROKER: ctrader
       DATA_PROVIDER: ctrader
@@ -31,7 +49,8 @@ jobs:
       CTRADER_ACCESS_TOKEN: ${{ secrets.CTRADER_ACCESS_TOKEN }}
       # Parametros para CFDs: stop mas corto que en acciones y exposicion nominal hasta 5x el equity
       # (el riesgo por operacion sigue siendo el 2 % del equity; el apalancamiento solo amplia el tamano).
-      SYMBOLS: ${{ vars.CTRADER_SYMBOLS || 'XAUUSD,XAGUSD,XPTUSD,XPDUSD,XTIUSD,XBRUSD,US500,NAS100' }}
+      # Metales, energia, agricolas (cafe, algodon, trigo, maiz, azucar) e indices, todo como CFD en Fusion Markets
+      SYMBOLS: ${{ vars.CTRADER_SYMBOLS || 'XAUUSD,XAGUSD,XPTUSD,XTIUSD,XBRUSD,XNGUSD,COFARA,COTTON,WHEAT,CORN,SUGAR,US500,NAS100' }}
       EXPOSURE_LEVERAGE: ${{ vars.EXPOSURE_LEVERAGE || '5' }}
       STOP_LOSS_PCT: ${{ vars.CTRADER_STOP_LOSS_PCT || '0.03' }}
       MAX_POSITIONS: "8"
