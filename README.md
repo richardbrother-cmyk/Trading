@@ -154,8 +154,13 @@ Pasos:
 Los servidores de trading de cTrader usan el puerto 5035, no HTTPS, así que hace falta una red
 sin restricciones: tu ordenador, un VPS o los runners de GitHub Actions. El workflow
 `ctrader-demo.yml` corre un ciclo cada hora con los secrets `CTRADER_CLIENT_ID`,
-`CTRADER_CLIENT_SECRET`, `CTRADER_REFRESH_TOKEN` y `CTRADER_ACCOUNT_LOGIN`, y se activa con la
+`CTRADER_CLIENT_SECRET`, `CTRADER_ACCOUNT_LOGIN` y `CTRADER_ACCESS_TOKEN`, y se activa con la
 variable de repositorio `CTRADER_ENABLED=true`.
+
+El access token dura 30 días. cTrader rota el refresh token en cada renovación e invalida el
+anterior, así que el workflow no renueva nada: cada mes se ejecuta `scripts/ctrader_token.py
+--refresh` donde esté guardado `state/ctrader_tokens.json` y se actualiza el secret
+`CTRADER_ACCESS_TOKEN` con el nuevo valor. Los tokens nunca se suben al repositorio.
 
 Diferencias con acciones:
 
