@@ -91,6 +91,21 @@ def collect(no_live: bool) -> dict:
             rec = json.loads(ln)
             if not rec.get("broker", "").startswith("alpaca"):
                 continue
+            if rec.get("kind") == "preopen":
+                if rec.get("skipped"):
+                    note = f"Validación previa a la apertura: {rec['skipped']}"
+                else:
+                    parts = []
+                    if rec["cancelled"]:
+                        parts.append("canceladas " + ", ".join(rec["cancelled"]))
+                    if rec["replaced"]:
+                        parts.append("recolocadas " + ", ".join(rec["replaced"]))
+                    if rec["kept"]:
+                        parts.append("mantenidas " + ", ".join(rec["kept"]))
+                    note = "Validación previa a la apertura: " + "; ".join(parts)
+                cycles.append({"at": rec["timestamp"][:16].replace("T", " "), "equity": None, "positions": "", "buys": "", "sells": "",
+                               "errors": 0, "note": note, "kind": "preopen"})
+                continue
             last_run = rec
             cycles.append({"at": rec["timestamp"][:16].replace("T", " "), "equity": rec["equity"], "positions": len(rec["positions"]),
                            "buys": sum(1 for o in rec["orders"] if o["side"] == "buy" and not str(o["status"]).startswith("error")),
