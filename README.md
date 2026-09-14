@@ -162,6 +162,12 @@ anterior, así que el workflow no renueva nada: cada mes se ejecuta `scripts/ctr
 --refresh` donde esté guardado `state/ctrader_tokens.json` y se actualiza el secret
 `CTRADER_ACCESS_TOKEN` con el nuevo valor. Los tokens nunca se suben al repositorio.
 
+Configuración activa en la demo de Fusion Markets (fijada en el propio workflow): universo
+XAUUSD, XAGUSD, XPTUSD, XTIUSD, XBRUSD, XNGUSD, COFARA (café), COTTON (algodón), WHEAT, CORN,
+SUGAR, US500 y NAS100; stop del 3 %; hasta 8 posiciones del 12 % del equity con exposición
+hasta 5x; ciclo cada hora de domingo noche a viernes. El interruptor `SCHEDULE_ENABLED` del
+workflow para los ciclos programados; los lanzamientos manuales siempre corren.
+
 Diferencias con acciones:
 
 - Los tamaños son fraccionarios y se redondean al paso mínimo del símbolo (p.ej. 0.01 lotes).
