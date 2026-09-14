@@ -29,8 +29,13 @@ jobs:
       CTRADER_CLIENT_SECRET: ${{ secrets.CTRADER_CLIENT_SECRET }}
       CTRADER_ACCOUNT_LOGIN: ${{ secrets.CTRADER_ACCOUNT_LOGIN }}
       CTRADER_ACCESS_TOKEN: ${{ secrets.CTRADER_ACCESS_TOKEN }}
-      SYMBOLS: ${{ vars.CTRADER_SYMBOLS || 'XAUUSD,XAGUSD' }}
-      EXPOSURE_LEVERAGE: ${{ vars.EXPOSURE_LEVERAGE || '1' }}
+      # Parametros para CFDs: stop mas corto que en acciones y exposicion nominal hasta 5x el equity
+      # (el riesgo por operacion sigue siendo el 2 % del equity; el apalancamiento solo amplia el tamano).
+      SYMBOLS: ${{ vars.CTRADER_SYMBOLS || 'XAUUSD,XAGUSD,XPTUSD,XPDUSD,XTIUSD,XBRUSD,US500,NAS100' }}
+      EXPOSURE_LEVERAGE: ${{ vars.EXPOSURE_LEVERAGE || '5' }}
+      STOP_LOSS_PCT: ${{ vars.CTRADER_STOP_LOSS_PCT || '0.03' }}
+      MAX_POSITIONS: "8"
+      MAX_POSITION_PCT: "0.12"
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5

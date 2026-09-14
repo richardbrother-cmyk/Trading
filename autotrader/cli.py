@@ -12,7 +12,7 @@ from .backtest import run_backtest
 from .broker import build_broker
 from .config import ConfigError, Settings
 from .data import DataProvider
-from .risk import RiskParams
+from .risk import RiskParams, position_size
 from .strategy import StrategyParams
 
 
@@ -127,15 +127,21 @@ def cmd_ctrader_check(args) -> int:
     print(f"Cuenta {s.ctrader_account_login} ({'demo' if s.ctrader_demo else 'live'}) id={session.account_id}")
     print(f"  balance: {balance:,.2f}   apalancamiento: 1:{leverage:.0f}   PnL abierto: {session.unrealized_pnl():,.2f}")
     names = session.all_symbol_names()
-    print(f"  simbolos disponibles: {len(names)}")
-    for key in ["XAU", "XAG", "XPT", "XPD", "XTI", "XBR", "BRENT", "WTI", "OIL", "NGAS", "US500", "SPX", "NAS", "US30", "COPPER"]:
-        hits = [n for n in names if key in n.upper()]
-        if hits:
-            print(f"    {key:>6}: {', '.join(hits[:8])}")
+    print(f"  simbolos disponibles ({len(names)}): {', '.join(names)}")
+    risk = RiskParams(s.risk_per_trade, s.max_positions, s.max_position_pct, s.max_daily_loss_pct, s.stop_loss_pct, s.exposure_leverage)
+    print(f"  parametros: riesgo {s.risk_per_trade:.1%} por operacion, stop {s.stop_loss_pct:.1%}, tope {s.max_position_pct:.0%} x {s.exposure_leverage:g}x, max {s.max_positions} posiciones")
     try:
         info = session.load_symbols(s.symbols)
+        equity = balance + session.unrealized_pnl()
         for name, i in info.items():
-            print(f"  {name:>8}: id={i.symbol_id} digits={i.digits} lote={i.lot_size / 100:g} min={i.min_volume / 100:g} paso={i.step_volume / 100:g}")
+            try:
+                px = float(session.daily_bars(name, days=10)["close"].iloc[-1])
+            except Exception as exc:  # noqa: BLE001
+                px = float("nan")
+            step = i.step_volume / 100
+            qty = position_size(equity, equity, px, risk, step=step) if px == px else 0
+            ok = "OK" if qty >= i.min_volume / 100 else "POR DEBAJO DEL MINIMO"
+            print(f"  {name:>8}: precio={px:.2f} lote={i.lot_size / 100:g} min={i.min_volume / 100:g} paso={step:g} -> compraria {qty:g} uds (~{qty * px:,.0f} USD) {ok}")
     except ValueError as exc:
         print(f"  [aviso] {exc}")
     session.close()
