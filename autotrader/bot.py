@@ -116,9 +116,10 @@ def run_cycle(settings: Settings, broker: Broker, provider: DataProvider, dry_ru
                                       "status": order.get("status"), "id": order.get("id")})
             if side == "buy":
                 open_slots -= 1
-                account.cash -= qty * price
+                # Con apalancamiento de exposicion (CFDs) el efectivo "consumido" es el nominal / apalancamiento
+                account.cash -= qty * price / risk.exposure_leverage
             else:
-                account.cash += qty * price
+                account.cash += qty * price / risk.exposure_leverage
         except Exception as exc:  # noqa: BLE001
             summary["orders"].append({"symbol": symbol, "side": side, "qty": qty, "price": price, "status": f"error: {exc}"})
 

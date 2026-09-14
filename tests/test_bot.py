@@ -85,3 +85,50 @@ def test_gap_filter_uses_last_completed_close(tmp_path):
     summary = run_cycle(s, broker, Prov())
     assert broker.orders == []
     assert any("cae" in x for x in summary["skipped"])
+
+
+def test_exposure_leverage_allows_several_cfd_positions(tmp_path):
+    """Con 5x de exposicion y 10k de equity caben varias posiciones de ~5k nominales."""
+    from autotrader.broker import Account
+
+    class FakeBroker:
+        name = "fake"
+
+        def __init__(self):
+            self.orders = []
+
+        def account(self, prices=None):
+            return Account(cash=10_000, equity=10_000)
+
+        def is_market_open(self):
+            return True
+
+        def qty_step(self, symbol):
+            return 1.0
+
+        def submit_market_order(self, symbol, qty, side, price_hint=None):
+            self.orders.append((symbol, qty))
+            return {"id": "x", "status": "order_accepted"}
+
+    syms = ["A", "B", "C", "D", "E", "F"]
+    s = Settings(broker="sim", data_provider="synthetic", symbols=syms, fast_sma=10, slow_sma=30, rsi_max_entry=101.0,
+                 max_positions=8, max_position_pct=0.12, exposure_leverage=5.0, stop_loss_pct=0.03, state_dir=str(tmp_path))
+    broker = FakeBroker()
+
+    class Prov:
+        def bars_many(self, symbols):
+            from autotrader.data import synthetic_bars
+            import numpy as np, pandas as pd
+            out = {}
+            for sym in symbols:
+                n = 200
+                close = np.linspace(4000, 4400, n)
+                idx = pd.bdate_range(end=pd.Timestamp.now(tz="UTC").normalize().tz_localize(None), periods=n)
+                out[sym] = pd.DataFrame({"open": close, "high": close, "low": close, "close": close, "volume": 1e6}, index=idx)
+            return out
+
+        def quote(self, symbol):
+            return None
+
+    summary = run_cycle(s, broker, Prov())
+    assert len(broker.orders) >= 5, summary["skipped"]
