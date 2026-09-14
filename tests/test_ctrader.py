@@ -1,7 +1,7 @@
 from datetime import datetime, timezone
 from types import SimpleNamespace
 
-from autotrader.ctrader import cfd_market_open, decode_trendbars, money, round_volume
+from autotrader.ctrader import cfd_market_open, decode_trendbars, money, relative_stop, round_volume
 from autotrader.risk import RiskParams, position_size
 
 
@@ -40,3 +40,15 @@ def test_position_size_with_leverage_keeps_risk_constant():
     assert position_size(10_000, 10_000, 4000, p1, step=0.01) == 0.37
     assert position_size(10_000, 10_000, 4000, p3, step=0.01) == 1.0  # el riesgo (2 %) sigue mandando
     assert position_size(10_000, 10_000, 100, p1) == 15  # acciones enteras por defecto
+
+
+def test_relative_stop_matches_symbol_precision():
+    # XAUUSD (2 decimales): el stop debe ser multiplo de 0.01 -> multiplo de 1000 en 1e-5
+    assert relative_stop(4348.67, 0.03, 2) % 1000 == 0
+    assert abs(relative_stop(4348.67, 0.03, 2) / 100000 - 130.46) < 1e-6
+    # XAGUSD (3 decimales): multiplo de 100
+    assert relative_stop(64.477, 0.03, 3) % 100 == 0
+    # indices con 2 decimales y precio grande
+    assert relative_stop(29369.88, 0.03, 2) % 1000 == 0
+    # nunca cero
+    assert relative_stop(0.0001, 0.03, 5) == 1

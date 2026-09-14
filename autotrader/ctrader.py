@@ -65,6 +65,13 @@ def money(value: int, digits: int) -> float:
     return value / (10 ** digits)
 
 
+def relative_stop(price: float, stop_loss_pct: float, digits: int) -> int:
+    """Stop relativo en 1/100000 de precio, redondeado a la precision del simbolo (cTrader lo exige)."""
+    tick = 10 ** max(5 - digits, 0)
+    raw = price * stop_loss_pct * PRICE_SCALE
+    return max(int(round(raw / tick)) * tick, tick)
+
+
 def round_volume(units: float, min_volume: int, step_volume: int, max_volume: int | None = None) -> int:
     """Convierte unidades a volumen del protocolo (centesimas) respetando minimo y paso."""
     raw = int(units * VOLUME_SCALE)
@@ -258,7 +265,7 @@ class CTraderSession:
         volume = round_volume(units, info.min_volume, info.step_volume, info.max_volume)
         if volume <= 0:
             raise ValueError(f"{symbol}: {units} unidades por debajo del minimo {info.min_volume / VOLUME_SCALE}")
-        rel_sl = int(price_hint * stop_loss_pct * PRICE_SCALE)
+        rel_sl = relative_stop(price_hint, stop_loss_pct, info.digits)
         res = self.call("ProtoOANewOrderReq", timeout=30, ctidTraderAccountId=self.account_id, symbolId=info.symbol_id,
                         orderType=self.model.ProtoOAOrderType.MARKET, tradeSide=self.model.ProtoOATradeSide.BUY,
                         volume=volume, relativeStopLoss=rel_sl, label=label)
