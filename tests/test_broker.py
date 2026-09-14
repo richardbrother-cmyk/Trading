@@ -38,7 +38,8 @@ def test_settings_refuse_live_url(monkeypatch):
 
 
 def test_settings_defaults(monkeypatch):
-    for k in ["BROKER", "ALPACA_API_KEY", "ALPACA_SECRET_KEY", "ALPACA_BASE_URL", "SYMBOLS"]:
+    for k in ["BROKER", "DATA_PROVIDER", "ALPACA_API_KEY", "ALPACA_SECRET_KEY", "ALPACA_BASE_URL", "SYMBOLS",
+              "CTRADER_CLIENT_ID", "CTRADER_CLIENT_SECRET", "CTRADER_DEMO", "MAX_POSITIONS", "MAX_POSITION_PCT"]:
         monkeypatch.delenv(k, raising=False)
     s = Settings.from_env(dotenv_path="/nonexistent")
     assert s.broker == "sim" and s.symbols[0] == "SPY"
