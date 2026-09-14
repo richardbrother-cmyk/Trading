@@ -6,6 +6,8 @@ import json
 import os
 from datetime import datetime, timezone
 
+import pandas as pd
+
 from .broker import Broker, SimulatedBroker
 from .config import Settings
 from .data import DataProvider
@@ -81,7 +83,11 @@ def run_cycle(settings: Settings, broker: Broker, provider: DataProvider, dry_ru
         if decision["action"] == "BUY":
             quote = provider.quote(symbol)
             if quote:
-                gap = quote["last"] / price - 1
+                # Referencia: ultimo cierre COMPLETO (la barra de hoy es parcial durante la sesion)
+                today = pd.Timestamp(datetime.now(timezone.utc).date())
+                completed = df[df.index < today]["close"]
+                ref_close = float(completed.iloc[-1]) if len(completed) else price
+                gap = quote["last"] / ref_close - 1
                 verdict = gap_verdict(gap, settings.max_gap_down, settings.max_gap_up)
                 if verdict:
                     summary["skipped"].append(f"{symbol}: {verdict.replace('antes de la apertura', 'hoy')}")

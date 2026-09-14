@@ -45,3 +45,43 @@ def test_run_cycle_skips_symbols_with_pending_buy(tmp_path):
     summary = run_cycle(s, broker, DataProvider("synthetic", days=300))
     assert broker.orders == []
     assert len(summary["skipped"]) == 4
+
+
+def test_gap_filter_uses_last_completed_close(tmp_path):
+    """Durante la sesion, la barra de hoy es parcial: el hueco se mide contra el cierre anterior."""
+    import pandas as pd
+    from autotrader.broker import Account
+
+    today = pd.Timestamp.now(tz="UTC").normalize().tz_localize(None)
+    idx = pd.bdate_range(end=today, periods=120)
+    close = [100.0 + i * 0.5 for i in range(120)]
+    close[-1] = close[-2] * 0.97  # hoy cae un 3 % respecto a ayer
+    df = pd.DataFrame({"open": close, "high": close, "low": close, "close": close, "volume": 1e6}, index=idx)
+
+    class Prov:
+        def bars_many(self, symbols):
+            return {"AAA": df}
+
+        def quote(self, symbol):
+            return {"last": close[-1], "at": None, "prev_close": None}
+
+    class FakeBroker:
+        name = "fake"
+        orders = []
+
+        def account(self, prices=None):
+            return Account(cash=100_000, equity=100_000)
+
+        def is_market_open(self):
+            return True
+
+        def submit_market_order(self, symbol, qty, side, price_hint=None):
+            self.orders.append(symbol)
+            return {"id": "x", "status": "accepted"}
+
+    s = Settings(broker="sim", data_provider="yahoo", symbols=["AAA"], fast_sma=10, slow_sma=30,
+                 rsi_max_entry=101.0, state_dir=str(tmp_path))
+    broker = FakeBroker()
+    summary = run_cycle(s, broker, Prov())
+    assert broker.orders == []
+    assert any("cae" in x for x in summary["skipped"])
