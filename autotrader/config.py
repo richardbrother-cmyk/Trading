@@ -8,8 +8,8 @@ from dataclasses import dataclass, field
 from dotenv import load_dotenv
 
 PAPER_URL = "https://paper-api.alpaca.markets"
-# Acciones/ETFs de indice + ETFs de metales con respaldo fisico (replican el precio contado)
-DEFAULT_SYMBOLS = ["SPY", "QQQ", "AAPL", "MSFT", "NVDA", "GLD", "SLV", "PPLT", "PALL"]
+# Acciones/ETFs de indice + metales fisicos + ETFs de futuros de petroleo y agricolas
+DEFAULT_SYMBOLS = ["SPY", "QQQ", "AAPL", "MSFT", "NVDA", "GLD", "SLV", "PPLT", "PALL", "USO", "WEAT", "CORN", "DBA"]
 
 
 class ConfigError(ValueError):
@@ -32,8 +32,8 @@ class Settings:
     rsi_max_entry: float = 70.0
     initial_cash: float = 100_000.0
     risk_per_trade: float = 0.02
-    max_positions: int = 8
-    max_position_pct: float = 0.15
+    max_positions: int = 10
+    max_position_pct: float = 0.12
     max_daily_loss_pct: float = 0.03
     stop_loss_pct: float = 0.05
     state_dir: str = "state"
@@ -64,8 +64,8 @@ class Settings:
             rsi_max_entry=float(_env("RSI_MAX_ENTRY", "70")),
             initial_cash=float(_env("INITIAL_CASH", "100000")),
             risk_per_trade=float(_env("RISK_PER_TRADE", "0.02")),
-            max_positions=int(_env("MAX_POSITIONS", "8")),
-            max_position_pct=float(_env("MAX_POSITION_PCT", "0.15")),
+            max_positions=int(_env("MAX_POSITIONS", "10")),
+            max_position_pct=float(_env("MAX_POSITION_PCT", "0.12")),
             max_daily_loss_pct=float(_env("MAX_DAILY_LOSS_PCT", "0.03")),
             stop_loss_pct=float(_env("STOP_LOSS_PCT", "0.05")),
             state_dir=_env("STATE_DIR", "state"),

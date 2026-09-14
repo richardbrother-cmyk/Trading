@@ -98,8 +98,8 @@ python -m autotrader.cli preopen             # cancela o recoloca
 - **Salida**: SMA rápida < SMA lenta, o precio ≤ precio de entrada × (1 − stop loss).
   En Alpaca el stop viaja con la compra como orden vinculada (clase OTO), así que el broker lo
   ejecuta aunque el bot no esté mirando; antes de vender por señal, el bot cancela ese stop.
-- **Tamaño**: `equity × riesgo_por_operación / (precio × stop_loss)`, acotado al 15 % del
-  equity por posición y al efectivo disponible. Máximo 8 posiciones. El bot nunca usa
+- **Tamaño**: `equity × riesgo_por_operación / (precio × stop_loss)`, acotado al 12 % del
+  equity por posición y al efectivo disponible. Máximo 10 posiciones. El bot nunca usa
   margen: dimensiona sobre efectivo y equity, no sobre el *buying power* del broker.
 - **Cortafuegos**: si el equity cae un 3 % respecto al inicio del día, no se abren más
   posiciones ese día.
@@ -108,8 +108,10 @@ python -m autotrader.cli preopen             # cancela o recoloca
 
 - **Índices y tecnología**: SPY, QQQ, AAPL, MSFT, NVDA.
 - **Metales con respaldo físico**: GLD (oro), SLV (plata), PPLT (platino), PALL (paladio).
-  Se eligen ETFs físicos y no de futuros (USO, UNG, DBC…) porque estos últimos sufren
-  *contango* y se desvían del precio contado con el tiempo.
+- **Energía y agrícolas vía futuros**: USO (petróleo WTI), WEAT (trigo), CORN (maíz), DBA (cesta
+  agrícola). Estos ETFs sufren desgaste por el traspaso de contratos (*contango*); la estrategia
+  rota rápido y lo mitiga, pero no sirven para mantener meses. Café, algodón y cacao no se pueden
+  operar en Alpaca: sus ETN fueron liquidados.
 
 Alpaca no ofrece futuros ni contado de materias primas; la exposición se obtiene vía ETFs.
 
@@ -119,7 +121,9 @@ Alpaca no ofrece futuros ni contado de materias primas; la exposición se obtien
 |---|---|---|---|---|---|
 | Solo acciones (5 pos., 25 %) | +3.5 % | 0.20 | −12.3 % | 45 | 1.13 |
 | Solo metales físicos | +73.1 % | 1.12 | −24.9 % | 30 | 4.66 |
-| **Combinado (8 pos., 15 %)** | **+31.9 %** | **0.93** | **−13.6 %** | 72 | 2.28 |
+| Combinado (8 pos., 15 %) | +31.9 % | 0.93 | −13.6 % | 72 | 2.28 |
+| Agrícolas y energía (5 pos., 25 %) | +32.0 % | 0.97 | −16.7 % | 64 | 2.74 |
+| **Universo completo (10 pos., 12 %)** | **+51.4 %** | **1.45** | **−12.4 %** | 91 | 3.57 |
 
 Dos años con un mercado alcista en metales favorecen mucho al segundo grupo; no hay que
 leerlo como rendimiento esperado. La iteración (otros parámetros, otras señales, otros

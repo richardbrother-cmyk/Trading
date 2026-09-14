@@ -23,7 +23,7 @@ from autotrader.strategy import StrategyParams  # noqa: E402
 UNIVERSES = [
     ("Acciones e índices", ["SPY", "QQQ", "AAPL", "MSFT", "NVDA"], 5, 0.25),
     ("Metales físicos", ["GLD", "SLV", "PPLT", "PALL"], 5, 0.25),
-    ("Combinado (activo)", ["SPY", "QQQ", "AAPL", "MSFT", "NVDA", "GLD", "SLV", "PPLT", "PALL"], 8, 0.15),
+    ("Universo completo (activo)", ["SPY", "QQQ", "AAPL", "MSFT", "NVDA", "GLD", "SLV", "PPLT", "PALL", "USO", "WEAT", "CORN", "DBA"], 10, 0.12),
 ]
 
 

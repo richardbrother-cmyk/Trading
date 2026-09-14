@@ -107,7 +107,7 @@ footer { color: var(--muted); font-size: 12.5px; }
 
   <section>
     <div class="sec-head">
-      <div><h2>Evolución del capital en backtest</h2><p class="lede">Mismo motor, misma estrategia, tres universos de activos. 100.000 USD iniciales, del 12 sep 2024 al 11 sep 2026.</p></div>
+      <div><h2>Evolución del capital en backtest</h2><p class="lede">Mismo motor, misma estrategia, tres universos de activos: acciones, metales físicos y el universo completo que opera hoy. 100.000 USD iniciales, del 12 sep 2024 al 11 sep 2026.</p></div>
       <div class="legend" id="legend"></div>
     </div>
     <div class="chart-wrap"><svg class="chart" id="eq" viewBox="0 0 1100 380" role="img" aria-label="Curvas de capital de tres backtests"></svg><div class="tip" id="tip"></div></div>
@@ -148,7 +148,7 @@ footer { color: var(--muted); font-size: 12.5px; }
   </section>
 
   <section>
-    <div class="sec-head"><div><h2>Resultado por activo en el backtest combinado</h2><p class="lede">Beneficio neto acumulado de todas las operaciones cerradas por símbolo.</p></div></div>
+    <div class="sec-head"><div><h2>Resultado por activo en el backtest del universo completo</h2><p class="lede">Beneficio neto acumulado de todas las operaciones cerradas por símbolo.</p></div></div>
     <div class="bars" id="bars"></div>
     <details style="margin-top:14px"><summary id="trades-summary">Ver todas las operaciones</summary><div class="tbl-wrap" style="margin-top:10px"><table id="trades"></table></div></details>
   </section>
@@ -312,7 +312,7 @@ document.getElementById("kpis").innerHTML = kp.map(k => `<div class="tile"><div 
   for (const t of b.trades) agg[t.symbol] = (agg[t.symbol]||0) + t.pnl;
   const items = Object.entries(agg).sort((a,c)=>c[1]-a[1]); const m = Math.max(...items.map(i=>Math.abs(i[1])));
   document.getElementById("bars").innerHTML = items.map(([s,v])=>{ const w = Math.abs(v)/m*50; const left = v>=0 ? 50 : 50-w; return `<div class="bar-row"><span class="mono">${esc(s)}</span><div class="bar-track"><span class="zero" style="left:50%"></span><span class="fill" style="left:${left}%;width:${w}%;background:${v>=0?"var(--s1)":"var(--bad-mark)"};border-radius:${v>=0?"0 4px 4px 0":"4px 0 0 4px"}"></span></div><span class="v ${v>=0?"pos":"neg"}">${fmtUSD(v)}</span></div>`; }).join("");
-  document.getElementById("trades-summary").textContent = `Ver las ${b.trades.length} operaciones del backtest combinado`;
+  document.getElementById("trades-summary").textContent = `Ver las ${b.trades.length} operaciones del backtest del universo completo`;
   const reason = {signal:"señal", stop:"stop loss", open_at_end:"abierta al final"};
   document.getElementById("trades").innerHTML = `<thead><tr><th>Activo</th><th>Entrada</th><th>Salida</th><th class="num">Cant.</th><th class="num">Precio entrada</th><th class="num">Precio salida</th><th class="num">P&L</th><th class="num">Retorno</th><th>Cierre</th></tr></thead><tbody>` + b.trades.map(t=>`<tr><td class="mono">${esc(t.symbol)}</td><td>${t.entry}</td><td>${t.exit}</td><td class="num">${t.qty}</td><td class="num">${fmtUSD2(t.entry_price)}</td><td class="num">${fmtUSD2(t.exit_price)}</td><td class="num ${t.pnl>=0?"pos":"neg"}">${fmtUSD2(t.pnl)}</td><td class="num ${t.ret>=0?"pos":"neg"}">${pct(t.ret)}</td><td>${reason[t.reason]||t.reason}</td></tr>`).join("") + "</tbody>";
 })();
