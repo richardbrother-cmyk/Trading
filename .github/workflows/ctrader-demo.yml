@@ -1,7 +1,10 @@
 name: ctrader-demo
 
 # Ciclo del bot contra la cuenta DEMO de cTrader (Fusion Markets), cada hora de domingo noche a viernes.
-# Secrets necesarios: CTRADER_CLIENT_ID, CTRADER_CLIENT_SECRET, CTRADER_REFRESH_TOKEN, CTRADER_ACCOUNT_LOGIN.
+# Secrets necesarios: CTRADER_CLIENT_ID, CTRADER_CLIENT_SECRET, CTRADER_ACCOUNT_LOGIN, CTRADER_ACCESS_TOKEN.
+# El access token dura 30 días. cTrader rota el refresh token en cada renovación e invalida el anterior,
+# así que el workflow NO renueva: cada ~30 días se renueva fuera (scripts/ctrader_token.py --refresh)
+# y se actualiza el secret CTRADER_ACCESS_TOKEN.
 # Los servidores de cTrader usan el puerto 5035, alcanzable desde los runners de GitHub.
 on:
   schedule:
@@ -24,7 +27,6 @@ jobs:
       CTRADER_DEMO: "true"
       CTRADER_CLIENT_ID: ${{ secrets.CTRADER_CLIENT_ID }}
       CTRADER_CLIENT_SECRET: ${{ secrets.CTRADER_CLIENT_SECRET }}
-      CTRADER_REFRESH_TOKEN: ${{ secrets.CTRADER_REFRESH_TOKEN }}
       CTRADER_ACCOUNT_LOGIN: ${{ secrets.CTRADER_ACCOUNT_LOGIN }}
       CTRADER_ACCESS_TOKEN: ${{ secrets.CTRADER_ACCESS_TOKEN }}
       SYMBOLS: ${{ vars.CTRADER_SYMBOLS || 'XAUUSD,XAGUSD' }}
