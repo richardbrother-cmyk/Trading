@@ -19,7 +19,7 @@ jobs:
           python-version: "3.11"
       - run: pip install -r requirements.txt
       - name: Tests
-        run: pytest -q
+        run: python -m pytest -q
       - name: Ciclo de trading (paper)
         env:
           ALPACA_API_KEY: ${{ secrets.ALPACA_API_KEY }}

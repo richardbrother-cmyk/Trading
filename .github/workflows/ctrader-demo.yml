@@ -35,7 +35,7 @@ jobs:
           python-version: "3.11"
       - run: pip install -r requirements.txt
       - name: Tests
-        run: pytest -q
+        run: python -m pytest -q
       - name: Verificar conexion y simbolos
         run: python -m autotrader.cli --env /dev/null ctrader-check
       - name: Ciclo de trading (demo)
