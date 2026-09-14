@@ -85,6 +85,17 @@ def cmd_run(args) -> int:
         time.sleep(args.interval)
 
 
+def cmd_preopen(args) -> int:
+    from .preopen import preopen_check
+
+    s = _settings(args)
+    broker = build_broker(s)
+    provider = _provider(s, broker)
+    summary = preopen_check(s, broker, provider, dry_run=args.dry_run)
+    print(json.dumps(summary, indent=2, default=str, ensure_ascii=False))
+    return 0
+
+
 def cmd_status(args) -> int:
     s = _settings(args)
     broker = build_broker(s)
@@ -150,6 +161,10 @@ def main(argv: list[str] | None = None) -> int:
     r.add_argument("--dry-run", action="store_true", help="decidir sin enviar ordenes")
     r.add_argument("--force", action="store_true", help="operar aunque el mercado este cerrado (en Alpaca las ordenes quedan en cola hasta la apertura)")
     r.set_defaults(func=cmd_run)
+
+    po = sub.add_parser("preopen", help="valida las ordenes en cola con el precio de premercado")
+    po.add_argument("--dry-run", action="store_true", help="solo informar, sin cancelar ni recolocar")
+    po.set_defaults(func=cmd_preopen)
 
     st = sub.add_parser("status", help="muestra cuenta y posiciones")
     st.set_defaults(func=cmd_status)

@@ -74,6 +74,29 @@ def yahoo_bars(symbol: str, range_: str = "2y", interval: str = "1d", session: r
     return _validate(df, symbol)
 
 
+def yahoo_quote(symbol: str, session: requests.Session | None = None) -> dict:
+    """Ultimo precio disponible de Yahoo incluyendo pre y post mercado (velas de 1 minuto de hoy).
+
+    Devuelve {"last": precio, "at": datetime UTC, "prev_close": ultimo cierre regular segun Yahoo}.
+    """
+    sess = session or requests.Session()
+    url = f"https://query1.finance.yahoo.com/v8/finance/chart/{symbol}"
+    params = {"range": "1d", "interval": "1m", "includePrePost": "true"}
+    resp = sess.get(url, params=params, headers={"User-Agent": "Mozilla/5.0 (autotrader)"}, timeout=20)
+    resp.raise_for_status()
+    result = resp.json().get("chart", {}).get("result")
+    if not result:
+        raise ValueError(f"Yahoo sin cotizacion para {symbol}")
+    node = result[0]
+    closes = node["indicators"]["quote"][0].get("close") or []
+    stamps = node.get("timestamp") or []
+    pairs = [(t, c) for t, c in zip(stamps, closes) if c is not None]
+    if not pairs:
+        raise ValueError(f"Yahoo sin velas de hoy para {symbol}")
+    t, c = pairs[-1]
+    return {"last": float(c), "at": datetime.fromtimestamp(t, tz=timezone.utc), "prev_close": node["meta"].get("regularMarketPrice")}
+
+
 def alpaca_bars(symbol: str, api_key: str, secret_key: str, days: int = 500, session: requests.Session | None = None) -> pd.DataFrame:
     """Barras diarias desde la API de datos de Alpaca (feed IEX, gratuito)."""
     sess = session or requests.Session()
@@ -123,6 +146,15 @@ class DataProvider:
         if self.provider == "alpaca":
             return alpaca_bars(symbol, self.api_key, self.secret_key, days=self.days, session=self.session)
         raise ValueError(f"Proveedor desconocido: {self.provider}")
+
+    def quote(self, symbol: str) -> dict | None:
+        """Precio en vivo si el proveedor lo ofrece; None en caso contrario."""
+        if self.provider == "yahoo":
+            try:
+                return yahoo_quote(symbol, session=self.session)
+            except Exception as exc:  # noqa: BLE001
+                print(f"[quote] {symbol}: {exc}")
+        return None
 
     def bars_many(self, symbols: list[str]) -> dict[str, pd.DataFrame]:
         out: dict[str, pd.DataFrame] = {}

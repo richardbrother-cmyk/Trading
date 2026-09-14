@@ -9,6 +9,7 @@ from datetime import datetime, timezone
 from .broker import Broker, SimulatedBroker
 from .config import Settings
 from .data import DataProvider
+from .preopen import gap_verdict
 from .risk import RiskParams, daily_loss_breached, position_size, stop_hit
 from .strategy import StrategyParams, latest_decision
 
@@ -78,6 +79,14 @@ def run_cycle(settings: Settings, broker: Broker, provider: DataProvider, dry_ru
         if not market_open or halted or decision["action"] == "HOLD":
             continue
         if decision["action"] == "BUY":
+            quote = provider.quote(symbol)
+            if quote:
+                gap = quote["last"] / price - 1
+                verdict = gap_verdict(gap, settings.max_gap_down, settings.max_gap_up)
+                if verdict:
+                    summary["skipped"].append(f"{symbol}: {verdict.replace('antes de la apertura', 'hoy')}")
+                    continue
+                price = quote["last"]
             if open_slots <= 0:
                 summary["skipped"].append(f"{symbol}: sin huecos libres (max {risk.max_positions})")
                 continue

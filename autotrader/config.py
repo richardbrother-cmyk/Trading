@@ -41,6 +41,8 @@ class Settings:
     alpaca_secret_key: str = ""
     alpaca_base_url: str = PAPER_URL
     exposure_leverage: float = 1.0  # multiplica el tope de exposicion (solo tiene sentido en CFDs)
+    max_gap_down: float = 0.015  # no abrir posicion si el precio en vivo cae mas de esto vs el ultimo cierre
+    max_gap_up: float = 0.03  # ni si sube mas de esto (perseguir un hueco)
     ctrader_client_id: str = ""
     ctrader_client_secret: str = ""
     ctrader_access_token: str = ""
@@ -71,6 +73,8 @@ class Settings:
             alpaca_secret_key=_env("ALPACA_SECRET_KEY", ""),
             alpaca_base_url=_env("ALPACA_BASE_URL", PAPER_URL).rstrip("/"),
             exposure_leverage=float(_env("EXPOSURE_LEVERAGE", "1")),
+            max_gap_down=float(_env("MAX_GAP_DOWN", "0.015")),
+            max_gap_up=float(_env("MAX_GAP_UP", "0.03")),
             ctrader_client_id=_env("CTRADER_CLIENT_ID", ""),
             ctrader_client_secret=_env("CTRADER_CLIENT_SECRET", ""),
             ctrader_access_token=_env("CTRADER_ACCESS_TOKEN", ""),

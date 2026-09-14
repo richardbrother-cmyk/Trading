@@ -73,6 +73,25 @@ Para que opere sola sin tener un ordenador encendido, añade `ALPACA_API_KEY` y
 `paper-trading.yml` correrá un ciclo cada hora de 14:35 a 20:35 UTC de lunes a viernes
 y subirá el registro como artefacto.
 
+## Validación previa a la apertura
+
+Las señales se calculan con el cierre diario y las órdenes se ejecutan en la apertura siguiente.
+Entre medias el mercado se mueve, así que antes de abrir (`preopen`) el bot revisa cada compra en
+cola con el precio de premercado de Yahoo:
+
+- la cancela si el precio cae más de `MAX_GAP_DOWN` (1,5 %) respecto al último cierre, si sube más
+  de `MAX_GAP_UP` (3 %), o si la señal recalculada con el precio proyectado deja de ser de compra;
+- si se mantiene pero el precio se ha movido más de un 1 %, la recoloca con tamaño y stop
+  recalculados sobre el precio en vivo.
+
+La misma regla de hueco se aplica a las compras nuevas durante la sesión: el ciclo horario no abre
+posición en un activo que ese día caiga más del 1,5 %.
+
+```bash
+python -m autotrader.cli preopen --dry-run   # solo informa
+python -m autotrader.cli preopen             # cancela o recoloca
+```
+
 ## Estrategia
 
 - **Entrada**: SMA rápida > SMA lenta y RSI < 70.

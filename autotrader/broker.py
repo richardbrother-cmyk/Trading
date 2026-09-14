@@ -156,6 +156,12 @@ class AlpacaBroker:
             raise RuntimeError(f"Alpaca {resp.status_code}: {resp.text}")
         return resp
 
+    def open_buy_orders(self) -> list[dict]:
+        """Ordenes de compra pendientes (sin los tramos de stop)."""
+        return [{"id": o["id"], "symbol": o["symbol"], "qty": int(float(o["qty"])), "status": o["status"]}
+                for o in self._get("/v2/orders", status="open", nested="false")
+                if o.get("side") == "buy" and o.get("type") == "market"]
+
     def cancel_symbol_orders(self, symbol: str) -> int:
         """Cancela las ordenes abiertas de un simbolo (p.ej. el stop vinculado antes de vender por senal)."""
         n = 0
