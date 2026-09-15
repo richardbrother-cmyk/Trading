@@ -341,6 +341,21 @@ class CTraderBroker:
                 n += 1
         return {"symbol": symbol, "stop_price": stop_price, "status": f"amended x{n}"}
 
+    def ensure_stops(self) -> list[dict]:
+        """Pone stop a toda posicion larga que no lo tenga (p.ej. si el broker rechazo el stop de la orden)."""
+        placed = []
+        for p in self.session.positions():
+            if p.side != "buy" or p.stop_loss > 0 or p.symbol not in self.session.symbols:
+                continue
+            info = self.session.symbols[p.symbol]
+            stop_price = round(p.price * (1 - self.stop_loss_pct), info.digits)
+            try:
+                self.session.amend_stop(p.position_id, stop_price)
+                placed.append({"symbol": p.symbol, "qty": p.units, "stop_price": stop_price, "status": "amended"})
+            except Exception as exc:  # noqa: BLE001
+                placed.append({"symbol": p.symbol, "qty": p.units, "stop_price": stop_price, "status": f"error: {exc}"})
+        return placed
+
     def qty_step(self, symbol: str) -> float:
         info = self.session.symbols[symbol.upper()]
         return info.step_volume / VOLUME_SCALE

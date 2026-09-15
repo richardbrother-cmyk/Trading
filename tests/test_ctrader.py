@@ -52,3 +52,27 @@ def test_relative_stop_matches_symbol_precision():
     assert relative_stop(29369.88, 0.03, 2) % 1000 == 0
     # nunca cero
     assert relative_stop(0.0001, 0.03, 5) == 1
+
+
+def test_ctrader_ensure_stops_amends_only_unprotected_positions():
+    from autotrader.ctrader import CTraderBroker, OpenPosition, SymbolInfo
+
+    class Sess:
+        demo = True
+        symbols = {"COFARA": SymbolInfo(1, "COFARA", digits=2), "WHEAT": SymbolInfo(2, "WHEAT", digits=2)}
+        amended = []
+
+        def load_symbols(self, names):
+            return self.symbols
+
+        def positions(self):
+            return [OpenPosition(11, "COFARA", 80, "buy", 298.46, 0.0), OpenPosition(12, "WHEAT", 8, "buy", 702.9, 681.68)]
+
+        def amend_stop(self, pid, price):
+            self.amended.append((pid, price))
+
+    b = CTraderBroker.__new__(CTraderBroker)
+    b.session = Sess(); b.stop_loss_pct = 0.03; b.name = "ctrader-demo"
+    placed = b.ensure_stops()
+    assert [p["symbol"] for p in placed] == ["COFARA"]
+    assert b.session.amended == [(11, round(298.46 * 0.97, 2))]
