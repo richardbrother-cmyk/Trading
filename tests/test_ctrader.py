@@ -76,3 +76,28 @@ def test_ctrader_ensure_stops_amends_only_unprotected_positions():
     placed = b.ensure_stops()
     assert [p["symbol"] for p in placed] == ["COFARA"]
     assert b.session.amended == [(11, round(298.46 * 0.97, 2))]
+
+
+def test_positions_filter_by_bot_label():
+    """Solo se gestionan las posiciones con la etiqueta del bot; las manuales se ignoran salvo que se pidan."""
+    from types import SimpleNamespace
+    from autotrader.ctrader import BOT_LABEL, CTraderSession, SymbolInfo
+
+    class Model:
+        class ProtoOAPositionStatus: POSITION_STATUS_OPEN = 1
+        class ProtoOATradeSide: BUY = 1
+    def td(symbol_id, volume, label):
+        t = SimpleNamespace(symbolId=symbol_id, volume=volume, tradeSide=1, label=label)
+        t.HasField = lambda f: f == "label" and label != ""
+        return t
+    def pos(pid, symbol_id, volume, label):
+        p = SimpleNamespace(positionId=pid, positionStatus=1, tradeData=td(symbol_id, volume, label), price=300.0, stopLoss=0.0)
+        p.HasField = lambda f: False
+        return p
+    sess = CTraderSession.__new__(CTraderSession)
+    sess.model = Model; sess.account_id = 1
+    sess.symbols = {"COFARA": SymbolInfo(7, "COFARA")}
+    sess.call = lambda *a, **k: SimpleNamespace(position=[pos(1, 7, 2000, BOT_LABEL), pos(2, 7, 8000, "")])
+    own = sess.positions()
+    assert [p.position_id for p in own] == [1] and own[0].is_bot
+    assert len(sess.positions(only_bot=False)) == 2

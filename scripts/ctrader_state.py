@@ -59,7 +59,7 @@ def collect(s: Settings) -> tuple[dict, dict | None]:
         pnl = session.unrealized_pnl()
         positions = []
         prices: dict[str, float] = {}
-        for p in session.positions():
+        for p in session.positions(only_bot=False):
             if p.side != "buy":
                 continue
             if p.symbol not in prices:
@@ -69,7 +69,7 @@ def collect(s: Settings) -> tuple[dict, dict | None]:
                     prices[p.symbol] = p.price
             px = prices[p.symbol]
             positions.append({"symbol": p.symbol, "qty": p.units, "avg": p.price, "price": px, "stop": p.stop_loss,
-                              "pnl": round((px - p.price) * p.units, 2), "position_id": p.position_id})
+                              "pnl": round((px - p.price) * p.units, 2), "position_id": p.position_id, "bot": p.is_bot})
     finally:
         session.close()
     now = datetime.now(timezone.utc)

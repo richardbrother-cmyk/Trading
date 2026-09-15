@@ -23,6 +23,7 @@ from .broker import Account, Position
 
 PRICE_SCALE = 100_000
 VOLUME_SCALE = 100
+BOT_LABEL = "autotrader"  # etiqueta con la que el bot abre sus posiciones; solo gestiona las que la llevan
 DEMO_HOST = "demo.ctraderapi.com"
 LIVE_HOST = "live.ctraderapi.com"
 PORT = 5035
@@ -116,6 +117,11 @@ class OpenPosition:
     side: str
     price: float
     stop_loss: float = 0.0
+    label: str = ""
+
+    @property
+    def is_bot(self) -> bool:
+        return self.label == BOT_LABEL
 
 
 # ----------------------------------------------------------------------------------------------
@@ -230,7 +236,9 @@ class CTraderSession:
             return 0.0
         return sum(money(int(p.netUnrealizedPnL), int(res.moneyDigits)) for p in res.positionUnrealizedPnL)
 
-    def positions(self) -> list[OpenPosition]:
+    def positions(self, only_bot: bool = True) -> list[OpenPosition]:
+        """Posiciones abiertas. Por defecto solo las que abrio el bot (etiqueta BOT_LABEL):
+        las abiertas a mano en la misma cuenta no se cuentan, no se venden y no se les toca el stop."""
         res = self.call("ProtoOAReconcileReq", ctidTraderAccountId=self.account_id)
         id_to_name = {info.symbol_id: name for name, info in self.symbols.items()}
         out = []
@@ -240,8 +248,11 @@ class CTraderSession:
             td = p.tradeData
             name = id_to_name.get(int(td.symbolId), str(td.symbolId))
             side = "buy" if td.tradeSide == self.model.ProtoOATradeSide.BUY else "sell"
+            label = td.label if td.HasField("label") else ""
+            if only_bot and label != BOT_LABEL:
+                continue
             out.append(OpenPosition(int(p.positionId), name, int(td.volume) / VOLUME_SCALE, side, float(p.price),
-                                    float(p.stopLoss) if p.HasField("stopLoss") else 0.0))
+                                    float(p.stopLoss) if p.HasField("stopLoss") else 0.0, label))
         return out
 
     def amend_stop(self, position_id: int, stop_price: float) -> None:
@@ -266,7 +277,7 @@ class CTraderSession:
         return df
 
     # -- ordenes ---------------------------------------------------------------------------------
-    def market_buy(self, symbol: str, units: float, stop_loss_pct: float, price_hint: float, label: str = "autotrader") -> dict:
+    def market_buy(self, symbol: str, units: float, stop_loss_pct: float, price_hint: float, label: str = BOT_LABEL) -> dict:
         info = self.symbols[symbol.upper()]
         volume = round_volume(units, info.min_volume, info.step_volume, info.max_volume)
         if volume <= 0:
