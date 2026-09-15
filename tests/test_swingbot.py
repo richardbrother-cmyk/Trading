@@ -1,0 +1,74 @@
+from datetime import datetime, timedelta, timezone
+from types import SimpleNamespace
+
+import numpy as np
+import pandas as pd
+
+from autotrader.config import Settings
+from autotrader.ctrader import SymbolInfo, OpenPosition
+from autotrader.swingbot import SWING_LABEL, run_swing_cycle, size_units
+from autotrader.intraday import SPECS
+
+
+def _h4(n=300, crash_last=True, seed=1):
+    rng = np.random.default_rng(seed)
+    idx = pd.date_range("2026-06-01", periods=n, freq="4h", tz="UTC")
+    close = 7600 + np.cumsum(rng.normal(0, 8, n))
+    if crash_last:
+        close[-1] = close[-25:-1].mean() - 14 * close[-25:-1].std()  # cierre muy por debajo de la banda
+    o = np.concatenate([[close[0]], close[:-1]])
+    return pd.DataFrame({"open": o, "high": np.maximum(o, close) + 3, "low": np.minimum(o, close) - 3, "close": close, "volume": 1.0}, index=idx)
+
+
+class FakeSession:
+    def __init__(self, bars, positions):
+        self.bars, self._positions, self.calls = bars, positions, []
+        self.symbols = {"US500": SymbolInfo(1, "US500", digits=2, lot_size=100, min_volume=1, step_volume=1)}
+        self.account_id = 1
+        self.model = SimpleNamespace(ProtoOAOrderType=SimpleNamespace(MARKET=1), ProtoOATradeSide=SimpleNamespace(BUY=1),
+                                     ProtoOAExecutionType=SimpleNamespace(Name=lambda x: "ORDER_ACCEPTED"))
+
+    def trader(self):
+        return 200.0, 2, 500.0
+
+    def unrealized_pnl(self):
+        return 0.0
+
+    def positions(self, only_bot=True):
+        return self._positions
+
+    def call(self, name, timeout=None, **kw):
+        self.calls.append((name, kw))
+        return SimpleNamespace(executionType=1)
+
+
+def test_swing_buys_on_band_signal_with_stop_and_target(tmp_path, monkeypatch):
+    import autotrader.swingbot as sb
+    bars = _h4()
+    monkeypatch.setattr(sb, "closed_h4_bars", lambda session, symbol, days=60, now=None: bars)
+    s = Settings(broker="sim", symbols=["US500"], state_dir=str(tmp_path), event_mode="off", risk_per_trade=0.01)
+    sess = FakeSession(bars, [])
+    summary = run_swing_cycle(s, sess, equity_cap=200.0, now=bars.index[-1] + timedelta(hours=5))
+    assert summary["decisions"][0]["action"] == "BUY"
+    orders = [c for c in sess.calls if c[0] == "ProtoOANewOrderReq"]
+    assert len(orders) == 1 and orders[0][1]["label"] == SWING_LABEL
+    assert orders[0][1]["relativeStopLoss"] % 1000 == 0 and orders[0][1]["relativeTakeProfit"] > 0
+    assert summary["orders"][0]["risk_usd"] <= 200 * 0.03 + 1e-6
+
+
+def test_swing_closes_old_positions_and_skips_held_symbols(tmp_path, monkeypatch):
+    import autotrader.swingbot as sb
+    bars = _h4()
+    monkeypatch.setattr(sb, "closed_h4_bars", lambda session, symbol, days=60, now=None: bars)
+    now = bars.index[-1] + timedelta(hours=5)
+    old = OpenPosition(9, "US500", 0.05, "buy", 7500.0, 7400.0, SWING_LABEL, (now - timedelta(days=4)).to_pydatetime())
+    s = Settings(broker="sim", symbols=["US500"], state_dir=str(tmp_path), event_mode="off")
+    sess = FakeSession(bars, [old])
+    summary = run_swing_cycle(s, sess, equity_cap=200.0, now=now)
+    assert [c[0] for c in sess.calls] == ["ProtoOAClosePositionReq"] or "ProtoOAClosePositionReq" in [c[0] for c in sess.calls]
+    assert summary["closed"][0]["reason"] == "tiempo maximo"
+
+
+def test_size_units_min_lot_rule():
+    assert size_units(200, 4300, 4300 - 66, SPECS["XAUUSD"], 0.01, 0.03) == 0.0
+    assert size_units(200, 7600, 7600 - 55, SPECS["US500"], 0.01, 0.03) == 0.03

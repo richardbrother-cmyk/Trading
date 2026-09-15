@@ -112,6 +112,28 @@ def cmd_status(args) -> int:
     return 0
 
 
+def cmd_swing_run(args) -> int:
+    """Ciclo del bot swing (bandas H4, solo largos) sobre la cuenta demo de cTrader."""
+    from .ctrader import CTraderSession
+    from .ctrader_auth import load_access_token
+    from .swingbot import run_swing_cycle
+
+    s = _settings(args)
+    s.broker = "ctrader"
+    s.validate()
+    token = load_access_token(os.path.join(s.state_dir, "ctrader_tokens.json"), s.ctrader_client_id,
+                              s.ctrader_client_secret, s.ctrader_access_token, s.ctrader_refresh_token)
+    session = CTraderSession(s.ctrader_client_id, s.ctrader_client_secret, token, s.ctrader_account_login or None, demo=s.ctrader_demo)
+    try:
+        session.load_symbols(s.symbols)
+        cap = float(os.getenv("EQUITY_CAP", "0")) or None
+        summary = run_swing_cycle(s, session, equity_cap=cap, dry_run=args.dry_run)
+    finally:
+        session.close()
+    print(json.dumps(summary, indent=2, default=str, ensure_ascii=False))
+    return 0
+
+
 def cmd_ctrader_check(args) -> int:
     """Verifica autorizacion, cuenta y simbolos de cTrader sin operar."""
     s = _settings(args)
@@ -174,6 +196,10 @@ def main(argv: list[str] | None = None) -> int:
 
     st = sub.add_parser("status", help="muestra cuenta y posiciones")
     st.set_defaults(func=cmd_status)
+
+    sw = sub.add_parser("swing-run", help="ciclo del bot swing (bandas H4, solo largos) en cTrader")
+    sw.add_argument("--dry-run", action="store_true")
+    sw.set_defaults(func=cmd_swing_run)
 
     cc = sub.add_parser("ctrader-check", help="verifica autorizacion, cuenta y simbolos de cTrader")
     cc.set_defaults(func=cmd_ctrader_check)
