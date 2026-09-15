@@ -11,6 +11,7 @@ import pandas as pd
 from .broker import Broker, SimulatedBroker
 from .config import Settings
 from .data import DataProvider
+from .events import active_events, load_events, trailed_stop
 from .preopen import gap_verdict
 from .risk import RiskParams, daily_loss_breached, position_size, stop_hit
 from .strategy import StrategyParams, latest_decision
@@ -61,6 +62,21 @@ def run_cycle(settings: Settings, broker: Broker, provider: DataProvider, dry_ru
     market_open = force or broker.is_market_open()
     if not market_open:
         summary["skipped"].append("mercado cerrado")
+
+    # Ventana de proteccion alrededor de eventos de alto impacto (FOMC, CPI, NFP...)
+    events_now = []
+    if settings.event_mode != "off":
+        events_now = active_events(load_events(settings.events_path or None), datetime.now(timezone.utc),
+                                   settings.event_hours_before, settings.event_hours_after)
+    if events_now:
+        summary["event_window"] = [f"{e.name} ({e.at.strftime('%Y-%m-%d %H:%M')} UTC)" for e in events_now]
+        summary["protection"] = []
+    current_stops = {}
+    if events_now and hasattr(broker, "current_stops"):
+        try:
+            current_stops = broker.current_stops()
+        except Exception as exc:  # noqa: BLE001
+            summary["skipped"].append(f"current_stops: {exc}")
     halted = daily_loss_breached(account.equity, day_start, risk)
     if halted:
         summary["skipped"].append(f"limite de perdida diaria alcanzado ({account.equity:.2f} vs {day_start:.2f})")
@@ -75,6 +91,25 @@ def run_cycle(settings: Settings, broker: Broker, provider: DataProvider, dry_ru
         price = prices[symbol]
         if pos is not None and stop_hit(pos.avg_price, price, risk):
             decision = {**decision, "action": "SELL", "reason": f"stop loss ({price:.2f} <= {pos.avg_price * (1 - risk.stop_loss_pct):.2f})"}
+        if events_now and pos is not None and decision["action"] != "SELL" and market_open:
+            gain = price / pos.avg_price - 1
+            if gain >= settings.event_min_gain:
+                if settings.event_mode == "close":
+                    decision = {**decision, "action": "SELL", "reason": f"cierre preventivo antes de evento (+{gain * 100:.2f} %)"}
+                elif settings.event_mode == "trail":
+                    cur = current_stops.get(symbol, pos.avg_price * (1 - risk.stop_loss_pct))
+                    new = trailed_stop(cur, price, settings.event_trail_pct)
+                    if new > cur + 1e-9 and not dry_run:
+                        try:
+                            broker.update_stop(symbol, new)
+                            summary["protection"].append(f"{symbol}: stop {cur:.2f} -> {new:.2f} (+{gain * 100:.2f} %)")
+                        except Exception as exc:  # noqa: BLE001
+                            summary["protection"].append(f"{symbol}: error al subir stop: {exc}")
+                    elif new > cur + 1e-9:
+                        summary["protection"].append(f"{symbol}: subiria stop {cur:.2f} -> {new:.2f} (dry run)")
+        if events_now and decision["action"] == "BUY":
+            summary["skipped"].append(f"{symbol}: sin entradas nuevas durante ventana de evento")
+            decision = {**decision, "action": "HOLD", "reason": "ventana de evento"}
         decision["symbol"] = symbol
         summary["decisions"].append(decision)
 

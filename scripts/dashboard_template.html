@@ -125,6 +125,11 @@ footer { color: var(--muted); font-size: 12.5px; }
   </div>
 
   <section>
+    <div class="sec-head"><div><h2>Eventos de alto impacto</h2><p class="lede" id="events-lede"></p></div></div>
+    <div class="tbl-wrap"><table id="events"></table></div>
+  </section>
+
+  <section>
     <div class="sec-head"><div><h2>Última decisión del bot</h2><p class="lede" id="run-lede"></p></div></div>
     <div class="chips" id="decisions"></div>
   </section>
@@ -254,6 +259,17 @@ document.getElementById("kpis").innerHTML = kp.map(k => `<div class="tile"><div 
     lede.textContent = live.orders.length ? "Aceptadas por el broker; se ejecutan a precio de mercado en la próxima apertura. Cada compra lleva un stop loss vinculado que se activa al ejecutarse." : "No hay órdenes pendientes.";
     t.innerHTML = `<thead><tr><th>Activo</th><th>Lado</th><th class="num">Cant.</th><th class="num">Ref. cierre</th><th class="num">Stop</th><th>Enviada</th></tr></thead><tbody>` + live.orders.map(o=>{ const px = D.last_run?.decisions.find(d=>d.symbol===o.symbol)?.close; return `<tr><td class="mono">${esc(o.symbol)}</td><td>${o.side==="buy"?"Compra":"Venta"}</td><td class="num">${o.qty}</td><td class="num">${px?fmtUSD2(px):"—"}</td><td class="num">${o.stop?fmtUSD2(o.stop):"—"}</td><td class="mono" style="font-size:12px">${esc(o.submitted_at)}</td></tr>`; }).join("") + "</tbody>";
   }
+})();
+
+// --- Events ---
+(function(){
+  const es = D.event_settings || {}, evs = D.events || [];
+  const modeTxt = {trail: "subir el stop de las posiciones ganadoras", close: "cerrar las posiciones ganadoras", off: "sin protección"}[es.mode] || es.mode;
+  document.getElementById("events-lede").textContent = `Desde ${es.hours_before} h antes hasta ${es.hours_after} h después de cada evento el bot no abre posiciones y aplica la protección: ${modeTxt} (ganancia mínima ${(es.min_gain*100).toFixed(1)} %, stop a ${(es.trail_pct*100).toFixed(1)} % bajo el precio).`;
+  const t = document.getElementById("events");
+  if (!evs.length) { t.innerHTML = `<tbody><tr><td class="empty">Sin eventos en las próximas tres semanas.</td></tr></tbody>`; return; }
+  const now = Date.now();
+  t.innerHTML = `<thead><tr><th>Cuándo</th><th>Evento</th><th>Estado</th></tr></thead><tbody>` + evs.map(e=>{ const d = new Date(e.at); const h = (d-now)/36e5; const when = d.toLocaleString("es-ES",{weekday:"short",day:"numeric",month:"short",hour:"2-digit",minute:"2-digit",timeZone:"UTC"}) + " UTC"; const st = e.active ? `<span class="status accepted">ventana activa</span>` : h < 0 ? `<span class="status canceled">pasado</span>` : h < 24 ? `<span class="status filled">en ${h.toFixed(0)} h</span>` : `<span class="status">en ${(h/24).toFixed(0)} días</span>`; return `<tr${e.active?' class="active"':''}><td class="mono" style="font-size:12px">${esc(when)}</td><td>${esc(e.name)}</td><td>${st}</td></tr>`; }).join("") + "</tbody>";
 })();
 
 // --- Decisions ---

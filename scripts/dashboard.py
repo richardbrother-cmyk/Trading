@@ -17,6 +17,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from autotrader.backtest import run_backtest  # noqa: E402
 from autotrader.config import Settings  # noqa: E402
 from autotrader.data import DataProvider  # noqa: E402
+from autotrader.events import active_events, load_events, upcoming_events  # noqa: E402
 from autotrader.risk import RiskParams  # noqa: E402
 from autotrader.strategy import StrategyParams  # noqa: E402
 
@@ -113,7 +114,14 @@ def collect(no_live: bool) -> dict:
                            "errors": sum(1 for o in rec["orders"] if str(o["status"]).startswith("error")),
                            "note": (rec["skipped"][0][:60] + (f" (+{len(rec['skipped']) - 1})" if len(rec["skipped"]) > 1 else "")) if rec["skipped"] else ("sin cambios" if not rec["orders"] else "")})
         cycles = cycles[-30:]
-    return {"generated_at": datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC"), "settings": {
+    now = datetime.now(timezone.utc)
+    evs = load_events(s.events_path or None)
+    active_names = {e.name for e in active_events(evs, now, s.event_hours_before, s.event_hours_after)} if s.event_mode != "off" else set()
+    events = [{"name": e.name, "at": e.at.strftime("%Y-%m-%dT%H:%MZ"), "tags": list(e.tags), "active": e.name in active_names}
+              for e in upcoming_events(evs, now, days=21)]
+    return {"generated_at": datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC"), "events": events, "event_settings": {
+        "mode": s.event_mode, "hours_before": s.event_hours_before, "hours_after": s.event_hours_after,
+        "min_gain": s.event_min_gain, "trail_pct": s.event_trail_pct}, "settings": {
         "fast_sma": s.fast_sma, "slow_sma": s.slow_sma, "rsi_max_entry": s.rsi_max_entry, "risk_per_trade": s.risk_per_trade,
         "stop_loss_pct": s.stop_loss_pct, "max_daily_loss_pct": s.max_daily_loss_pct, "initial_cash": s.initial_cash},
         "backtests": backtests, "live": live, "last_run": last_run, "cycles": cycles}

@@ -115,6 +115,7 @@ class OpenPosition:
     units: float
     side: str
     price: float
+    stop_loss: float = 0.0
 
 
 # ----------------------------------------------------------------------------------------------
@@ -239,8 +240,13 @@ class CTraderSession:
             td = p.tradeData
             name = id_to_name.get(int(td.symbolId), str(td.symbolId))
             side = "buy" if td.tradeSide == self.model.ProtoOATradeSide.BUY else "sell"
-            out.append(OpenPosition(int(p.positionId), name, int(td.volume) / VOLUME_SCALE, side, float(p.price)))
+            out.append(OpenPosition(int(p.positionId), name, int(td.volume) / VOLUME_SCALE, side, float(p.price),
+                                    float(p.stopLoss) if p.HasField("stopLoss") else 0.0))
         return out
+
+    def amend_stop(self, position_id: int, stop_price: float) -> None:
+        self.call("ProtoOAAmendPositionSLTPReq", timeout=30, ctidTraderAccountId=self.account_id,
+                  positionId=position_id, stopLoss=float(stop_price))
 
     def daily_bars(self, symbol: str, days: int = 400) -> pd.DataFrame:
         info = self.symbols[symbol.upper()]
@@ -317,6 +323,23 @@ class CTraderBroker:
 
     def is_market_open(self) -> bool:
         return cfd_market_open()
+
+    def current_stops(self) -> dict[str, float]:
+        out: dict[str, float] = {}
+        for p in self.session.positions():
+            if p.side == "buy" and p.stop_loss > 0:
+                out[p.symbol] = min(out.get(p.symbol, p.stop_loss), p.stop_loss)
+        return out
+
+    def update_stop(self, symbol: str, stop_price: float) -> dict:
+        info = self.session.symbols[symbol.upper()]
+        stop_price = round(stop_price, info.digits)
+        n = 0
+        for p in self.session.positions():
+            if p.symbol == symbol.upper() and p.side == "buy":
+                self.session.amend_stop(p.position_id, stop_price)
+                n += 1
+        return {"symbol": symbol, "stop_price": stop_price, "status": f"amended x{n}"}
 
     def qty_step(self, symbol: str) -> float:
         info = self.session.symbols[symbol.upper()]

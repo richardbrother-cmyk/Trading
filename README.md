@@ -73,6 +73,21 @@ Para que opere sola sin tener un ordenador encendido, añade `ALPACA_API_KEY` y
 `paper-trading.yml` correrá un ciclo cada hora de 14:35 a 20:35 UTC de lunes a viernes
 y subirá el registro como artefacto.
 
+## Eventos de alto impacto
+
+`data/events.json` contiene el calendario de eventos que mueven el mercado (decisiones de la Fed,
+IPC, nóminas). Se edita a mano y el bot lo lee en cada ciclo. Alrededor de cada evento, desde
+`EVENT_HOURS_BEFORE` (3 h) antes hasta `EVENT_HOURS_AFTER` (1 h) después:
+
+- no se abren posiciones nuevas;
+- `EVENT_MODE=trail` (por defecto): a las posiciones que ganan al menos `EVENT_MIN_GAIN` (1 %) se
+  les sube el stop hasta `EVENT_TRAIL_PCT` (1,5 %) bajo el precio actual, sin bajarlo nunca;
+- `EVENT_MODE=close`: esas posiciones se cierran antes del evento y se reevalúan en el primer
+  ciclo tras la ventana;
+- `EVENT_MODE=off`: sin protección.
+
+El panel muestra los eventos de las próximas tres semanas y marca la ventana activa.
+
 ## Validación previa a la apertura
 
 Las señales se calculan con el cierre diario y las órdenes se ejecutan en la apertura siguiente.

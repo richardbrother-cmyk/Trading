@@ -162,6 +162,27 @@ class AlpacaBroker:
                 for o in self._get("/v2/orders", status="open", nested="false")
                 if o.get("side") == "buy" and o.get("type") == "market"]
 
+    def current_stops(self) -> dict[str, float]:
+        """Precio del stop de venta abierto por simbolo."""
+        return {o["symbol"]: float(o["stop_price"]) for o in self._get("/v2/orders", status="open", nested="false")
+                if o.get("side") == "sell" and o.get("type") == "stop" and o.get("stop_price")}
+
+    def update_stop(self, symbol: str, stop_price: float) -> dict:
+        """Sube el stop de una posicion (modifica la orden abierta o crea una GTC si no existe)."""
+        stop_price = round(stop_price, 2)
+        for o in self._get("/v2/orders", status="open", nested="false"):
+            if o["symbol"] == symbol and o.get("side") == "sell" and o.get("type") == "stop":
+                resp = self.session.patch(f"{self.base_url}/v2/orders/{o['id']}", json={"stop_price": f"{stop_price:.2f}"}, timeout=20)
+                if resp.status_code >= 400:
+                    raise RuntimeError(f"Alpaca {resp.status_code}: {resp.text}")
+                return {"symbol": symbol, "stop_price": stop_price, "status": "replaced"}
+        for p in self._get("/v2/positions"):
+            if p["symbol"] == symbol:
+                order = self._post("/v2/orders", {"symbol": symbol, "qty": p["qty"], "side": "sell", "type": "stop",
+                                                  "stop_price": f"{stop_price:.2f}", "time_in_force": "gtc"})
+                return {"symbol": symbol, "stop_price": stop_price, "status": order.get("status")}
+        raise ValueError(f"Sin posicion en {symbol}")
+
     def ensure_stops(self) -> list[dict]:
         """Coloca un stop GTC para toda posicion larga que no tenga ya una orden de venta stop abierta."""
         if not self.stop_loss_pct:

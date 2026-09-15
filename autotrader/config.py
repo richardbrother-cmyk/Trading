@@ -41,6 +41,12 @@ class Settings:
     alpaca_secret_key: str = ""
     alpaca_base_url: str = PAPER_URL
     exposure_leverage: float = 1.0  # multiplica el tope de exposicion (solo tiene sentido en CFDs)
+    event_mode: str = "trail"  # trail | close | off: proteccion alrededor de eventos de alto impacto
+    event_hours_before: float = 3.0
+    event_hours_after: float = 1.0
+    event_min_gain: float = 0.01  # solo se protegen posiciones con al menos esta ganancia
+    event_trail_pct: float = 0.015  # stop a esta distancia bajo el precio actual durante la ventana
+    events_path: str = ""  # vacio = data/events.json
     max_gap_down: float = 0.015  # no abrir posicion si el precio en vivo cae mas de esto vs el ultimo cierre
     max_gap_up: float = 0.03  # ni si sube mas de esto (perseguir un hueco)
     ctrader_client_id: str = ""
@@ -73,6 +79,12 @@ class Settings:
             alpaca_secret_key=_env("ALPACA_SECRET_KEY", ""),
             alpaca_base_url=_env("ALPACA_BASE_URL", PAPER_URL).rstrip("/"),
             exposure_leverage=float(_env("EXPOSURE_LEVERAGE", "1")),
+            event_mode=_env("EVENT_MODE", "trail").lower(),
+            event_hours_before=float(_env("EVENT_HOURS_BEFORE", "3")),
+            event_hours_after=float(_env("EVENT_HOURS_AFTER", "1")),
+            event_min_gain=float(_env("EVENT_MIN_GAIN", "0.01")),
+            event_trail_pct=float(_env("EVENT_TRAIL_PCT", "0.015")),
+            events_path=_env("EVENTS_PATH", ""),
             max_gap_down=float(_env("MAX_GAP_DOWN", "0.015")),
             max_gap_up=float(_env("MAX_GAP_UP", "0.03")),
             ctrader_client_id=_env("CTRADER_CLIENT_ID", ""),
@@ -103,6 +115,8 @@ class Settings:
         if self.broker == "alpaca" or self.data_provider == "alpaca":
             if not (self.alpaca_api_key and self.alpaca_secret_key):
                 raise ConfigError("Faltan ALPACA_API_KEY / ALPACA_SECRET_KEY")
+        if self.event_mode not in {"trail", "close", "off"}:
+            raise ConfigError("EVENT_MODE debe ser trail, close u off")
         if not 1 <= self.exposure_leverage <= 10:
             raise ConfigError("EXPOSURE_LEVERAGE debe estar entre 1 y 10")
         if self.broker == "ctrader":

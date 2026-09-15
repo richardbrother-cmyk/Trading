@@ -1,0 +1,80 @@
+{
+  "_doc": "Eventos de alto impacto (UTC). FOMC: decision a las 14:00 ET (18:00 UTC en horario de verano, 19:00 UTC en invierno). CPI y NFP: 08:30 ET. Editar libremente; el bot lo lee en cada ciclo.",
+  "events": [
+    {
+      "name": "FOMC: decisión de tipos + proyecciones",
+      "at": "2026-09-16T18:00:00Z",
+      "impact": "high",
+      "tags": [
+        "fed",
+        "rates"
+      ]
+    },
+    {
+      "name": "Nóminas no agrícolas (NFP)",
+      "at": "2026-10-02T12:30:00Z",
+      "impact": "high",
+      "tags": [
+        "jobs"
+      ]
+    },
+    {
+      "name": "IPC EE. UU. (CPI) de septiembre",
+      "at": "2026-10-14T12:30:00Z",
+      "impact": "high",
+      "tags": [
+        "inflation"
+      ]
+    },
+    {
+      "name": "FOMC: decisión de tipos",
+      "at": "2026-10-28T18:00:00Z",
+      "impact": "high",
+      "tags": [
+        "fed",
+        "rates"
+      ]
+    },
+    {
+      "name": "Nóminas no agrícolas (NFP)",
+      "at": "2026-11-06T13:30:00Z",
+      "impact": "high",
+      "tags": [
+        "jobs"
+      ]
+    },
+    {
+      "name": "IPC EE. UU. (CPI) de octubre",
+      "at": "2026-11-10T13:30:00Z",
+      "impact": "high",
+      "tags": [
+        "inflation"
+      ]
+    },
+    {
+      "name": "Nóminas no agrícolas (NFP)",
+      "at": "2026-12-04T13:30:00Z",
+      "impact": "high",
+      "tags": [
+        "jobs"
+      ]
+    },
+    {
+      "name": "FOMC: decisión de tipos + proyecciones",
+      "at": "2026-12-09T19:00:00Z",
+      "impact": "high",
+      "tags": [
+        "fed",
+        "rates"
+      ]
+    },
+    {
+      "name": "IPC EE. UU. (CPI) de noviembre",
+      "at": "2026-12-10T13:30:00Z",
+      "impact": "high",
+      "tags": [
+        "inflation"
+      ]
+    }
+  ]
+}
