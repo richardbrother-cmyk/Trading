@@ -6,7 +6,7 @@ name: ctrader-swing
 #          CTRADER_SWING_ACCOUNT_LOGIN (numero de la cuenta demo de 200 USD).
 on:
   schedule:
-    - cron: "7 0,4,8,12,16,20 * * 0-5"
+    - cron: "7 1,5,9,13,17,21 * * 0-5"
   workflow_dispatch:
     inputs:
       dry_run:
@@ -18,7 +18,7 @@ permissions:
   contents: write
 
 env:
-  SCHEDULE_ENABLED: "false"
+  SCHEDULE_ENABLED: "true"
 
 jobs:
   gate:

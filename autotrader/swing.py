@@ -50,9 +50,11 @@ class SwingParams:
         return int(self.max_hold_days * per_day)
 
 
-def resample(df15: pd.DataFrame, timeframe: str) -> pd.DataFrame:
+def resample(df15: pd.DataFrame, timeframe: str, offset: str = "1h") -> pd.DataFrame:
+    """Agrega a H1/H4. Las barras H4 de cTrader (Fusion) empiezan a las 01, 05, 09... UTC: offset 1h."""
     rule = TF_RULE[timeframe]
-    out = df15.resample(rule, label="left", closed="left").agg({"open": "first", "high": "max", "low": "min", "close": "last", "volume": "sum"})
+    out = df15.resample(rule, label="left", closed="left", offset=offset if timeframe == "H4" else "0h").agg(
+        {"open": "first", "high": "max", "low": "min", "close": "last", "volume": "sum"})
     return out.dropna(subset=["open", "close"])
 
 
