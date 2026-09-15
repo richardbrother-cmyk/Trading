@@ -1,0 +1,46 @@
+name: intraday-research
+
+# Descarga barras M15 de cTrader y corre el backtest intradia. Lanzamiento manual.
+on:
+  workflow_dispatch:
+    inputs:
+      symbols:
+        description: "Simbolos (coma)"
+        default: "US500,NAS100,XAUUSD,XTIUSD,EURUSD,GBPUSD"
+      days:
+        description: "Dias de historico"
+        default: "120"
+
+permissions:
+  contents: write
+
+jobs:
+  research:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      BROKER: ctrader
+      DATA_PROVIDER: ctrader
+      CTRADER_DEMO: "true"
+      CTRADER_CLIENT_ID: ${{ secrets.CTRADER_CLIENT_ID }}
+      CTRADER_CLIENT_SECRET: ${{ secrets.CTRADER_CLIENT_SECRET }}
+      CTRADER_ACCOUNT_LOGIN: ${{ secrets.CTRADER_ACCOUNT_LOGIN }}
+      CTRADER_ACCESS_TOKEN: ${{ secrets.CTRADER_ACCESS_TOKEN }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install -r requirements.txt
+      - name: Descargar barras M15
+        run: python scripts/fetch_intraday.py --symbols "${{ inputs.symbols }}" --days "${{ inputs.days }}"
+      - name: Backtest intradia
+        run: python scripts/intraday_backtest.py
+      - name: Publicar datos e informe
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add data/intraday docs/intraday_report.json
+          if git diff --cached --quiet; then echo "sin cambios"; exit 0; fi
+          git commit -m "Investigación intradía: datos M15 e informe"
+          for i in 1 2 3; do git pull --rebase -q origin "${GITHUB_REF_NAME}" && git push && break || sleep 5; done
