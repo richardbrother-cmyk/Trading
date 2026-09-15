@@ -162,6 +162,23 @@ class AlpacaBroker:
                 for o in self._get("/v2/orders", status="open", nested="false")
                 if o.get("side") == "buy" and o.get("type") == "market"]
 
+    def ensure_stops(self) -> list[dict]:
+        """Coloca un stop GTC para toda posicion larga que no tenga ya una orden de venta stop abierta."""
+        if not self.stop_loss_pct:
+            return []
+        open_stops = {o["symbol"] for o in self._get("/v2/orders", status="open", nested="false")
+                      if o.get("side") == "sell" and o.get("type") == "stop"}
+        placed = []
+        for p in self._get("/v2/positions"):
+            qty = int(float(p["qty"]))
+            if p["symbol"] in open_stops or qty <= 0:
+                continue
+            stop_price = round(float(p["avg_entry_price"]) * (1 - self.stop_loss_pct), 2)
+            order = self._post("/v2/orders", {"symbol": p["symbol"], "qty": str(qty), "side": "sell", "type": "stop",
+                                              "stop_price": f"{stop_price:.2f}", "time_in_force": "gtc"})
+            placed.append({"symbol": p["symbol"], "qty": qty, "stop_price": stop_price, "status": order.get("status")})
+        return placed
+
     def cancel_symbol_orders(self, symbol: str) -> int:
         """Cancela las ordenes abiertas de un simbolo (p.ej. el stop vinculado antes de vender por senal)."""
         n = 0
@@ -194,8 +211,10 @@ class AlpacaBroker:
         side = side.lower()
         payload = {"symbol": symbol, "qty": str(qty), "side": side, "type": "market", "time_in_force": "day"}
         if side == "buy" and self.stop_loss_pct and price_hint:
+            # El tramo de stop hereda la vigencia del padre: con "day" caducaria al cierre y la posicion
+            # quedaria sin proteccion al dia siguiente. Con "gtc" el stop sobrevive hasta ejecutarse o cancelarse.
             stop_price = round(price_hint * (1 - self.stop_loss_pct), 2)
-            payload.update({"order_class": "oto", "stop_loss": {"stop_price": f"{stop_price:.2f}"}})
+            payload.update({"order_class": "oto", "time_in_force": "gtc", "stop_loss": {"stop_price": f"{stop_price:.2f}"}})
         elif side == "sell":
             self.cancel_symbol_orders(symbol)
         order = self._post("/v2/orders", payload)

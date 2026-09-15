@@ -80,6 +80,7 @@ def test_alpaca_buy_attaches_oto_stop():
     b.submit_market_order("GLD", 10, "buy", price_hint=400.0)
     p = sess.posted[0]
     assert p["order_class"] == "oto" and p["stop_loss"] == {"stop_price": "380.00"} and p["type"] == "market"
+    assert p["time_in_force"] == "gtc"  # el stop hereda la vigencia: "day" caducaria al cierre
 
 
 def test_alpaca_sell_cancels_open_orders_first():
@@ -88,3 +89,18 @@ def test_alpaca_sell_cancels_open_orders_first():
     b.submit_market_order("GLD", 10, "sell", price_hint=390.0)
     assert sess.deleted == [f"{PAPER_URL}/v2/orders/stop1"]
     assert "order_class" not in sess.posted[0] and sess.posted[0]["side"] == "sell"
+
+
+def test_ensure_stops_places_missing_gtc_stops():
+    class Sess(_FakeSession):
+        def get(self, url, params=None, timeout=None):
+            if "/v2/positions" in url:
+                return _FakeResp([{"symbol": "GLD", "qty": "38", "avg_entry_price": "391.76"},
+                                  {"symbol": "SPY", "qty": "19", "avg_entry_price": "758.79"}])
+            return _FakeResp(self.open_orders)
+
+    sess = Sess([{"id": "s1", "symbol": "SPY", "side": "sell", "type": "stop"}])  # SPY ya tiene stop
+    b = AlpacaBroker("k", "s", session=sess, stop_loss_pct=0.05)
+    placed = b.ensure_stops()
+    assert [p["symbol"] for p in placed] == ["GLD"]
+    assert sess.posted[0]["type"] == "stop" and sess.posted[0]["time_in_force"] == "gtc" and sess.posted[0]["stop_price"] == "372.17"

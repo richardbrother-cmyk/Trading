@@ -123,5 +123,13 @@ def run_cycle(settings: Settings, broker: Broker, provider: DataProvider, dry_ru
         except Exception as exc:  # noqa: BLE001
             summary["orders"].append({"symbol": symbol, "side": side, "qty": qty, "price": price, "status": f"error: {exc}"})
 
+    # Red de seguridad: toda posicion abierta debe tener su stop vivo en el broker
+    if hasattr(broker, "ensure_stops") and not dry_run:
+        try:
+            placed = broker.ensure_stops()
+            if placed:
+                summary["stops_placed"] = placed
+        except Exception as exc:  # noqa: BLE001
+            summary["skipped"].append(f"ensure_stops: {exc}")
     _append(log_path, summary)
     return summary
