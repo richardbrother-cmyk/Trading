@@ -209,6 +209,22 @@ Hay una copia estática en `docs/index.html`, publicada con GitHub Pages en
 <https://richardbrother-cmyk.github.io/Trading/>. El workflow de Alpaca la regenera en cada ciclo y la adjunta como
 artefacto de la ejecución.
 
+## Investigación intradía
+
+`autotrader/intraday.py` es un backtester sobre barras de 15 minutos con dos estrategias de sesión
+(ruptura del rango de apertura y cruce EMA9/EMA21), costes de spread y comisión, y tamaños que
+respetan el lote mínimo de cada CFD (útil para ver qué es operable con cuentas pequeñas).
+
+- `scripts/fetch_intraday.py` descarga barras M15 de cTrader a `data/intraday/` (solo desde una red
+  que alcance el puerto 5035, p.ej. el workflow `intraday-research.yml`).
+- `scripts/intraday_backtest.py` corre las estrategias sobre esos CSV y deja el informe en
+  `docs/intraday_report.json`.
+
+Resultado de la primera pasada (mayo a septiembre de 2026, seis símbolos): ninguna de las dos
+estrategias tiene expectativa positiva en conjunto; las pocas configuraciones ganadoras se
+concentran en petróleo solo largo, en un periodo de fuerte subida del crudo, y no se sostienen
+como regla general. Ver la conversación de investigación antes de operar nada de esto.
+
 ## Estructura de estado
 
 ```
