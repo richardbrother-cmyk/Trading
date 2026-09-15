@@ -226,6 +226,18 @@ configuración que destacaba a cuatro meses (petróleo solo largo) pierde en tre
 trimestres del año. Conclusión: con estas estrategias simples no hay ventaja intradía
 demostrable; no operar nada de esto con dinero real.
 
+## Investigación swing (1 h y 4 h, posiciones de 1 a 3 días)
+
+`autotrader/swing.py` reagrupa las barras M15 a 1 h y 4 h y prueba tres familias, largos y cortos:
+retroceso en tendencia (EMA50/200 + RSI), ruptura de máximos de N barras y reversión en bandas de
+Bollinger; stops por ATR, comisión, spread, swap diario y cierre forzoso a los 3 días.
+`scripts/swing_backtest.py` corre el barrido y deja `docs/swing_report.json`.
+
+Resultado (sep 2025 – sep 2026): retroceso y ruptura pierden en ambos marcos. Solo la reversión en
+bandas de 4 h, solo largos, tiene expectativa positiva (68 operaciones, profit factor 1,8, unos
+2,4 días por operación), pero se debilita a lo largo del año y el último trimestre es negativo.
+Candidata a prueba en demo, no a dinero real.
+
 ## Estructura de estado
 
 ```
