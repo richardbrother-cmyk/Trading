@@ -220,10 +220,11 @@ respetan el lote mínimo de cada CFD (útil para ver qué es operable con cuenta
 - `scripts/intraday_backtest.py` corre las estrategias sobre esos CSV y deja el informe en
   `docs/intraday_report.json`.
 
-Resultado de la primera pasada (mayo a septiembre de 2026, seis símbolos): ninguna de las dos
-estrategias tiene expectativa positiva en conjunto; las pocas configuraciones ganadoras se
-concentran en petróleo solo largo, en un periodo de fuerte subida del crudo, y no se sostienen
-como regla general. Ver la conversación de investigación antes de operar nada de esto.
+Resultado (septiembre 2025 a septiembre 2026, seis símbolos, 144 configuraciones de ruptura del
+rango de apertura): ninguna alcanza un profit factor de 1,2 con al menos 60 operaciones. La
+configuración que destacaba a cuatro meses (petróleo solo largo) pierde en tres de los cuatro
+trimestres del año. Conclusión: con estas estrategias simples no hay ventaja intradía
+demostrable; no operar nada de esto con dinero real.
 
 ## Estructura de estado
 
