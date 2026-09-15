@@ -1,0 +1,321 @@
+{
+ "available": true,
+ "broker": "Fusion Markets · cTrader demo",
+ "account": 10136967,
+ "at": "2026-09-15T17:38Z",
+ "balance": 9783.22,
+ "equity": 10117.1,
+ "unrealized_pnl": 333.88,
+ "leverage": 500.0,
+ "positions": [
+  {
+   "symbol": "XAGUSD",
+   "qty": 50.0,
+   "avg": 63.137,
+   "price": 63.227,
+   "stop": 61.203,
+   "pnl": 4.5,
+   "position_id": 43025194
+  },
+  {
+   "symbol": "XPTUSD",
+   "qty": 3.0,
+   "avg": 1768.39,
+   "price": 1762.3500000000001,
+   "stop": 1714.67,
+   "pnl": -18.12,
+   "position_id": 43025196
+  },
+  {
+   "symbol": "COTTON",
+   "qty": 70.0,
+   "avg": 83.58,
+   "price": 83.2,
+   "stop": 81.039,
+   "pnl": -26.6,
+   "position_id": 43025293
+  },
+  {
+   "symbol": "WHEAT",
+   "qty": 8.0,
+   "avg": 702.9,
+   "price": 703.6,
+   "stop": 681.68,
+   "pnl": 5.6,
+   "position_id": 43025294
+  },
+  {
+   "symbol": "CORN",
+   "qty": 10.0,
+   "avg": 516.05,
+   "price": 516.5,
+   "stop": 500.63,
+   "pnl": 4.5,
+   "position_id": 43025295
+  },
+  {
+   "symbol": "XTIUSD",
+   "qty": 50.0,
+   "avg": 102.164,
+   "price": 102.04899999999999,
+   "stop": 99.103,
+   "pnl": -5.75,
+   "position_id": 43036316
+  },
+  {
+   "symbol": "XNGUSD",
+   "qty": 2000.0,
+   "avg": 2.879,
+   "price": 2.868,
+   "stop": 2.793,
+   "pnl": -22.0,
+   "position_id": 43036317
+  },
+  {
+   "symbol": "COFARA",
+   "qty": 80.0,
+   "avg": 298.46,
+   "price": 304.83,
+   "stop": 0.0,
+   "pnl": 509.6,
+   "position_id": 43066056
+  }
+ ],
+ "symbols": [
+  "XAUUSD",
+  "XAGUSD",
+  "XPTUSD",
+  "XTIUSD",
+  "XBRUSD",
+  "XNGUSD",
+  "COFARA",
+  "COTTON",
+  "WHEAT",
+  "CORN",
+  "SUGAR",
+  "US500",
+  "NAS100"
+ ],
+ "settings": {
+  "stop_loss_pct": 0.03,
+  "max_positions": 8,
+  "max_position_pct": 0.12,
+  "exposure_leverage": 5.0,
+  "risk_per_trade": 0.02
+ },
+ "event_window": [],
+ "last_run": {
+  "at": "2026-09-15 17:37",
+  "equity": 10122.01,
+  "positions": 8,
+  "buys": 0,
+  "sells": 0,
+  "errors": 1,
+  "note": "XAUUSD: sin huecos libres (max 8) (+4)",
+  "decisions": [
+   {
+    "symbol": "XAUUSD",
+    "action": "BUY",
+    "rsi": 44.48287662656319,
+    "trend_up": true,
+    "close": 4298.7
+   },
+   {
+    "symbol": "XAGUSD",
+    "action": "HOLD",
+    "rsi": 44.67395966365969,
+    "trend_up": true,
+    "close": 63.227
+   },
+   {
+    "symbol": "XPTUSD",
+    "action": "HOLD",
+    "rsi": 47.62580695861045,
+    "trend_up": true,
+    "close": 1762.3500000000001
+   },
+   {
+    "symbol": "XTIUSD",
+    "action": "HOLD",
+    "rsi": 69.89882306681716,
+    "trend_up": true,
+    "close": 102.04899999999999
+   },
+   {
+    "symbol": "XBRUSD",
+    "action": "BUY",
+    "rsi": 68.67252437293291,
+    "trend_up": true,
+    "close": 107.095
+   },
+   {
+    "symbol": "XNGUSD",
+    "action": "HOLD",
+    "rsi": 51.42939187866526,
+    "trend_up": true,
+    "close": 2.868
+   },
+   {
+    "symbol": "COFARA",
+    "action": "SELL",
+    "rsi": 37.96237729301972,
+    "trend_up": false,
+    "close": 304.83
+   },
+   {
+    "symbol": "COTTON",
+    "action": "HOLD",
+    "rsi": 44.345674750272075,
+    "trend_up": true,
+    "close": 83.2
+   },
+   {
+    "symbol": "WHEAT",
+    "action": "HOLD",
+    "rsi": 51.15546892314293,
+    "trend_up": true,
+    "close": 703.6
+   },
+   {
+    "symbol": "CORN",
+    "action": "HOLD",
+    "rsi": 67.41171294417867,
+    "trend_up": true,
+    "close": 516.5
+   },
+   {
+    "symbol": "SUGAR",
+    "action": "BUY",
+    "rsi": 55.547738645455425,
+    "trend_up": true,
+    "close": 533.49
+   },
+   {
+    "symbol": "US500",
+    "action": "BUY",
+    "rsi": 47.07748026622605,
+    "trend_up": true,
+    "close": 7630.320000000001
+   },
+   {
+    "symbol": "NAS100",
+    "action": "BUY",
+    "rsi": 47.19085768406891,
+    "trend_up": true,
+    "close": 29183.14
+   }
+  ],
+  "protection": []
+ },
+ "history": [
+  [
+   "2026-09-15T17:38Z",
+   10117.1
+  ]
+ ],
+ "cycles": [
+  {
+   "at": "2026-09-15 17:37",
+   "equity": 10122.01,
+   "positions": 8,
+   "buys": 0,
+   "sells": 0,
+   "errors": 1,
+   "note": "XAUUSD: sin huecos libres (max 8) (+4)",
+   "decisions": [
+    {
+     "symbol": "XAUUSD",
+     "action": "BUY",
+     "rsi": 44.48287662656319,
+     "trend_up": true,
+     "close": 4298.7
+    },
+    {
+     "symbol": "XAGUSD",
+     "action": "HOLD",
+     "rsi": 44.67395966365969,
+     "trend_up": true,
+     "close": 63.227
+    },
+    {
+     "symbol": "XPTUSD",
+     "action": "HOLD",
+     "rsi": 47.62580695861045,
+     "trend_up": true,
+     "close": 1762.3500000000001
+    },
+    {
+     "symbol": "XTIUSD",
+     "action": "HOLD",
+     "rsi": 69.89882306681716,
+     "trend_up": true,
+     "close": 102.04899999999999
+    },
+    {
+     "symbol": "XBRUSD",
+     "action": "BUY",
+     "rsi": 68.67252437293291,
+     "trend_up": true,
+     "close": 107.095
+    },
+    {
+     "symbol": "XNGUSD",
+     "action": "HOLD",
+     "rsi": 51.42939187866526,
+     "trend_up": true,
+     "close": 2.868
+    },
+    {
+     "symbol": "COFARA",
+     "action": "SELL",
+     "rsi": 37.96237729301972,
+     "trend_up": false,
+     "close": 304.83
+    },
+    {
+     "symbol": "COTTON",
+     "action": "HOLD",
+     "rsi": 44.345674750272075,
+     "trend_up": true,
+     "close": 83.2
+    },
+    {
+     "symbol": "WHEAT",
+     "action": "HOLD",
+     "rsi": 51.15546892314293,
+     "trend_up": true,
+     "close": 703.6
+    },
+    {
+     "symbol": "CORN",
+     "action": "HOLD",
+     "rsi": 67.41171294417867,
+     "trend_up": true,
+     "close": 516.5
+    },
+    {
+     "symbol": "SUGAR",
+     "action": "BUY",
+     "rsi": 55.547738645455425,
+     "trend_up": true,
+     "close": 533.49
+    },
+    {
+     "symbol": "US500",
+     "action": "BUY",
+     "rsi": 47.07748026622605,
+     "trend_up": true,
+     "close": 7630.320000000001
+    },
+    {
+     "symbol": "NAS100",
+     "action": "BUY",
+     "rsi": 47.19085768406891,
+     "trend_up": true,
+     "close": 29183.14
+    }
+   ],
+   "protection": []
+  }
+ ]
+}
