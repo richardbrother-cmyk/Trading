@@ -18,7 +18,7 @@ def _m15(days=120, seed=5):
 def test_resample_and_strategies_hold_at_most_three_days():
     df = _m15()
     h4 = resample(df, "H4")
-    assert len(h4) == len(df) // 16
+    assert abs(len(h4) - len(df) // 16) <= 1  # el desfase de 1 h puede añadir una barra parcial
     for strat in ["pullback", "breakout", "bands"]:
         for tf in ["H1", "H4"]:
             p = SwingParams(strategy=strat, timeframe=tf)
