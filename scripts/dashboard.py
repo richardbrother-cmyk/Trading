@@ -28,6 +28,10 @@ UNIVERSES = [
 ]
 
 
+ALPACA_CACHE = "docs/alpaca_state.json"
+CTRADER_STATE = "docs/ctrader_state.json"
+
+
 def collect(no_live: bool) -> dict:
     s = Settings.from_env(".env")
     provider = DataProvider("yahoo")
@@ -48,6 +52,10 @@ def collect(no_live: bool) -> dict:
                         "pnl": round(t.pnl, 2), "ret": round(t.ret, 4), "reason": t.reason} for t in res.trades],
         })
     live = {"available": False}
+    if no_live and os.path.exists(ALPACA_CACHE):
+        with open(ALPACA_CACHE, encoding="utf-8") as fh:
+            live = json.load(fh)
+        live["stale"] = True
     if not no_live and s.alpaca_api_key:
         from autotrader.broker import AlpacaBroker
         b = AlpacaBroker(s.alpaca_api_key, s.alpaca_secret_key)
@@ -82,6 +90,15 @@ def collect(no_live: bool) -> dict:
             "positions": [{"symbol": p["symbol"], "qty": int(float(p["qty"])), "avg": float(p["avg_entry_price"]),
                            "price": float(p["current_price"]), "pnl": float(p["unrealized_pl"])} for p in positions],
         }
+    if live.get("available") and not live.get("stale"):
+        live["at"] = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%MZ")
+        os.makedirs("docs", exist_ok=True)
+        with open(ALPACA_CACHE, "w", encoding="utf-8") as fh:
+            json.dump(live, fh, ensure_ascii=False)
+    ctrader = {"available": False}
+    if os.path.exists(CTRADER_STATE):
+        with open(CTRADER_STATE, encoding="utf-8") as fh:
+            ctrader = json.load(fh)
     last_run = None
     cycles = []
     log = os.path.join(s.state_dir, "run_log.jsonl")
@@ -124,7 +141,7 @@ def collect(no_live: bool) -> dict:
         "min_gain": s.event_min_gain, "trail_pct": s.event_trail_pct}, "settings": {
         "fast_sma": s.fast_sma, "slow_sma": s.slow_sma, "rsi_max_entry": s.rsi_max_entry, "risk_per_trade": s.risk_per_trade,
         "stop_loss_pct": s.stop_loss_pct, "max_daily_loss_pct": s.max_daily_loss_pct, "initial_cash": s.initial_cash},
-        "backtests": backtests, "live": live, "last_run": last_run, "cycles": cycles}
+        "backtests": backtests, "live": live, "last_run": last_run, "cycles": cycles, "ctrader": ctrader}
 
 
 def render(d: dict) -> str:

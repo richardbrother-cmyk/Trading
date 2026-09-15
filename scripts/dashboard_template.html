@@ -1,5 +1,5 @@
 <title>Cuaderno del bot</title>
-<meta name="description" content="Panel del experimento de trading automático: backtests comparados, cuenta paper y órdenes en cola.">
+<meta name="description" content="Panel del experimento de trading automático: cuenta paper de Alpaca y demo de Fusion Markets, backtests, eventos y órdenes.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
 <style>
@@ -7,7 +7,7 @@
   color-scheme: light;
   --plane: #f4f6f9; --surface: #ffffff; --ink: #14171c; --ink-2: #545b68; --muted: #8a919e;
   --grid: #e5e8ee; --axis: #c9ced8; --ring: rgba(20,23,28,.10);
-  --accent: #2a78d6; --accent-soft: rgba(42,120,214,.10);
+  --accent: #2a78d6; --accent-soft: rgba(42,120,214,.12); --accent-ring: rgba(42,120,214,.55);
   --s1: #2a78d6; --s2: #eb6834; --s3: #1baf7a;
   --good: #006300; --good-mark: #0ca30c; --bad: #b32e2e; --bad-mark: #d03b3b; --warn: #8a5a00; --warn-mark: #fab219;
   --tip-bg: #14171c; --tip-ink: #ffffff;
@@ -17,7 +17,7 @@
     color-scheme: dark;
     --plane: #0f1114; --surface: #181b20; --ink: #f2f3f5; --ink-2: #b8bec9; --muted: #8a919e;
     --grid: #262a31; --axis: #363b44; --ring: rgba(255,255,255,.10);
-    --accent: #3987e5; --accent-soft: rgba(57,135,229,.14);
+    --accent: #3987e5; --accent-soft: rgba(57,135,229,.18); --accent-ring: rgba(57,135,229,.6);
     --s1: #3987e5; --s2: #d95926; --s3: #199e70;
     --good: #3ec13e; --good-mark: #0ca30c; --bad: #ef6b6b; --bad-mark: #d03b3b; --warn: #fab219; --warn-mark: #fab219;
     --tip-bg: #f2f3f5; --tip-ink: #14171c;
@@ -27,7 +27,7 @@
   color-scheme: dark;
   --plane: #0f1114; --surface: #181b20; --ink: #f2f3f5; --ink-2: #b8bec9; --muted: #8a919e;
   --grid: #262a31; --axis: #363b44; --ring: rgba(255,255,255,.10);
-  --accent: #3987e5; --accent-soft: rgba(57,135,229,.14);
+  --accent: #3987e5; --accent-soft: rgba(57,135,229,.18); --accent-ring: rgba(57,135,229,.6);
   --s1: #3987e5; --s2: #d95926; --s3: #199e70;
   --good: #3ec13e; --good-mark: #0ca30c; --bad: #ef6b6b; --bad-mark: #d03b3b; --warn: #fab219; --warn-mark: #fab219;
   --tip-bg: #f2f3f5; --tip-ink: #14171c;
@@ -43,6 +43,14 @@ header p { margin: 4px 0 0; color: var(--ink-2); max-width: 62ch; }
 .pill { display: inline-flex; align-items: center; gap: 8px; padding: 6px 12px; border-radius: 999px; background: var(--surface); box-shadow: 0 0 0 1px var(--ring); font-size: 13px; color: var(--ink-2); white-space: nowrap; }
 .pill .dot { width: 9px; height: 9px; border-radius: 50%; background: var(--warn-mark); }
 .pill.open .dot { background: var(--good-mark); }
+.pill.event { background: var(--accent-soft); color: var(--ink); }
+.tabs { display: flex; gap: 6px; border-bottom: 1px solid var(--grid); }
+.tab { appearance: none; background: none; border: 0; border-bottom: 3px solid transparent; margin-bottom: -1px; padding: 10px 14px; font: inherit; font-weight: 500; color: var(--ink-2); cursor: pointer; display: inline-flex; align-items: center; gap: 8px; }
+.tab:hover { color: var(--ink); }
+.tab[aria-selected="true"] { color: var(--ink); border-bottom-color: var(--accent); }
+.tab .badge { font-size: 12px; padding: 1px 8px; border-radius: 999px; background: var(--plane); box-shadow: 0 0 0 1px var(--ring); color: var(--ink-2); font-variant-numeric: tabular-nums; }
+.panel[hidden] { display: none; }
+.panel { display: grid; gap: 22px; }
 .kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 12px; }
 .tile { background: var(--surface); box-shadow: 0 0 0 1px var(--ring); border-radius: 10px; padding: 14px 16px 12px; display: grid; gap: 4px; }
 .tile .label { font-size: 12.5px; color: var(--ink-2); }
@@ -61,7 +69,7 @@ svg.chart { width: 100%; height: auto; display: block; overflow: visible; }
 svg.chart text { font-family: "IBM Plex Sans", system-ui, sans-serif; font-size: 11.5px; fill: var(--muted); font-variant-numeric: tabular-nums; }
 svg.chart .endlab { fill: var(--ink-2); font-weight: 500; font-size: 12px; }
 .tip { position: absolute; pointer-events: none; background: var(--tip-bg); color: var(--tip-ink); padding: 8px 10px; border-radius: 8px; font-size: 12.5px; line-height: 1.4; display: none; min-width: 190px; box-shadow: 0 6px 20px rgba(0,0,0,.18); }
-.tip b { font-weight: 600; } .tip .row { display: flex; justify-content: space-between; gap: 14px; } .tip .row i { display: inline-block; width: 9px; height: 9px; border-radius: 2px; margin-right: 6px; vertical-align: 0; }
+.tip b { font-weight: 600; } .tip .row { display: flex; justify-content: space-between; gap: 14px; } .tip .row i { display: inline-block; width: 9px; height: 9px; border-radius: 2px; margin-right: 6px; }
 .two { display: grid; grid-template-columns: 1.15fr 1fr; gap: 22px; }
 @media (max-width: 820px) { .two { grid-template-columns: 1fr; } }
 .tbl-wrap { overflow-x: auto; }
@@ -70,6 +78,11 @@ th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--gri
 th { font-size: 11.5px; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); font-weight: 500; white-space: nowrap; }
 td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
 tr.active td { background: var(--accent-soft); }
+th.hl, td.hl { background: var(--accent-soft); box-shadow: inset 2px 0 0 var(--accent), inset -2px 0 0 var(--accent); }
+th.hl { color: var(--ink); }
+thead th.hl { box-shadow: inset 2px 0 0 var(--accent), inset -2px 0 0 var(--accent), inset 0 2px 0 var(--accent); border-radius: 6px 6px 0 0; }
+tbody tr:last-child td.hl { box-shadow: inset 2px 0 0 var(--accent), inset -2px 0 0 var(--accent), inset 0 -2px 0 var(--accent); border-radius: 0 0 6px 6px; }
+.tag { display: inline-block; font-size: 10.5px; letter-spacing: .06em; text-transform: uppercase; padding: 1px 6px; border-radius: 4px; background: var(--accent); color: #fff; margin-left: 6px; vertical-align: 1px; }
 .sw { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 8px; vertical-align: -1px; }
 .pos { color: var(--good); } .neg { color: var(--bad); }
 .chips { display: flex; flex-wrap: wrap; gap: 8px; }
@@ -91,74 +104,116 @@ footer { color: var(--muted); font-size: 12.5px; }
 .empty { margin: 8px 0 0; color: var(--ink-2); font-size: 13.5px; padding: 12px 14px; background: var(--plane); border-radius: 8px; }
 .status { display: inline-block; font-size: 11px; letter-spacing: .06em; text-transform: uppercase; padding: 2px 7px; border-radius: 4px; box-shadow: 0 0 0 1px var(--ring); color: var(--ink-2); }
 .status.filled { color: var(--good); } .status.canceled, .status.rejected, .status.expired { color: var(--muted); } .status.accepted, .status.new, .status.held { color: var(--warn); }
+.note { font-size: 12.5px; color: var(--muted); }
 @media (prefers-reduced-motion: no-preference) { .tip { transition: opacity .12s; } }
 </style>
 <div class="wrap">
   <header>
     <div>
-      <div class="eyebrow">Experimento de trading automático · cuenta paper</div>
+      <div class="eyebrow">Experimento de trading automático · cuentas simuladas</div>
       <h1>Cuaderno del bot</h1>
-      <p>Lo que la estrategia habría hecho en dos años, y lo que está haciendo ahora mismo en la cuenta simulada de Alpaca.</p>
+      <p>Lo que la estrategia habría hecho en dos años, y lo que está haciendo ahora mismo en la cuenta paper de Alpaca y en la demo de Fusion Markets.</p>
     </div>
-    <div id="market-pill" class="pill"><span class="dot"></span><span id="market-text">Mercado</span></div>
+    <div style="display:flex;flex-wrap:wrap;gap:8px;justify-content:end">
+      <div id="event-pill" class="pill event" hidden><span class="dot" style="background:var(--accent)"></span><span id="event-text"></span></div>
+      <div id="market-pill" class="pill"><span class="dot"></span><span id="market-text">Mercado</span></div>
+    </div>
   </header>
-
-  <div class="kpis" id="kpis"></div>
-
-  <section>
-    <div class="sec-head">
-      <div><h2>Evolución del capital en backtest</h2><p class="lede">Mismo motor, misma estrategia, tres universos de activos: acciones, metales físicos y el universo completo que opera hoy. 100.000 USD iniciales, del 12 sep 2024 al 11 sep 2026.</p></div>
-      <div class="legend" id="legend"></div>
-    </div>
-    <div class="chart-wrap"><svg class="chart" id="eq" viewBox="0 0 1100 380" role="img" aria-label="Curvas de capital de tres backtests"></svg><div class="tip" id="tip"></div></div>
-  </section>
-
-  <div class="two">
-    <section>
-      <div class="sec-head"><div><h2>Métricas comparadas</h2><p class="lede">La fila resaltada es la configuración que opera hoy.</p></div></div>
-      <div class="tbl-wrap"><table id="metrics"></table></div>
-    </section>
-    <section>
-      <div class="sec-head"><div><h2 id="live-title">Cuenta paper</h2><p class="lede" id="live-lede"></p></div></div>
-      <div class="tbl-wrap"><table id="live-table"></table></div>
-    </section>
-  </div>
 
   <section>
     <div class="sec-head"><div><h2>Eventos de alto impacto</h2><p class="lede" id="events-lede"></p></div></div>
     <div class="tbl-wrap"><table id="events"></table></div>
   </section>
 
-  <section>
-    <div class="sec-head"><div><h2>Última decisión del bot</h2><p class="lede" id="run-lede"></p></div></div>
-    <div class="chips" id="decisions"></div>
-  </section>
+  <div class="tabs" role="tablist" aria-label="Broker">
+    <button class="tab" role="tab" id="tab-alpaca" aria-selected="true" aria-controls="panel-alpaca">Alpaca · acciones y ETFs <span class="badge" id="badge-alpaca"></span></button>
+    <button class="tab" role="tab" id="tab-ctrader" aria-selected="false" aria-controls="panel-ctrader">Fusion Markets · CFDs <span class="badge" id="badge-ctrader"></span></button>
+  </div>
 
-  <section>
-    <div class="sec-head">
-      <div><h2>Seguimiento de la cuenta</h2><p class="lede" id="track-lede">Capital real de la cuenta paper, día a día, según el broker.</p></div>
-    </div>
-    <div class="chart-wrap" id="track-wrap"><svg class="chart" id="track" viewBox="0 0 1100 220" role="img" aria-label="Capital de la cuenta paper por día"></svg><div class="tip" id="tip2"></div></div>
-    <p class="empty" id="track-empty" hidden>Todavía no hay recorrido: las primeras órdenes se ejecutan en la próxima apertura y a partir de ahí esta curva se dibuja sola.</p>
-    <div class="two" style="margin-top:16px">
-      <div>
-        <div class="eyebrow" style="margin-bottom:8px">Historial de órdenes</div>
-        <div class="tbl-wrap"><table id="orders-all"></table></div>
+  <!-- ============================ ALPACA ============================ -->
+  <div class="panel" id="panel-alpaca" role="tabpanel" aria-labelledby="tab-alpaca">
+    <div class="kpis" id="kpis"></div>
+
+    <section>
+      <div class="sec-head">
+        <div><h2>Seguimiento de la cuenta</h2><p class="lede" id="track-lede">Capital real de la cuenta paper, día a día, según el broker.</p></div>
       </div>
-      <div>
+      <div class="chart-wrap" id="track-wrap"><svg class="chart" id="track" viewBox="0 0 1100 220" role="img" aria-label="Capital de la cuenta paper por día"></svg><div class="tip" id="tip2"></div></div>
+      <p class="empty" id="track-empty" hidden>Todavía no hay recorrido: la curva se dibuja a partir del primer día completo.</p>
+      <div class="two" style="margin-top:16px">
+        <div>
+          <div class="sec-head"><div><h2 id="live-title">Posiciones</h2><p class="lede" id="live-lede"></p></div></div>
+          <div class="tbl-wrap"><table id="live-table"></table></div>
+        </div>
+        <div>
+          <div class="sec-head"><div><h2>Última decisión del bot</h2><p class="lede" id="run-lede"></p></div></div>
+          <div class="chips" id="decisions"></div>
+        </div>
+      </div>
+      <div class="two" style="margin-top:16px">
+        <div>
+          <div class="eyebrow" style="margin-bottom:8px">Historial de órdenes</div>
+          <div class="tbl-wrap"><table id="orders-all"></table></div>
+        </div>
+        <div>
+          <div class="eyebrow" style="margin-bottom:8px">Ciclos del bot</div>
+          <div class="tbl-wrap"><table id="cycles"></table></div>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="sec-head">
+        <div><h2>Evolución del capital en backtest</h2><p class="lede">Mismo motor, misma estrategia, tres universos de activos: acciones, metales físicos y el universo completo que opera hoy. 100.000 USD iniciales, del 12 sep 2024 al 11 sep 2026.</p></div>
+        <div class="legend" id="legend"></div>
+      </div>
+      <div class="chart-wrap"><svg class="chart" id="eq" viewBox="0 0 1100 380" role="img" aria-label="Curvas de capital de tres backtests"></svg><div class="tip" id="tip"></div></div>
+    </section>
+
+    <div class="two">
+      <section>
+        <div class="sec-head"><div><h2>Métricas comparadas</h2><p class="lede">La columna enmarcada en azul es la configuración que opera hoy.</p></div></div>
+        <div class="tbl-wrap"><table id="metrics"></table></div>
+      </section>
+      <section>
+        <div class="sec-head"><div><h2>Resultado por activo en el backtest activo</h2><p class="lede">Beneficio neto acumulado de todas las operaciones cerradas por símbolo.</p></div></div>
+        <div class="bars" id="bars"></div>
+        <details style="margin-top:14px"><summary id="trades-summary">Ver todas las operaciones</summary><div class="tbl-wrap" style="margin-top:10px"><table id="trades"></table></div></details>
+      </section>
+    </div>
+  </div>
+
+  <!-- ============================ FUSION / CTRADER ============================ -->
+  <div class="panel" id="panel-ctrader" role="tabpanel" aria-labelledby="tab-ctrader" hidden>
+    <div class="kpis" id="ct-kpis"></div>
+    <section>
+      <div class="sec-head">
+        <div><h2>Seguimiento de la cuenta demo</h2><p class="lede" id="ct-track-lede">Capital (saldo más resultado abierto) registrado en cada ciclo del bot desde GitHub Actions.</p></div>
+      </div>
+      <div class="chart-wrap" id="ct-track-wrap"><svg class="chart" id="ct-track" viewBox="0 0 1100 220" role="img" aria-label="Capital de la cuenta demo de cTrader por ciclo"></svg><div class="tip" id="ct-tip"></div></div>
+      <p class="empty" id="ct-track-empty" hidden></p>
+      <div class="two" style="margin-top:16px">
+        <div>
+          <div class="sec-head"><div><h2>Posiciones abiertas</h2><p class="lede" id="ct-pos-lede"></p></div></div>
+          <div class="tbl-wrap"><table id="ct-positions"></table></div>
+        </div>
+        <div>
+          <div class="sec-head"><div><h2>Última decisión del bot</h2><p class="lede" id="ct-run-lede"></p></div></div>
+          <div class="chips" id="ct-decisions"></div>
+        </div>
+      </div>
+      <div style="margin-top:16px">
         <div class="eyebrow" style="margin-bottom:8px">Ciclos del bot</div>
-        <div class="tbl-wrap"><table id="cycles"></table></div>
+        <div class="tbl-wrap"><table id="ct-cycles"></table></div>
       </div>
-    </div>
-  </section>
+    </section>
+    <section>
+      <div class="sec-head"><div><h2>Configuración activa</h2><p class="lede">Parámetros con los que opera el bot de CFDs, fijados en el workflow de GitHub Actions.</p></div></div>
+      <div class="tbl-wrap"><table id="ct-settings"></table></div>
+    </section>
+  </div>
 
-  <section>
-    <div class="sec-head"><div><h2>Resultado por activo en el backtest del universo completo</h2><p class="lede">Beneficio neto acumulado de todas las operaciones cerradas por símbolo.</p></div></div>
-    <div class="bars" id="bars"></div>
-    <details style="margin-top:14px"><summary id="trades-summary">Ver todas las operaciones</summary><div class="tbl-wrap" style="margin-top:10px"><table id="trades"></table></div></details>
-  </section>
-
-  <footer>Generado el __GENERATED_AT__ · Datos históricos de Yahoo Finance · Estrategia: cruce SMA con filtro RSI, stop 5 %, riesgo 2 % por operación. No es asesoramiento financiero.</footer>
+  <footer>Generado el __GENERATED_AT__ · Datos históricos de Yahoo Finance · Estrategia: cruce SMA con filtro RSI, riesgo 2 % por operación. No es asesoramiento financiero.</footer>
 </div>
 <script>
 const D = /*__DATA__*/null;
@@ -168,28 +223,120 @@ const pct = (x, d=1) => (x>0?"+":"") + (x*100).toFixed(d).replace(".", ",") + " 
 const esc = s => String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 const SERIES = ["var(--s1)","var(--s2)","var(--s3)"];
 const active = D.backtests.findIndex(b => b.name.includes("activo"));
+const live = D.live, CT = D.ctrader || {available:false};
+const nice = r => { const p = Math.pow(10, Math.floor(Math.log10(r))); const m = r/p; return (m<1.5?1:m<3.5?2:m<7.5?5:10)*p; };
 
-// --- KPIs ---
-const live = D.live, kp = [];
-if (live.available) {
-  const pending = live.orders.filter(o => o.status !== "filled");
-  const committed = pending.reduce((a,o)=>a+o.qty*(D.last_run?.decisions.find(d=>d.symbol===o.symbol)?.close||0),0);
-  kp.push({label:"Capital de la cuenta", value: fmtUSD(live.equity), sub: live.broker});
-  kp.push({label:"Efectivo disponible", value: fmtUSD(live.cash), sub: committed ? `${fmtUSD(committed)} comprometidos en órdenes` : "sin órdenes en cola"});
-  kp.push({label:"Posiciones abiertas", value: String(live.positions.length), sub: live.positions.length ? "P&L " + fmtUSD2(live.positions.reduce((a,p)=>a+p.pnl,0)) : "aún sin ejecutar"});
-  kp.push({label:"Órdenes en cola", value: String(pending.length), sub: pending.length ? "se ejecutan en la apertura" : "nada pendiente"});
-  const open = live.is_open, pill = document.getElementById("market-pill");
-  pill.classList.toggle("open", open);
-  const nextOpen = new Date(live.next_open);
-  document.getElementById("market-text").textContent = open ? "Mercado abierto" : "Mercado cerrado · abre " + nextOpen.toLocaleString("es-ES", {weekday:"short", day:"numeric", month:"short", hour:"2-digit", minute:"2-digit", timeZone:"America/New_York"}) + " ET";
-} else {
-  const m = D.backtests[active].metrics;
-  kp.push({label:"Capital final (backtest)", value: fmtUSD(m.final_equity), sub: pct(m.total_return) + " en dos años"});
-  document.getElementById("market-text").textContent = "Sin conexión con la cuenta";
+// --- Tabs ---
+(function(){
+  const tabs = [...document.querySelectorAll(".tab")];
+  function select(id){ tabs.forEach(t=>{ const on = t.id===id; t.setAttribute("aria-selected", on); document.getElementById(t.getAttribute("aria-controls")).hidden = !on; }); try { localStorage.setItem("cuaderno-tab", id); } catch(e){} }
+  tabs.forEach(t=>t.addEventListener("click", ()=>select(t.id)));
+  let saved = null; try { saved = localStorage.getItem("cuaderno-tab"); } catch(e){}
+  if (saved && document.getElementById(saved)) select(saved);
+})();
+
+// --- Generic single-series equity chart ---
+function drawEquity(svgId, tipId, wrapId, emptyId, pts, initial, emptyText){
+  const svg = document.getElementById(svgId), empty = document.getElementById(emptyId), wrap = document.getElementById(wrapId);
+  if (!pts || pts.length < 2) { wrap.hidden = true; empty.hidden = false; empty.textContent = emptyText; return; }
+  const W=1100, H=220, P={t:14, r:120, b:30, l:70};
+  const T = p => new Date(p[0]).getTime();
+  const x0 = T(pts[0]), x1 = T(pts[pts.length-1]);
+  const vals = pts.map(p=>p[1]); let lo = Math.min(...vals, initial), hi = Math.max(...vals, initial);
+  const span = Math.max(hi-lo, initial*0.01); const stp = nice(span/4); lo = Math.floor((lo-span*0.05)/stp)*stp; hi = Math.ceil((hi+span*0.05)/stp)*stp;
+  const X = t => P.l + (x1===x0 ? 0 : (t-x0)/(x1-x0))*(W-P.l-P.r), Y = v => P.t + (hi-v)/(hi-lo)*(H-P.t-P.b);
+  let g = "";
+  for (let v=lo; v<=hi+1e-9; v+=stp) g += `<line x1="${P.l}" x2="${W-P.r}" y1="${Y(v).toFixed(1)}" y2="${Y(v).toFixed(1)}" stroke="var(--grid)"/><text x="${P.l-8}" y="${(Y(v)+4).toFixed(1)}" text-anchor="end">${fmtUSD(v)}</text>`;
+  const path = pts.map((p,i)=>(i?"L":"M")+X(T(p)).toFixed(1)+" "+Y(p[1]).toFixed(1)).join("");
+  g += `<path d="${path} L${X(x1).toFixed(1)} ${Y(lo).toFixed(1)} L${X(x0).toFixed(1)} ${Y(lo).toFixed(1)} Z" fill="var(--s1)" opacity=".10"/>`;
+  g += `<line x1="${P.l}" x2="${W-P.r}" y1="${Y(initial).toFixed(1)}" y2="${Y(initial).toFixed(1)}" stroke="var(--axis)"/>`;
+  g += `<path d="${path}" fill="none" stroke="var(--s1)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>`;
+  const last = pts[pts.length-1];
+  g += `<circle cx="${X(x1).toFixed(1)}" cy="${Y(last[1]).toFixed(1)}" r="4.5" fill="var(--s1)" stroke="var(--surface)" stroke-width="2"/><text class="endlab" x="${W-P.r+12}" y="${(Y(last[1])+4).toFixed(1)}">${fmtUSD(last[1])} · ${pct(last[1]/initial-1)}</text>`;
+  const n = pts.length, every = Math.max(1, Math.round(n/8));
+  const dayOnly = (x1-x0) > 3*864e5;
+  pts.forEach((p,i)=>{ if (i%every===0 || i===n-1) g += `<text x="${X(T(p)).toFixed(1)}" y="${H-P.b+18}" text-anchor="middle">${new Date(p[0]).toLocaleString("es-ES", dayOnly?{day:"numeric",month:"short",timeZone:"UTC"}:{day:"numeric",month:"short",hour:"2-digit",minute:"2-digit",timeZone:"UTC"})}</text>`; });
+  g += `<g class="cross" style="display:none"><line class="cx" y1="${P.t}" y2="${H-P.b}" stroke="var(--axis)"/><circle class="cd" r="4.5" fill="var(--s1)" stroke="var(--surface)" stroke-width="2"/></g><rect class="hit" x="${P.l}" y="${P.t}" width="${W-P.l-P.r}" height="${H-P.t-P.b}" fill="transparent"/>`;
+  svg.innerHTML = g;
+  const tip = document.getElementById(tipId), cross = svg.querySelector(".cross");
+  svg.querySelector(".hit").addEventListener("mousemove", ev => {
+    const r = svg.getBoundingClientRect(); const sx = (ev.clientX-r.left)*W/r.width; const t = x0 + (sx-P.l)/(W-P.l-P.r)*(x1-x0);
+    let k = 0, best = Infinity; pts.forEach((p,i)=>{ const d = Math.abs(T(p)-t); if (d<best){best=d;k=i;} });
+    const px = X(T(pts[k])), py = Y(pts[k][1]);
+    cross.style.display=""; svg.querySelector(".cx").setAttribute("x1",px); svg.querySelector(".cx").setAttribute("x2",px); svg.querySelector(".cd").setAttribute("cx",px); svg.querySelector(".cd").setAttribute("cy",py);
+    tip.innerHTML = `<b>${new Date(pts[k][0]).toLocaleString("es-ES",{day:"numeric",month:"short",hour:"2-digit",minute:"2-digit",timeZone:"UTC"})} UTC</b><div class="row"><span>Capital</span><span>${fmtUSD2(pts[k][1])}</span></div><div class="row"><span>Desde el inicio</span><span>${pct(pts[k][1]/initial-1, 2)}</span></div>`;
+    tip.style.display="block"; const left=(ev.clientX-r.left)+14, maxLeft = wrap.clientWidth - tip.offsetWidth - 8; tip.style.left=Math.min(left,maxLeft)+"px"; tip.style.top=Math.max(0,(ev.clientY-r.top)-tip.offsetHeight-12)+"px";
+  });
+  svg.querySelector(".hit").addEventListener("mouseleave", ()=>{ tip.style.display="none"; cross.style.display="none"; });
 }
-document.getElementById("kpis").innerHTML = kp.map(k => `<div class="tile"><div class="label">${esc(k.label)}</div><div class="value">${esc(k.value)}</div><div class="sub ${k.cls||""}">${esc(k.sub)}</div></div>`).join("");
 
-// --- Equity chart ---
+const st = s => ({filled:"ejecutada", canceled:"cancelada", accepted:"en cola", new:"en cola", held:"stop en espera", rejected:"rechazada", expired:"expirada", partially_filled:"parcial", pending_new:"en cola"}[s]||s);
+function decisionChips(list){
+  return list.map(d=>`<span class="chip ${d.action.toLowerCase()}"><span class="k mono">${esc(d.symbol)}</span><span class="act">${d.action==="BUY"?"Comprar":d.action==="SELL"?"Vender":"Esperar"}</span><span class="m">RSI ${d.rsi!=null?Number(d.rsi).toFixed(0):"—"} · ${d.trend_up?"tendencia alcista":"tendencia bajista"}</span></span>`).join("");
+}
+function cyclesTable(cycles){
+  if (!cycles || !cycles.length) return `<tbody><tr><td class="empty">Sin ciclos registrados.</td></tr></tbody>`;
+  return `<thead><tr><th>Ciclo (UTC)</th><th class="num">Capital</th><th class="num">Pos.</th><th class="num">Compras</th><th class="num">Ventas</th><th>Nota</th></tr></thead><tbody>` + [...cycles].reverse().map(c=>`<tr${c.kind==="preopen"?' class="active"':""}><td class="mono" style="font-size:12px">${esc(c.at)}</td><td class="num">${c.equity==null?"—":fmtUSD(c.equity)}</td><td class="num">${c.positions}</td><td class="num">${c.buys||""}</td><td class="num">${c.sells||""}</td><td style="color:var(--ink-2);font-size:12.5px">${esc(c.note||"")}${c.errors?` · ${c.errors} error(es)`:""}${(c.protection&&c.protection.length)?` · ${esc(c.protection.join("; "))}`:""}</td></tr>`).join("") + "</tbody>";
+}
+
+// --- Events (shared) ---
+(function(){
+  const es = D.event_settings || {}, evs = D.events || [];
+  const modeTxt = {trail: "subir el stop de las posiciones ganadoras", close: "cerrar las posiciones ganadoras", off: "sin protección"}[es.mode] || es.mode;
+  document.getElementById("events-lede").textContent = `Desde ${es.hours_before} h antes hasta ${es.hours_after} h después de cada evento el bot no abre posiciones y aplica la protección: ${modeTxt} (ganancia mínima ${(es.min_gain*100).toFixed(1)} %, stop a ${(es.trail_pct*100).toFixed(1)} % bajo el precio).`;
+  const t = document.getElementById("events");
+  const act = evs.filter(e=>e.active);
+  if (act.length) { const p = document.getElementById("event-pill"); p.hidden = false; document.getElementById("event-text").textContent = "Ventana de evento activa: " + act[0].name; }
+  if (!evs.length) { t.innerHTML = `<tbody><tr><td class="empty">Sin eventos en las próximas tres semanas.</td></tr></tbody>`; return; }
+  const now = Date.now();
+  t.innerHTML = `<thead><tr><th>Cuándo</th><th>Evento</th><th>Estado</th></tr></thead><tbody>` + evs.map(e=>{ const d = new Date(e.at); const h = (d-now)/36e5; const when = d.toLocaleString("es-ES",{weekday:"short",day:"numeric",month:"short",hour:"2-digit",minute:"2-digit",timeZone:"UTC"}) + " UTC"; const s = e.active ? `<span class="status accepted">ventana activa</span>` : h < 0 ? `<span class="status canceled">pasado</span>` : h < 24 ? `<span class="status filled">en ${h.toFixed(0)} h</span>` : `<span class="status">en ${(h/24).toFixed(0)} días</span>`; return `<tr${e.active?' class="active"':''}><td class="mono" style="font-size:12px">${esc(when)}</td><td>${esc(e.name)}</td><td>${s}</td></tr>`; }).join("") + "</tbody>";
+})();
+
+// ============================ ALPACA ============================
+(function(){
+  const kp = [];
+  if (live.available) {
+    const pending = (live.orders||[]).filter(o => o.status !== "filled");
+    const pnl = (live.positions||[]).reduce((a,p)=>a+p.pnl,0);
+    kp.push({label:"Capital de la cuenta", value: fmtUSD(live.equity), sub: (live.broker||"Alpaca paper") + (live.stale ? " · última lectura " + esc((live.at||"").replace("T"," ").replace("Z"," UTC")) : "")});
+    kp.push({label:"Efectivo disponible", value: fmtUSD(live.cash), sub: pending.length ? `${pending.length} órdenes en cola` : "sin órdenes en cola"});
+    kp.push({label:"Posiciones abiertas", value: String((live.positions||[]).length), sub: (live.positions||[]).length ? "P&L abierto " + fmtUSD2(pnl) : "sin posiciones", cls: pnl>=0?"good":"bad"});
+    kp.push({label:"Desde el inicio", value: pct(live.equity/D.settings.initial_cash-1, 2), sub: fmtUSD(D.settings.initial_cash) + " iniciales", cls: live.equity>=D.settings.initial_cash?"good":"bad"});
+    const open = live.is_open, pill = document.getElementById("market-pill");
+    pill.classList.toggle("open", !!open);
+    const nextOpen = new Date(live.next_open);
+    document.getElementById("market-text").textContent = open ? "Bolsa EE. UU. abierta" : "Bolsa EE. UU. cerrada · abre " + nextOpen.toLocaleString("es-ES", {weekday:"short", day:"numeric", month:"short", hour:"2-digit", minute:"2-digit", timeZone:"America/New_York"}) + " ET";
+    document.getElementById("badge-alpaca").textContent = pct(live.equity/D.settings.initial_cash-1, 1);
+  } else {
+    const m = D.backtests[active].metrics;
+    kp.push({label:"Capital final (backtest)", value: fmtUSD(m.final_equity), sub: pct(m.total_return) + " en dos años"});
+    document.getElementById("market-text").textContent = "Sin conexión con la cuenta";
+  }
+  document.getElementById("kpis").innerHTML = kp.map(k => `<div class="tile"><div class="label">${esc(k.label)}</div><div class="value">${esc(k.value)}</div><div class="sub ${k.cls||""}">${k.sub}</div></div>`).join("");
+
+  drawEquity("track", "tip2", "track-wrap", "track-empty", live.available ? live.history : [], D.settings.initial_cash, "Todavía no hay recorrido: la curva se dibuja a partir del primer día completo.");
+
+  const t = document.getElementById("live-table"), lede = document.getElementById("live-lede");
+  if (!live.available) { lede.textContent = "El panel se generó sin acceso a la cuenta."; t.innerHTML = ""; }
+  else if ((live.positions||[]).length) {
+    lede.textContent = `Precio medio de entrada, resultado no realizado y stop loss vigente en el broker (${(D.settings.stop_loss_pct*100).toFixed(0)} % bajo la entrada, o más alto si el bot lo subió).`;
+    t.innerHTML = `<thead><tr><th>Activo</th><th class="num">Cant.</th><th class="num">Entrada</th><th class="num">Actual</th><th class="num">Stop</th><th class="num">P&L</th></tr></thead><tbody>` + live.positions.map(p=>{ const stop = (live.stops && live.stops[p.symbol]) || p.avg*(1-D.settings.stop_loss_pct); return `<tr><td class="mono">${esc(p.symbol)}</td><td class="num">${p.qty}</td><td class="num">${fmtUSD2(p.avg)}</td><td class="num">${fmtUSD2(p.price)}</td><td class="num">${fmtUSD2(stop)}</td><td class="num ${p.pnl>=0?"pos":"neg"}">${fmtUSD2(p.pnl)} <span style="color:var(--muted)">(${pct(p.pnl/(p.avg*p.qty))})</span></td></tr>`; }).join("") + "</tbody>";
+  } else {
+    document.getElementById("live-title").textContent = "Órdenes en cola";
+    lede.textContent = live.orders.length ? "Aceptadas por el broker; se ejecutan a precio de mercado en la próxima apertura. Cada compra lleva un stop loss vinculado." : "No hay posiciones ni órdenes pendientes.";
+    t.innerHTML = live.orders.length ? `<thead><tr><th>Activo</th><th>Lado</th><th class="num">Cant.</th><th class="num">Stop</th><th>Enviada</th></tr></thead><tbody>` + live.orders.map(o=>`<tr><td class="mono">${esc(o.symbol)}</td><td>${o.side==="buy"?"Compra":"Venta"}</td><td class="num">${o.qty}</td><td class="num">${o.stop?fmtUSD2(o.stop):"—"}</td><td class="mono" style="font-size:12px">${esc(o.submitted_at)}</td></tr>`).join("") + "</tbody>" : "";
+  }
+
+  const r = D.last_run, box = document.getElementById("decisions"), rl = document.getElementById("run-lede");
+  if (!r) rl.textContent = "Aún no hay ciclos registrados.";
+  else { rl.textContent = `Ciclo del ${new Date(r.timestamp).toLocaleString("es-ES",{day:"numeric",month:"short",hour:"2-digit",minute:"2-digit",timeZone:"UTC"})} UTC. Compra si la SMA rápida supera la lenta con RSI < ${D.settings.rsi_max_entry}; vende si el cruce se invierte.`; box.innerHTML = decisionChips(r.decisions); }
+
+  const oa = document.getElementById("orders-all");
+  oa.innerHTML = live.available && (live.orders_all||[]).length ? `<thead><tr><th>Cuándo (UTC)</th><th>Activo</th><th>Lado</th><th class="num">Cant.</th><th class="num">Precio</th><th>Estado</th></tr></thead><tbody>` + live.orders_all.map(o=>`<tr><td class="mono" style="font-size:12px">${esc(o.at)}</td><td class="mono">${esc(o.symbol)}</td><td>${o.side==="buy"?"Compra":"Venta"}</td><td class="num">${o.qty}</td><td class="num">${o.filled_price?fmtUSD2(o.filled_price):(o.type==="stop"&&o.stop_price?"stop "+fmtUSD2(o.stop_price):"mercado")}</td><td><span class="status ${esc(o.status)}">${st(o.status)}</span></td></tr>`).join("") + "</tbody>" : `<tbody><tr><td class="empty">Sin órdenes todavía.</td></tr></tbody>`;
+  document.getElementById("cycles").innerHTML = cyclesTable(D.cycles);
+})();
+
+// --- Backtest chart ---
 (function(){
   const W=1100, H=380, P={t:18, r:150, b:34, l:64};
   const svg = document.getElementById("eq");
@@ -198,7 +345,7 @@ document.getElementById("kpis").innerHTML = kp.map(k => `<div class="tile"><div 
   const x0 = new Date(dates[0]).getTime(), x1 = new Date(dates[dates.length-1]).getTime();
   const vals = series.flatMap(s=>s.pts.map(p=>p[1]));
   let lo = Math.min(...vals), hi = Math.max(...vals);
-  const step = niceStep((hi-lo)/5); lo = Math.floor(lo/step)*step; hi = Math.ceil(hi/step)*step;
+  const step = nice((hi-lo)/5); lo = Math.floor(lo/step)*step; hi = Math.ceil(hi/step)*step;
   const X = t => P.l + (t-x0)/(x1-x0)*(W-P.l-P.r);
   const Y = v => P.t + (hi-v)/(hi-lo)*(H-P.t-P.b);
   let g = "";
@@ -234,92 +381,15 @@ document.getElementById("kpis").innerHTML = kp.map(k => `<div class="tile"><div 
   });
   svg.querySelector("#hit").addEventListener("mouseleave", ()=>{ tip.style.display="none"; cross.style.display="none"; });
   document.getElementById("legend").innerHTML = series.map((s,i)=>`<span><i style="border-color:${s.color}"></i>${esc(s.name)}</span>`).join("");
-  function niceStep(r){ const p = Math.pow(10, Math.floor(Math.log10(r))); const m = r/p; return (m<1.5?1:m<3.5?2:m<7.5?5:10)*p; }
 })();
 
-// --- Metrics table ---
+// --- Metrics table (active column highlighted) ---
 (function(){
   const rows = [["Retorno total", b=>pct(b.metrics.total_return)], ["Rentabilidad anual", b=>pct(b.metrics.cagr)], ["Sharpe", b=>b.metrics.sharpe.toFixed(2)], ["Caída máxima", b=>pct(b.metrics.max_drawdown)], ["Operaciones", b=>b.metrics.trades], ["Acierto", b=>(b.metrics.win_rate*100).toFixed(0)+" %"], ["Profit factor", b=>b.metrics.profit_factor.toFixed(2)], ["Máx. posiciones", b=>b.max_positions+" × "+(b.max_position_pct*100)+" %"]];
-  let h = `<thead><tr><th>Métrica</th>${D.backtests.map((b,i)=>`<th class="num"><span class="sw" style="background:${SERIES[i]}"></span>${esc(b.name.replace(" (activo)",""))}</th>`).join("")}</tr></thead><tbody>`;
-  for (const [lab, f] of rows) h += `<tr><td>${lab}</td>${D.backtests.map(b=>`<td class="num">${f(b)}</td>`).join("")}</tr>`;
+  const hl = i => i===active ? ' class="num hl"' : ' class="num"';
+  let h = `<thead><tr><th>Métrica</th>${D.backtests.map((b,i)=>`<th${hl(i)}><span class="sw" style="background:${SERIES[i]}"></span>${esc(b.name.replace(" (activo)",""))}${i===active?'<span class="tag">hoy</span>':""}</th>`).join("")}</tr></thead><tbody>`;
+  for (const [lab, f] of rows) h += `<tr><td>${lab}</td>${D.backtests.map((b,i)=>`<td${hl(i)}>${f(b)}</td>`).join("")}</tr>`;
   document.getElementById("metrics").innerHTML = h + "</tbody>";
-})();
-
-// --- Live table ---
-(function(){
-  const t = document.getElementById("live-table"), lede = document.getElementById("live-lede");
-  if (!live.available) { lede.textContent = "El panel se generó sin acceso a la cuenta."; t.innerHTML = ""; return; }
-  if (live.positions.length) {
-    document.getElementById("live-title").textContent = "Posiciones abiertas";
-    lede.textContent = "Precio medio de entrada y resultado no realizado.";
-    lede.textContent = `Precio medio de entrada, resultado no realizado y stop loss vigente en el broker (${(D.settings.stop_loss_pct*100).toFixed(0)} % bajo la entrada).`;
-    t.innerHTML = `<thead><tr><th>Activo</th><th class="num">Cant.</th><th class="num">Entrada</th><th class="num">Actual</th><th class="num">Stop</th><th class="num">P&L</th></tr></thead><tbody>` + live.positions.map(p=>{ const stop = (live.stops && live.stops[p.symbol]) || p.avg*(1-D.settings.stop_loss_pct); return `<tr><td class="mono">${esc(p.symbol)}</td><td class="num">${p.qty}</td><td class="num">${fmtUSD2(p.avg)}</td><td class="num">${fmtUSD2(p.price)}</td><td class="num">${fmtUSD2(stop)}</td><td class="num ${p.pnl>=0?"pos":"neg"}">${fmtUSD2(p.pnl)} <span style="color:var(--muted)">(${pct(p.pnl/(p.avg*p.qty))})</span></td></tr>`; }).join("") + "</tbody>";
-  } else {
-    document.getElementById("live-title").textContent = "Órdenes en cola";
-    lede.textContent = live.orders.length ? "Aceptadas por el broker; se ejecutan a precio de mercado en la próxima apertura. Cada compra lleva un stop loss vinculado que se activa al ejecutarse." : "No hay órdenes pendientes.";
-    t.innerHTML = `<thead><tr><th>Activo</th><th>Lado</th><th class="num">Cant.</th><th class="num">Ref. cierre</th><th class="num">Stop</th><th>Enviada</th></tr></thead><tbody>` + live.orders.map(o=>{ const px = D.last_run?.decisions.find(d=>d.symbol===o.symbol)?.close; return `<tr><td class="mono">${esc(o.symbol)}</td><td>${o.side==="buy"?"Compra":"Venta"}</td><td class="num">${o.qty}</td><td class="num">${px?fmtUSD2(px):"—"}</td><td class="num">${o.stop?fmtUSD2(o.stop):"—"}</td><td class="mono" style="font-size:12px">${esc(o.submitted_at)}</td></tr>`; }).join("") + "</tbody>";
-  }
-})();
-
-// --- Events ---
-(function(){
-  const es = D.event_settings || {}, evs = D.events || [];
-  const modeTxt = {trail: "subir el stop de las posiciones ganadoras", close: "cerrar las posiciones ganadoras", off: "sin protección"}[es.mode] || es.mode;
-  document.getElementById("events-lede").textContent = `Desde ${es.hours_before} h antes hasta ${es.hours_after} h después de cada evento el bot no abre posiciones y aplica la protección: ${modeTxt} (ganancia mínima ${(es.min_gain*100).toFixed(1)} %, stop a ${(es.trail_pct*100).toFixed(1)} % bajo el precio).`;
-  const t = document.getElementById("events");
-  if (!evs.length) { t.innerHTML = `<tbody><tr><td class="empty">Sin eventos en las próximas tres semanas.</td></tr></tbody>`; return; }
-  const now = Date.now();
-  t.innerHTML = `<thead><tr><th>Cuándo</th><th>Evento</th><th>Estado</th></tr></thead><tbody>` + evs.map(e=>{ const d = new Date(e.at); const h = (d-now)/36e5; const when = d.toLocaleString("es-ES",{weekday:"short",day:"numeric",month:"short",hour:"2-digit",minute:"2-digit",timeZone:"UTC"}) + " UTC"; const st = e.active ? `<span class="status accepted">ventana activa</span>` : h < 0 ? `<span class="status canceled">pasado</span>` : h < 24 ? `<span class="status filled">en ${h.toFixed(0)} h</span>` : `<span class="status">en ${(h/24).toFixed(0)} días</span>`; return `<tr${e.active?' class="active"':''}><td class="mono" style="font-size:12px">${esc(when)}</td><td>${esc(e.name)}</td><td>${st}</td></tr>`; }).join("") + "</tbody>";
-})();
-
-// --- Decisions ---
-(function(){
-  const r = D.last_run, box = document.getElementById("decisions"), lede = document.getElementById("run-lede");
-  if (!r) { lede.textContent = "Aún no hay ciclos registrados."; return; }
-  lede.textContent = `Ciclo del ${new Date(r.timestamp).toLocaleString("es-ES",{day:"numeric",month:"short",hour:"2-digit",minute:"2-digit",timeZone:"UTC"})} UTC. Compra si la SMA rápida supera la lenta con RSI < ${D.settings.rsi_max_entry}; vende si el cruce se invierte.`;
-  box.innerHTML = r.decisions.map(d=>`<span class="chip ${d.action.toLowerCase()}"><span class="k mono">${esc(d.symbol)}</span><span class="act">${d.action==="BUY"?"Comprar":d.action==="SELL"?"Vender":"Esperar"}</span><span class="m">RSI ${d.rsi?.toFixed(0)} · ${d.trend_up?"tendencia alcista":"tendencia bajista"}</span></span>`).join("");
-})();
-
-// --- Live tracking ---
-(function(){
-  const svg = document.getElementById("track"), empty = document.getElementById("track-empty"), wrap = document.getElementById("track-wrap");
-  const pts = live.available ? live.history : [];
-  if (pts.length < 2) { svg.hidden = true; wrap.hidden = true; empty.hidden = false; }
-  else {
-    const W=1100, H=220, P={t:14, r:110, b:30, l:64};
-    const x0 = new Date(pts[0][0]).getTime(), x1 = new Date(pts[pts.length-1][0]).getTime();
-    const vals = pts.map(p=>p[1]); let lo = Math.min(...vals, D.settings.initial_cash), hi = Math.max(...vals, D.settings.initial_cash);
-    const span = Math.max(hi-lo, D.settings.initial_cash*0.01); const stp = nice(span/4); lo = Math.floor((lo-span*0.05)/stp)*stp; hi = Math.ceil((hi+span*0.05)/stp)*stp;
-    const X = t => P.l + (x1===x0 ? 0 : (t-x0)/(x1-x0))*(W-P.l-P.r), Y = v => P.t + (hi-v)/(hi-lo)*(H-P.t-P.b);
-    let g = "";
-    for (let v=lo; v<=hi+1e-9; v+=stp) g += `<line x1="${P.l}" x2="${W-P.r}" y1="${Y(v).toFixed(1)}" y2="${Y(v).toFixed(1)}" stroke="var(--grid)"/><text x="${P.l-8}" y="${(Y(v)+4).toFixed(1)}" text-anchor="end">${fmtUSD(v)}</text>`;
-    const path = pts.map((p,i)=>(i?"L":"M")+X(new Date(p[0]).getTime()).toFixed(1)+" "+Y(p[1]).toFixed(1)).join("");
-    g += `<path d="${path} L${X(x1).toFixed(1)} ${Y(lo).toFixed(1)} L${X(x0).toFixed(1)} ${Y(lo).toFixed(1)} Z" fill="var(--s1)" opacity=".10"/>`;
-    g += `<line x1="${P.l}" x2="${W-P.r}" y1="${Y(D.settings.initial_cash).toFixed(1)}" y2="${Y(D.settings.initial_cash).toFixed(1)}" stroke="var(--axis)"/>`;
-    g += `<path d="${path}" fill="none" stroke="var(--s1)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>`;
-    const last = pts[pts.length-1];
-    g += `<circle cx="${X(x1).toFixed(1)}" cy="${Y(last[1]).toFixed(1)}" r="4.5" fill="var(--s1)" stroke="var(--surface)" stroke-width="2"/><text class="endlab" x="${W-P.r+12}" y="${(Y(last[1])+4).toFixed(1)}">${fmtUSD(last[1])} · ${pct(last[1]/D.settings.initial_cash-1)}</text>`;
-    const n = pts.length, every = Math.max(1, Math.round(n/8));
-    pts.forEach((p,i)=>{ if (i%every===0 || i===n-1) g += `<text x="${X(new Date(p[0]).getTime()).toFixed(1)}" y="${H-P.b+18}" text-anchor="middle">${new Date(p[0]).toLocaleDateString("es-ES",{day:"numeric",month:"short"})}</text>`; });
-    g += `<g id="cross2" style="display:none"><line id="cx2" y1="${P.t}" y2="${H-P.b}" stroke="var(--axis)"/><circle id="cd2" r="4.5" fill="var(--s1)" stroke="var(--surface)" stroke-width="2"/></g><rect id="hit2" x="${P.l}" y="${P.t}" width="${W-P.l-P.r}" height="${H-P.t-P.b}" fill="transparent"/>`;
-    svg.innerHTML = g;
-    const tip = document.getElementById("tip2"), cross = svg.querySelector("#cross2");
-    svg.querySelector("#hit2").addEventListener("mousemove", ev => {
-      const r = svg.getBoundingClientRect(); const sx = (ev.clientX-r.left)*W/r.width; const t = x0 + (sx-P.l)/(W-P.l-P.r)*(x1-x0);
-      let k = 0, best = Infinity; pts.forEach((p,i)=>{ const d = Math.abs(new Date(p[0]).getTime()-t); if (d<best){best=d;k=i;} });
-      const px = X(new Date(pts[k][0]).getTime()), py = Y(pts[k][1]);
-      cross.style.display=""; svg.querySelector("#cx2").setAttribute("x1",px); svg.querySelector("#cx2").setAttribute("x2",px); svg.querySelector("#cd2").setAttribute("cx",px); svg.querySelector("#cd2").setAttribute("cy",py);
-      tip.innerHTML = `<b>${new Date(pts[k][0]).toLocaleDateString("es-ES",{day:"numeric",month:"short",year:"numeric"})}</b><div class="row"><span>Capital</span><span>${fmtUSD2(pts[k][1])}</span></div><div class="row"><span>Desde el inicio</span><span>${pct(pts[k][1]/D.settings.initial_cash-1, 2)}</span></div>`;
-      tip.style.display="block"; const left=(ev.clientX-r.left)+14, maxLeft = wrap.clientWidth - tip.offsetWidth - 8; tip.style.left=Math.min(left,maxLeft)+"px"; tip.style.top=Math.max(0,(ev.clientY-r.top)-tip.offsetHeight-12)+"px";
-    });
-    svg.querySelector("#hit2").addEventListener("mouseleave", ()=>{ tip.style.display="none"; cross.style.display="none"; });
-  }
-  function nice(r){ const p = Math.pow(10, Math.floor(Math.log10(r))); const m = r/p; return (m<1.5?1:m<3.5?2:m<7.5?5:10)*p; }
-  const st = s => ({filled:"ejecutada", canceled:"cancelada", accepted:"en cola", new:"en cola", held:"stop en espera", rejected:"rechazada", expired:"expirada", partially_filled:"parcial"}[s]||s);
-  const oa = document.getElementById("orders-all");
-  oa.innerHTML = live.available && live.orders_all.length ? `<thead><tr><th>Cuándo (UTC)</th><th>Activo</th><th>Lado</th><th class="num">Cant.</th><th class="num">Precio</th><th>Estado</th></tr></thead><tbody>` + live.orders_all.map(o=>`<tr><td class="mono" style="font-size:12px">${esc(o.at)}</td><td class="mono">${esc(o.symbol)}</td><td>${o.side==="buy"?"Compra":"Venta"}</td><td class="num">${o.qty}</td><td class="num">${o.filled_price?fmtUSD2(o.filled_price):(o.type==="stop"&&o.stop_price?"stop "+fmtUSD2(o.stop_price):"mercado")}</td><td><span class="status ${esc(o.status)}">${st(o.status)}</span></td></tr>`).join("") + "</tbody>" : `<tbody><tr><td class="empty">Sin órdenes todavía.</td></tr></tbody>`;
-  const cy = document.getElementById("cycles");
-  cy.innerHTML = D.cycles.length ? `<thead><tr><th>Ciclo (UTC)</th><th class="num">Capital</th><th class="num">Pos.</th><th class="num">Compras</th><th class="num">Ventas</th><th>Nota</th></tr></thead><tbody>` + [...D.cycles].reverse().map(c=>`<tr${c.kind==="preopen"?' class="active"':""}><td class="mono" style="font-size:12px">${esc(c.at)}</td><td class="num">${c.equity==null?"—":fmtUSD(c.equity)}</td><td class="num">${c.positions}</td><td class="num">${c.buys||""}</td><td class="num">${c.sells||""}</td><td style="color:var(--ink-2);font-size:12.5px">${esc(c.note)}${c.errors?` · ${c.errors} error(es)`:""}</td></tr>`).join("") + "</tbody>" : `<tbody><tr><td class="empty">Sin ciclos registrados.</td></tr></tbody>`;
 })();
 
 // --- Per-symbol bars + trades ---
@@ -328,8 +398,47 @@ document.getElementById("kpis").innerHTML = kp.map(k => `<div class="tile"><div 
   for (const t of b.trades) agg[t.symbol] = (agg[t.symbol]||0) + t.pnl;
   const items = Object.entries(agg).sort((a,c)=>c[1]-a[1]); const m = Math.max(...items.map(i=>Math.abs(i[1])));
   document.getElementById("bars").innerHTML = items.map(([s,v])=>{ const w = Math.abs(v)/m*50; const left = v>=0 ? 50 : 50-w; return `<div class="bar-row"><span class="mono">${esc(s)}</span><div class="bar-track"><span class="zero" style="left:50%"></span><span class="fill" style="left:${left}%;width:${w}%;background:${v>=0?"var(--s1)":"var(--bad-mark)"};border-radius:${v>=0?"0 4px 4px 0":"4px 0 0 4px"}"></span></div><span class="v ${v>=0?"pos":"neg"}">${fmtUSD(v)}</span></div>`; }).join("");
-  document.getElementById("trades-summary").textContent = `Ver las ${b.trades.length} operaciones del backtest del universo completo`;
+  document.getElementById("trades-summary").textContent = `Ver las ${b.trades.length} operaciones del backtest activo`;
   const reason = {signal:"señal", stop:"stop loss", open_at_end:"abierta al final"};
   document.getElementById("trades").innerHTML = `<thead><tr><th>Activo</th><th>Entrada</th><th>Salida</th><th class="num">Cant.</th><th class="num">Precio entrada</th><th class="num">Precio salida</th><th class="num">P&L</th><th class="num">Retorno</th><th>Cierre</th></tr></thead><tbody>` + b.trades.map(t=>`<tr><td class="mono">${esc(t.symbol)}</td><td>${t.entry}</td><td>${t.exit}</td><td class="num">${t.qty}</td><td class="num">${fmtUSD2(t.entry_price)}</td><td class="num">${fmtUSD2(t.exit_price)}</td><td class="num ${t.pnl>=0?"pos":"neg"}">${fmtUSD2(t.pnl)}</td><td class="num ${t.ret>=0?"pos":"neg"}">${pct(t.ret)}</td><td>${reason[t.reason]||t.reason}</td></tr>`).join("") + "</tbody>";
+})();
+
+// ============================ FUSION / CTRADER ============================
+(function(){
+  const kp = document.getElementById("ct-kpis");
+  if (!CT.available) {
+    kp.innerHTML = `<div class="tile"><div class="label">Fusion Markets · cTrader demo</div><div class="value">—</div><div class="sub">Aún no hay estado publicado: el primer ciclo del workflow lo genera.</div></div>`;
+    document.getElementById("badge-ctrader").textContent = "sin datos";
+    drawEquity("ct-track", "ct-tip", "ct-track-wrap", "ct-track-empty", [], 10000, "Sin datos todavía.");
+    document.getElementById("ct-positions").innerHTML = ""; document.getElementById("ct-cycles").innerHTML = ""; document.getElementById("ct-settings").innerHTML = "";
+    return;
+  }
+  const initial = (CT.history && CT.history.length) ? CT.history[0][1] : CT.balance;
+  const base = 10000;
+  document.getElementById("badge-ctrader").textContent = pct(CT.equity/base-1, 1);
+  const tiles = [
+    {label:"Capital (saldo + abierto)", value: fmtUSD(CT.equity), sub: CT.broker + " · " + esc((CT.at||"").replace("T"," ").replace("Z"," UTC"))},
+    {label:"Saldo realizado", value: fmtUSD(CT.balance), sub: "apalancamiento de la cuenta 1:" + Math.round(CT.leverage)},
+    {label:"Posiciones abiertas", value: String(CT.positions.length), sub: "P&L abierto " + fmtUSD2(CT.unrealized_pnl), cls: CT.unrealized_pnl>=0?"good":"bad"},
+    {label:"Desde el inicio", value: pct(CT.equity/base-1, 2), sub: fmtUSD(base) + " iniciales", cls: CT.equity>=base?"good":"bad"},
+  ];
+  kp.innerHTML = tiles.map(k => `<div class="tile"><div class="label">${esc(k.label)}</div><div class="value">${esc(k.value)}</div><div class="sub ${k.cls||""}">${k.sub}</div></div>`).join("");
+  drawEquity("ct-track", "ct-tip", "ct-track-wrap", "ct-track-empty", CT.history, base, "Todavía no hay recorrido: la curva se dibuja con los ciclos del workflow.");
+  const s = CT.settings || {};
+  document.getElementById("ct-pos-lede").textContent = `Entrada media, último precio diario, stop vigente en el broker (${(s.stop_loss_pct*100).toFixed(0)} % bajo la entrada, o más alto si el bot lo subió) y resultado.`;
+  const pt = document.getElementById("ct-positions");
+  pt.innerHTML = CT.positions.length ? `<thead><tr><th>Activo</th><th class="num">Cant.</th><th class="num">Entrada</th><th class="num">Actual</th><th class="num">Stop</th><th class="num">Nominal</th><th class="num">P&L</th></tr></thead><tbody>` + CT.positions.map(p=>`<tr><td class="mono">${esc(p.symbol)}</td><td class="num">${p.qty}</td><td class="num">${p.avg.toFixed(p.avg<10?4:2)}</td><td class="num">${p.price.toFixed(p.price<10?4:2)}</td><td class="num">${p.stop?p.stop.toFixed(p.stop<10?4:2):"—"}</td><td class="num">${fmtUSD(p.qty*p.avg)}</td><td class="num ${p.pnl>=0?"pos":"neg"}">${fmtUSD2(p.pnl)} <span style="color:var(--muted)">(${pct(p.pnl/(p.avg*p.qty))})</span></td></tr>`).join("") + "</tbody>" : `<tbody><tr><td class="empty">Sin posiciones abiertas.</td></tr></tbody>`;
+  const lr = CT.last_run;
+  document.getElementById("ct-run-lede").textContent = lr ? `Ciclo del ${esc(lr.at)} UTC.` + (CT.event_window&&CT.event_window.length ? " Ventana de evento activa: " + CT.event_window.join(", ") : "") : "Aún no hay ciclos registrados.";
+  document.getElementById("ct-decisions").innerHTML = lr ? decisionChips(lr.decisions||[]) : "";
+  document.getElementById("ct-cycles").innerHTML = cyclesTable(CT.cycles);
+  document.getElementById("ct-settings").innerHTML = `<tbody>
+    <tr><td>Universo</td><td class="mono" style="font-size:12.5px">${esc((CT.symbols||[]).join(", "))}</td></tr>
+    <tr><td>Stop loss</td><td>${(s.stop_loss_pct*100).toFixed(1)} % bajo la entrada, enviado con la orden</td></tr>
+    <tr><td>Riesgo por operación</td><td>${(s.risk_per_trade*100).toFixed(1)} % del capital</td></tr>
+    <tr><td>Tamaño por posición</td><td>hasta ${(s.max_position_pct*100).toFixed(0)} % del capital × ${s.exposure_leverage}x de exposición, redondeado al lote mínimo</td></tr>
+    <tr><td>Máximo de posiciones</td><td>${s.max_positions}</td></tr>
+    <tr><td>Ciclos</td><td>cada hora, de domingo noche a viernes, desde GitHub Actions</td></tr>
+  </tbody>`;
 })();
 </script>
