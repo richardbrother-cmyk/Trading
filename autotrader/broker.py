@@ -187,16 +187,23 @@ class AlpacaBroker:
         """Coloca un stop GTC para toda posicion larga que no tenga ya una orden de venta stop abierta."""
         if not self.stop_loss_pct:
             return []
-        open_stops = {o["symbol"] for o in self._get("/v2/orders", status="open", nested="false")
-                      if o.get("side") == "sell" and o.get("type") == "stop"}
+        open_orders = self._get("/v2/orders", status="open", nested="false")
+        open_stops = {o["symbol"] for o in open_orders if o.get("side") == "sell" and o.get("type") == "stop"}
+        # Una compra OTO en curso ya lleva su stop como pata vinculada; mientras se ejecuta, las acciones
+        # recibidas quedan retenidas por esa pata y un stop adicional falla con 403.
+        pending_buys = {o["symbol"] for o in open_orders if o.get("side") == "buy"}
         placed = []
         for p in self._get("/v2/positions"):
             qty = int(float(p["qty"]))
-            if p["symbol"] in open_stops or qty <= 0:
+            if p["symbol"] in open_stops or p["symbol"] in pending_buys or qty <= 0:
                 continue
             stop_price = round(float(p["avg_entry_price"]) * (1 - self.stop_loss_pct), 2)
-            order = self._post("/v2/orders", {"symbol": p["symbol"], "qty": str(qty), "side": "sell", "type": "stop",
-                                              "stop_price": f"{stop_price:.2f}", "time_in_force": "gtc"})
+            try:
+                order = self._post("/v2/orders", {"symbol": p["symbol"], "qty": str(qty), "side": "sell", "type": "stop",
+                                                  "stop_price": f"{stop_price:.2f}", "time_in_force": "gtc"})
+            except Exception as exc:  # noqa: BLE001 - un fallo en un simbolo no debe dejar al resto sin stop
+                placed.append({"symbol": p["symbol"], "qty": qty, "stop_price": stop_price, "status": f"error: {exc}"})
+                continue
             placed.append({"symbol": p["symbol"], "qty": qty, "stop_price": stop_price, "status": order.get("status")})
         return placed
 
