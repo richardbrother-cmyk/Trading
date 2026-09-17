@@ -239,13 +239,17 @@ bandas de 4 h, solo largos, tiene expectativa positiva (68 operaciones, profit f
 Candidata a prueba en demo, no a dinero real.
 
 Esa prueba es `autotrader/swingbot.py` (comando `swing-run`) y el workflow `ctrader-swing.yml`:
-corre tras el cierre de cada barra de 4 h sobre una segunda cuenta demo de cTrader fondeada con
-200 USD y apalancamiento 1:500. Arriesga el 1 % del equity real de la cuenta (sin tope, así que
-el tamaño crece o se reduce con ella; `EQUITY_CAP` permite fijar un techo si hiciera falta),
-compra con stop a 2 ATR y objetivo en la media de las bandas enviados
+corre cada hora sobre una segunda cuenta demo de cTrader fondeada con 200 USD y apalancamiento
+1:500. GitHub Actions retrasa u omite los cron con frecuencia, así que el workflow se lanza a menudo
+y el bot solo entra si la última barra de 4 h cerrada lo hizo hace menos de 2 h
+(`SWING_MAX_SIGNAL_AGE_HOURS`); una entrada más tardía ya no es la que probó el backtest. Arriesga
+el 5 % del equity real de la cuenta por operación (`RISK_PER_TRADE`, decisión del usuario para
+simular una operativa agresiva; el tope `SWING_MAX_RISK_PCT` de 7.5 % decide si se acepta un lote
+mínimo que arriesgue más). No hay techo de equity, así que el tamaño crece o se reduce con la cuenta
+(`EQUITY_CAP` permite fijar uno). Compra con stop a 2 ATR y objetivo en la media de las bandas enviados
 con la orden, cierra a los 3 días, y etiqueta sus posiciones para no mezclarse con el bot
 tendencial ni con operaciones manuales. Oro y petróleo se descartan solos porque su lote mínimo
-arriesga más del 3 % del equity mientras la cuenta sea pequeña.
+arriesga más del tope mientras la cuenta sea pequeña.
 
 ## Estructura de estado
 

@@ -72,3 +72,28 @@ def test_swing_closes_old_positions_and_skips_held_symbols(tmp_path, monkeypatch
 def test_size_units_min_lot_rule():
     assert size_units(200, 4300, 4300 - 66, SPECS["XAUUSD"], 0.01, 0.03) == 0.0
     assert size_units(200, 7600, 7600 - 55, SPECS["US500"], 0.01, 0.03) == 0.03
+
+
+def test_swing_skips_stale_signal(tmp_path, monkeypatch):
+    import autotrader.swingbot as sb
+    bars = _h4()
+    monkeypatch.setattr(sb, "closed_h4_bars", lambda session, symbol, days=60, now=None: bars)
+    s = Settings(broker="sim", symbols=["US500"], state_dir=str(tmp_path), event_mode="off", risk_per_trade=0.01)
+    sess = FakeSession(bars, [])
+    # la barra cerro 4 h despues de abrir; 7 h tras la apertura llevan 3 h cerrada: caducada con el maximo de 2 h
+    summary = run_swing_cycle(s, sess, now=bars.index[-1] + timedelta(hours=7))
+    dec = summary["decisions"][0]
+    assert dec["action"] == "HOLD" and dec["reason"].startswith("senal caducada") and dec["bar_age_h"] == 3.0
+    assert not [c for c in sess.calls if c[0] == "ProtoOANewOrderReq"]
+    # con un maximo de 4 h si entra
+    sess2 = FakeSession(bars, [])
+    summary = run_swing_cycle(s, sess2, now=bars.index[-1] + timedelta(hours=7), max_signal_age_hours=4)
+    assert summary["decisions"][0]["action"] == "BUY"
+
+
+def test_swing_risk_5pct_and_cap():
+    from autotrader.swingbot import default_max_risk_pct
+    assert default_max_risk_pct(0.01) == 0.03
+    assert abs(default_max_risk_pct(0.05) - 0.075) < 1e-9
+    # 5 % de 200 USD = 10 USD de riesgo; con stop de 55 puntos en US500 (100 USD/punto por lote) entra 0.18 unidades
+    assert size_units(200, 7600, 7600 - 55, SPECS["US500"], 0.05, 0.075) == 0.18

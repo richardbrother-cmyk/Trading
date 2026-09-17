@@ -1,10 +1,12 @@
 """Bot swing en vivo para cTrader: reversion en bandas de Bollinger de 4 h, solo largos, 1-3 dias.
 
-Ciclo (cada 4 h, tras el cierre de la barra):
+Ciclo (cada hora; solo actua sobre la ultima barra H4 cerrada):
 1. Cierra las posiciones propias que lleven mas de `max_hold_days` abiertas.
 2. Para cada simbolo sin posicion propia: si la ultima barra H4 CERRADA cierra bajo la banda inferior
    con RSI < 30 (y no hay ventana de evento), compra a mercado con stop a `stop_atr` ATR y objetivo
-   en la media de las bandas, ambos enviados con la orden y vigilados por el broker.
+   en la media de las bandas, ambos enviados con la orden y vigilados por el broker. La senal caduca:
+   solo se entra si esa barra cerro hace menos de `max_signal_age_hours` (el planificador de GitHub
+   Actions llega con retraso y una entrada tardia ya no es la que probo el backtest).
 3. Tamano: `risk_pct` del equity (acotado por `equity_cap`), con lote minimo; si el minimo arriesga
    mas de `max_risk_pct`, no se opera ese simbolo.
 Las posiciones llevan la etiqueta SWING_LABEL: este bot no toca las del bot tendencial ni las manuales.
@@ -25,6 +27,8 @@ from .swing import SwingParams, indicators
 
 SWING_LABEL = "autotrader-swing"
 PERIOD_H4 = 10
+BAR_HOURS = 4
+DEFAULT_MAX_SIGNAL_AGE_HOURS = 2.0
 
 
 def closed_h4_bars(session: CTraderSession, symbol: str, days: int = 60, now: datetime | None = None) -> pd.DataFrame:
@@ -61,11 +65,17 @@ def size_units(equity: float, entry: float, stop: float, spec: SymbolSpec, risk_
     return float(round(units, 6))
 
 
+def default_max_risk_pct(risk_pct: float) -> float:
+    """Tope para aceptar el lote minimo: 3 % o 1.5x el riesgo objetivo, lo que sea mayor."""
+    return max(0.03, risk_pct * 1.5)
+
+
 def run_swing_cycle(settings, session: CTraderSession, params: SwingParams | None = None, equity_cap: float | None = None,
-                    dry_run: bool = False, now: datetime | None = None) -> dict:
+                    dry_run: bool = False, now: datetime | None = None, max_risk_pct: float | None = None,
+                    max_signal_age_hours: float = DEFAULT_MAX_SIGNAL_AGE_HOURS) -> dict:
     now = now or datetime.now(timezone.utc)
     p = params or SwingParams("bands", "H4", stop_atr=2.0, allow_short=False, risk_pct=settings.risk_per_trade,
-                              max_risk_pct=0.03, max_hold_days=3.0)
+                              max_risk_pct=max_risk_pct or default_max_risk_pct(settings.risk_per_trade), max_hold_days=3.0)
     balance, _d, _lev = session.trader()
     equity = balance + session.unrealized_pnl()
     sizing_equity = min(equity, equity_cap) if equity_cap else equity
@@ -113,12 +123,18 @@ def run_swing_cycle(settings, session: CTraderSession, params: SwingParams | Non
         dec = {"symbol": symbol, "close": round(float(last["close"]), info.digits), "bb_lo": round(float(last["bb_lo"]), info.digits),
                "bb_mid": round(float(last["bb_mid"]), info.digits), "rsi": round(float(last["rsi"]), 1), "atr": round(float(last["atr"]), info.digits),
                "bar": bars.index[-1].strftime("%Y-%m-%d %H:%M"), "action": "BUY" if signal else "HOLD"}
+        bar_closed = bars.index[-1].to_pydatetime() + timedelta(hours=BAR_HOURS)
+        age_h = (now - bar_closed).total_seconds() / 3600
+        dec["bar_age_h"] = round(age_h, 2)
         if symbol in held:
             dec["action"] = "HOLD"
             dec["reason"] = "posicion abierta"
         elif signal and events_now:
             dec["action"] = "HOLD"
             dec["reason"] = "ventana de evento"
+        elif signal and age_h > max_signal_age_hours:
+            dec["action"] = "HOLD"
+            dec["reason"] = f"senal caducada: la barra cerro hace {age_h:.1f} h (maximo {max_signal_age_hours:g} h)"
         summary["decisions"].append(dec)
         if dec["action"] != "BUY":
             continue

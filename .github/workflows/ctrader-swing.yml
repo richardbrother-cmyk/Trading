@@ -1,12 +1,13 @@
 name: ctrader-swing
 
 # Bot swing (bandas de Bollinger 4 h, solo largos, 1-3 dias) sobre una SEGUNDA cuenta demo de cTrader
-# que simula 200 USD con apalancamiento 1:500. Corre tras el cierre de cada barra de 4 h.
+# fondeada con 200 USD y apalancamiento 1:500. Corre cada hora: GitHub retrasa u omite los cron con frecuencia,
+# asi que se lanza a menudo y el bot solo entra si la ultima barra de 4 h cerro hace menos de 2 h.
 # Secrets: CTRADER_CLIENT_ID, CTRADER_CLIENT_SECRET, CTRADER_ACCESS_TOKEN (token que incluya esta cuenta),
 #          CTRADER_SWING_ACCOUNT_LOGIN (numero de la cuenta demo de 200 USD).
 on:
   schedule:
-    - cron: "7 1,5,9,13,17,21 * * 0-5"
+    - cron: "7 * * * 0-5"
   workflow_dispatch:
     inputs:
       dry_run:
@@ -43,9 +44,14 @@ jobs:
       CTRADER_CLIENT_SECRET: ${{ secrets.CTRADER_CLIENT_SECRET }}
       CTRADER_ACCOUNT_LOGIN: ${{ secrets.CTRADER_SWING_ACCOUNT_LOGIN }}
       CTRADER_ACCESS_TOKEN: ${{ secrets.CTRADER_ACCESS_TOKEN }}
-      # Indices y forex son operables con 200 USD; oro y petroleo se saltan solos si el lote minimo arriesga > 3 %
+      # Indices y forex son operables con 200 USD; oro y petroleo se saltan solos si el lote minimo arriesga
+      # mas de SWING_MAX_RISK_PCT
       SYMBOLS: "US500,NAS100,EURUSD,GBPUSD,XAUUSD,XTIUSD"
-      RISK_PER_TRADE: "0.01"
+      # Riesgo agresivo a peticion del usuario: 5 % del equity por operacion (tope 7.5 % para aceptar lotes minimos)
+      RISK_PER_TRADE: "0.05"
+      SWING_MAX_RISK_PCT: "0.075"
+      # Solo entra si la barra H4 de la senal cerro hace menos de 2 h
+      SWING_MAX_SIGNAL_AGE_HOURS: "2"
       # Sin tope: el tamano se calcula sobre el equity real de la cuenta (200 USD al inicio) y compone con ella
     steps:
       - uses: actions/checkout@v4

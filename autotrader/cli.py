@@ -116,7 +116,7 @@ def cmd_swing_run(args) -> int:
     """Ciclo del bot swing (bandas H4, solo largos) sobre la cuenta demo de cTrader."""
     from .ctrader import CTraderSession
     from .ctrader_auth import load_access_token
-    from .swingbot import run_swing_cycle
+    from .swingbot import DEFAULT_MAX_SIGNAL_AGE_HOURS, run_swing_cycle
 
     s = _settings(args)
     s.broker = "ctrader"
@@ -127,7 +127,10 @@ def cmd_swing_run(args) -> int:
     try:
         session.load_symbols(s.symbols)
         cap = float(os.getenv("EQUITY_CAP", "0")) or None
-        summary = run_swing_cycle(s, session, equity_cap=cap, dry_run=args.dry_run)
+        max_risk = float(os.getenv("SWING_MAX_RISK_PCT", "0")) or None
+        max_age = float(os.getenv("SWING_MAX_SIGNAL_AGE_HOURS", str(DEFAULT_MAX_SIGNAL_AGE_HOURS)))
+        summary = run_swing_cycle(s, session, equity_cap=cap, dry_run=args.dry_run, max_risk_pct=max_risk,
+                                  max_signal_age_hours=max_age)
     finally:
         session.close()
     print(json.dumps(summary, indent=2, default=str, ensure_ascii=False))
