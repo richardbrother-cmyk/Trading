@@ -234,9 +234,15 @@ footer { color: var(--muted); font-size: 12.5px; }
           <div class="chips" id="sw-decisions"></div>
         </div>
       </div>
-      <div style="margin-top:16px">
-        <div class="eyebrow" style="margin-bottom:8px">Ciclos del bot</div>
-        <div class="tbl-wrap"><table id="sw-cycles"></table></div>
+      <div class="two" style="margin-top:16px">
+        <div>
+          <div class="eyebrow" style="margin-bottom:8px">Operaciones cerradas (últimos 14 días, según el broker)</div>
+          <div class="tbl-wrap"><table id="sw-trades"></table></div>
+        </div>
+        <div>
+          <div class="eyebrow" style="margin-bottom:8px">Ciclos del bot</div>
+          <div class="tbl-wrap"><table id="sw-cycles"></table></div>
+        </div>
       </div>
     </section>
     <section>
@@ -506,6 +512,8 @@ function cyclesTable(cycles){
   const why = d => d.reason ? esc(d.reason.replace("senal caducada", "señal caducada")) : (d.close!=null && d.bb_lo!=null ? (d.close < d.bb_lo ? "bajo la banda inferior" : "sobre la banda inferior") : "");
   document.getElementById("sw-decisions").innerHTML = lr ? (lr.decisions||[]).map(d=>`<span class="chip ${d.action.toLowerCase()}"><span class="k mono">${esc(d.symbol)}</span><span class="act">${d.action==="BUY"?"Comprar":"Esperar"}</span><span class="m">RSI ${d.rsi!=null?Number(d.rsi).toFixed(0):"—"} · ${why(d)}${d.bar_age_h!=null?` · barra de hace ${Number(d.bar_age_h).toFixed(1)} h`:""}</span></span>`).join("") : "";
   document.getElementById("sw-cycles").innerHTML = cyclesTable(SW.cycles);
+  const tr = (SW.trades||[]).filter(t=>!t.error);
+  document.getElementById("sw-trades").innerHTML = tr.length ? `<thead><tr><th>Cerrada (UTC)</th><th>Par</th><th class="num">Unid.</th><th class="num">Entrada</th><th class="num">Salida</th><th class="num">Bruto</th><th class="num">Swap + com.</th><th class="num">Neto</th></tr></thead><tbody>` + [...tr].reverse().map(t=>`<tr><td class="mono" style="font-size:12px">${esc((t.at||"").replace("T"," ").replace("Z",""))}</td><td class="mono">${esc(t.symbol)}</td><td class="num">${t.units}</td><td class="num">${fx(t.entry,t.symbol)}</td><td class="num">${fx(t.exit,t.symbol)}</td><td class="num ${t.gross>=0?"pos":"neg"}">${fmtUSD2(t.gross)}</td><td class="num">${fmtUSD2(t.swap+t.commission)}</td><td class="num ${t.net>=0?"pos":"neg"}">${fmtUSD2(t.net)}</td></tr>`).join("") + "</tbody>" : `<tbody><tr><td class="empty">Sin operaciones cerradas todavía.</td></tr></tbody>`;
   document.getElementById("sw-settings").innerHTML = `<tbody>
     <tr><td>Universo</td><td class="mono" style="font-size:12.5px">${esc((SW.symbols||[]).join(", "))}</td></tr>
     <tr><td>Entrada</td><td>cierre de la barra de 4 h bajo la banda inferior de Bollinger (20, 2) con RSI &lt; 30, solo largos</td></tr>

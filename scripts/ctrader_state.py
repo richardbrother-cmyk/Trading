@@ -84,21 +84,37 @@ def collect(s: Settings, swing: bool = False, initial: float | None = None) -> t
     try:
         session.load_symbols(s.symbols)
         balance, _digits, leverage = session.trader()
-        pnl = session.unrealized_pnl()
+        by_pos = session.position_pnl()
+        pnl = sum(by_pos.values())
         positions = []
         prices: dict[str, float] = {}
         for p in session.positions(only_bot=False):
             if p.side != "buy" or (swing and p.label != SWING_LABEL):
                 continue
-            if p.symbol not in prices:
-                try:
-                    prices[p.symbol] = float(session.daily_bars(p.symbol, days=10)["close"].iloc[-1])
-                except Exception:  # noqa: BLE001
-                    prices[p.symbol] = p.price
-            px = prices[p.symbol]
-            positions.append({"symbol": p.symbol, "qty": p.units, "avg": p.price, "price": px, "stop": p.stop_loss,
+            if p.position_id in by_pos and p.units > 0:
+                # precio implicito en el resultado neto del servidor: mas fiel que el ultimo cierre diario
+                pos_pnl = by_pos[p.position_id]
+                px = p.price + pos_pnl / p.units
+            else:
+                if p.symbol not in prices:
+                    try:
+                        prices[p.symbol] = float(session.daily_bars(p.symbol, days=10)["close"].iloc[-1])
+                    except Exception:  # noqa: BLE001
+                        prices[p.symbol] = p.price
+                px = prices[p.symbol]
+                pos_pnl = (px - p.price) * p.units
+            positions.append({"symbol": p.symbol, "qty": p.units, "avg": p.price, "price": round(px, 6), "stop": p.stop_loss,
                               "target": p.take_profit or None, "opened_at": p.opened_at.strftime("%Y-%m-%dT%H:%MZ") if p.opened_at else None,
-                              "pnl": round((px - p.price) * p.units, 2), "position_id": p.position_id, "bot": p.is_bot})
+                              "pnl": round(pos_pnl, 2), "position_id": p.position_id, "bot": p.is_bot})
+        trades = []
+        try:
+            for d in session.deals(days=14):
+                if d["closes"]:
+                    trades.append({"symbol": d["symbol"], "at": d["at"].strftime("%Y-%m-%dT%H:%MZ"), "units": d["units"], "entry": d["entry_price"],
+                                   "exit": d["price"], "gross": round(d["gross"], 2), "swap": round(d["swap"], 2),
+                                   "commission": round(d["close_commission"], 2), "net": d["net"], "balance_after": d["balance_after"]})
+        except Exception as exc:  # noqa: BLE001
+            trades = [{"error": str(exc)[:120]}]
     finally:
         session.close()
     now = datetime.now(timezone.utc)
@@ -107,7 +123,7 @@ def collect(s: Settings, swing: bool = False, initial: float | None = None) -> t
     snapshot = {
         "available": True, "broker": "Fusion Markets · cTrader demo", "account": s.ctrader_account_login,
         "at": now.strftime("%Y-%m-%dT%H:%MZ"), "balance": round(balance, 2), "equity": round(balance + pnl, 2),
-        "unrealized_pnl": round(pnl, 2), "leverage": leverage, "positions": positions, "symbols": s.symbols,
+        "unrealized_pnl": round(pnl, 2), "leverage": leverage, "positions": positions, "symbols": s.symbols, "trades": trades,
         "settings": {"stop_loss_pct": s.stop_loss_pct, "max_positions": s.max_positions, "max_position_pct": s.max_position_pct,
                      "exposure_leverage": s.exposure_leverage, "risk_per_trade": s.risk_per_trade},
         "event_window": active,

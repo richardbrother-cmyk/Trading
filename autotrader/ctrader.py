@@ -232,11 +232,41 @@ class CTraderSession:
         return money(int(t.balance), int(t.moneyDigits)), int(t.moneyDigits), int(t.leverageInCents) / 100
 
     def unrealized_pnl(self) -> float:
+        return sum(self.position_pnl().values())
+
+    def position_pnl(self) -> dict[int, float]:
+        """Resultado abierto neto por posicion (id -> USD), segun el servidor."""
         try:
             res = self.call("ProtoOAGetPositionUnrealizedPnLReq", ctidTraderAccountId=self.account_id)
         except Exception:  # noqa: BLE001 - no todos los brokers lo soportan
-            return 0.0
-        return sum(money(int(p.netUnrealizedPnL), int(res.moneyDigits)) for p in res.positionUnrealizedPnL)
+            return {}
+        return {int(p.positionId): money(int(p.netUnrealizedPnL), int(res.moneyDigits)) for p in res.positionUnrealizedPnL}
+
+    def deals(self, days: int = 14) -> list[dict]:
+        """Operaciones ejecutadas en los ultimos dias; las que cierran posicion llevan el resultado realizado."""
+        now = datetime.now(timezone.utc)
+        res = self.call("ProtoOADealListReq", timeout=40, ctidTraderAccountId=self.account_id,
+                        fromTimestamp=int((now - timedelta(days=days)).timestamp() * 1000), toTimestamp=int(now.timestamp() * 1000), maxRows=500)
+        id_to_name = {info.symbol_id: name for name, info in self.symbols.items()}
+        out = []
+        for d in res.deal:
+            if d.dealStatus != self.model.ProtoOADealStatus.FILLED:
+                continue
+            md = int(d.moneyDigits) if d.HasField("moneyDigits") else 2
+            rec = {"deal_id": int(d.dealId), "position_id": int(d.positionId), "symbol": id_to_name.get(int(d.symbolId), str(d.symbolId)),
+                   "side": "buy" if d.tradeSide == self.model.ProtoOATradeSide.BUY else "sell",
+                   "units": int(d.filledVolume) / VOLUME_SCALE, "price": float(d.executionPrice),
+                   "at": datetime.fromtimestamp(int(d.executionTimestamp) / 1000, tz=timezone.utc),
+                   "commission": money(int(d.commission), md) if d.HasField("commission") else 0.0, "closes": False}
+            if d.HasField("closePositionDetail"):
+                c = d.closePositionDetail
+                cmd = int(c.moneyDigits) if c.HasField("moneyDigits") else md
+                rec.update({"closes": True, "entry_price": float(c.entryPrice), "gross": money(int(c.grossProfit), cmd),
+                            "swap": money(int(c.swap), cmd), "close_commission": money(int(c.commission), cmd),
+                            "balance_after": money(int(c.balance), cmd)})
+                rec["net"] = round(rec["gross"] + rec["swap"] + rec["close_commission"], 2)
+            out.append(rec)
+        return out
 
     def positions(self, only_bot: bool = True) -> list[OpenPosition]:
         """Posiciones abiertas. Por defecto solo las que abrio el bot (etiqueta BOT_LABEL):
