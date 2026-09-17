@@ -248,6 +248,13 @@ class CTraderSession:
         res = self.call("ProtoOADealListReq", timeout=40, ctidTraderAccountId=self.account_id,
                         fromTimestamp=int((now - timedelta(days=days)).timestamp() * 1000), toTimestamp=int(now.timestamp() * 1000), maxRows=500)
         id_to_name = {info.symbol_id: name for name, info in self.symbols.items()}
+        unknown = {int(d.symbolId) for d in res.deal} - set(id_to_name)
+        if unknown:  # operaciones manuales en simbolos que el bot no carga: resolver el nombre
+            try:
+                lst = self.call("ProtoOASymbolsListReq", ctidTraderAccountId=self.account_id, includeArchivedSymbols=False)
+                id_to_name.update({int(sym.symbolId): sym.symbolName for sym in lst.symbol if int(sym.symbolId) in unknown})
+            except Exception:  # noqa: BLE001
+                pass
         out = []
         for d in res.deal:
             if d.dealStatus != self.model.ProtoOADealStatus.FILLED:
