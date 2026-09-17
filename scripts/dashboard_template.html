@@ -129,6 +129,7 @@ footer { color: var(--muted); font-size: 12.5px; }
   <div class="tabs" role="tablist" aria-label="Broker">
     <button class="tab" role="tab" id="tab-alpaca" aria-selected="true" aria-controls="panel-alpaca">Alpaca · acciones y ETFs <span class="badge" id="badge-alpaca"></span></button>
     <button class="tab" role="tab" id="tab-ctrader" aria-selected="false" aria-controls="panel-ctrader">Fusion Markets · CFDs <span class="badge" id="badge-ctrader"></span></button>
+    <button class="tab" role="tab" id="tab-swing" aria-selected="false" aria-controls="panel-swing">Fusion · swing 200 USD <span class="badge" id="badge-swing"></span></button>
   </div>
 
   <!-- ============================ ALPACA ============================ -->
@@ -214,6 +215,36 @@ footer { color: var(--muted); font-size: 12.5px; }
     </section>
   </div>
 
+  <!-- ============================ FUSION / SWING ============================ -->
+  <div class="panel" id="panel-swing" role="tabpanel" aria-labelledby="tab-swing" hidden>
+    <div class="kpis" id="sw-kpis"></div>
+    <section>
+      <div class="sec-head">
+        <div><h2>Seguimiento de la cuenta swing</h2><p class="lede" id="sw-track-lede">Capital (saldo más resultado abierto) registrado en cada ciclo del bot swing desde GitHub Actions. Cuenta demo de 200 USD con apalancamiento 1:500.</p></div>
+      </div>
+      <div class="chart-wrap" id="sw-track-wrap"><svg class="chart" id="sw-track" viewBox="0 0 1100 220" role="img" aria-label="Capital de la cuenta swing por ciclo"></svg><div class="tip" id="sw-tip"></div></div>
+      <p class="empty" id="sw-track-empty" hidden></p>
+      <div class="two" style="margin-top:16px">
+        <div>
+          <div class="sec-head"><div><h2>Posiciones abiertas</h2><p class="lede" id="sw-pos-lede"></p></div></div>
+          <div class="tbl-wrap"><table id="sw-positions"></table></div>
+        </div>
+        <div>
+          <div class="sec-head"><div><h2>Última decisión del bot</h2><p class="lede" id="sw-run-lede"></p></div></div>
+          <div class="chips" id="sw-decisions"></div>
+        </div>
+      </div>
+      <div style="margin-top:16px">
+        <div class="eyebrow" style="margin-bottom:8px">Ciclos del bot</div>
+        <div class="tbl-wrap"><table id="sw-cycles"></table></div>
+      </div>
+    </section>
+    <section>
+      <div class="sec-head"><div><h2>Configuración activa</h2><p class="lede">Reversión a la media en bandas de Bollinger de 4 h, solo largos, salida por stop, objetivo o a los 3 días.</p></div></div>
+      <div class="tbl-wrap"><table id="sw-settings"></table></div>
+    </section>
+  </div>
+
   <footer>Generado el __GENERATED_AT__ · Datos históricos de Yahoo Finance · Estrategia: cruce SMA con filtro RSI, riesgo 2 % por operación. No es asesoramiento financiero.</footer>
 </div>
 <script>
@@ -224,7 +255,7 @@ const pct = (x, d=1) => (x>0?"+":"") + (x*100).toFixed(d).replace(".", ",") + " 
 const esc = s => String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 const SERIES = ["var(--s1)","var(--s2)","var(--s3)"];
 const active = D.backtests.findIndex(b => b.name.includes("activo"));
-const live = D.live, CT = D.ctrader || {available:false};
+const live = D.live, CT = D.ctrader || {available:false}, SW = D.swing || {available:false};
 const nice = r => { const p = Math.pow(10, Math.floor(Math.log10(r))); const m = r/p; return (m<1.5?1:m<3.5?2:m<7.5?5:10)*p; };
 
 // --- Tabs ---
@@ -247,13 +278,14 @@ function drawEquity(svgId, tipId, wrapId, emptyId, pts, initial, emptyText){
   const span = Math.max(hi-lo, initial*0.01); const stp = nice(span/4); lo = Math.floor((lo-span*0.05)/stp)*stp; hi = Math.ceil((hi+span*0.05)/stp)*stp;
   const X = t => P.l + (x1===x0 ? 0 : (t-x0)/(x1-x0))*(W-P.l-P.r), Y = v => P.t + (hi-v)/(hi-lo)*(H-P.t-P.b);
   let g = "";
-  for (let v=lo; v<=hi+1e-9; v+=stp) g += `<line x1="${P.l}" x2="${W-P.r}" y1="${Y(v).toFixed(1)}" y2="${Y(v).toFixed(1)}" stroke="var(--grid)"/><text x="${P.l-8}" y="${(Y(v)+4).toFixed(1)}" text-anchor="end">${fmtUSD(v)}</text>`;
+  const fmtY = stp < 1 ? fmtUSD2 : fmtUSD;
+  for (let v=lo; v<=hi+1e-9; v+=stp) g += `<line x1="${P.l}" x2="${W-P.r}" y1="${Y(v).toFixed(1)}" y2="${Y(v).toFixed(1)}" stroke="var(--grid)"/><text x="${P.l-8}" y="${(Y(v)+4).toFixed(1)}" text-anchor="end">${fmtY(v)}</text>`;
   const path = pts.map((p,i)=>(i?"L":"M")+X(T(p)).toFixed(1)+" "+Y(p[1]).toFixed(1)).join("");
   g += `<path d="${path} L${X(x1).toFixed(1)} ${Y(lo).toFixed(1)} L${X(x0).toFixed(1)} ${Y(lo).toFixed(1)} Z" fill="var(--s1)" opacity=".10"/>`;
   g += `<line x1="${P.l}" x2="${W-P.r}" y1="${Y(initial).toFixed(1)}" y2="${Y(initial).toFixed(1)}" stroke="var(--axis)"/>`;
   g += `<path d="${path}" fill="none" stroke="var(--s1)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>`;
   const last = pts[pts.length-1];
-  g += `<circle cx="${X(x1).toFixed(1)}" cy="${Y(last[1]).toFixed(1)}" r="4.5" fill="var(--s1)" stroke="var(--surface)" stroke-width="2"/><text class="endlab" x="${W-P.r+12}" y="${(Y(last[1])+4).toFixed(1)}">${fmtUSD(last[1])} · ${pct(last[1]/initial-1)}</text>`;
+  g += `<circle cx="${X(x1).toFixed(1)}" cy="${Y(last[1]).toFixed(1)}" r="4.5" fill="var(--s1)" stroke="var(--surface)" stroke-width="2"/><text class="endlab" x="${W-P.r+12}" y="${(Y(last[1])+4).toFixed(1)}">${fmtY(last[1])} · ${pct(last[1]/initial-1)}</text>`;
   const n = pts.length, every = Math.max(1, Math.round(n/8));
   const dayOnly = (x1-x0) > 3*864e5;
   pts.forEach((p,i)=>{ if (i%every===0 || i===n-1) g += `<text x="${X(T(p)).toFixed(1)}" y="${H-P.b+18}" text-anchor="middle">${new Date(p[0]).toLocaleString("es-ES", dayOnly?{day:"numeric",month:"short",timeZone:"UTC"}:{day:"numeric",month:"short",hour:"2-digit",minute:"2-digit",timeZone:"UTC"})}</text>`; });
@@ -440,6 +472,47 @@ function cyclesTable(cycles){
     <tr><td>Riesgo por operación</td><td>${(s.risk_per_trade*100).toFixed(1)} % del capital</td></tr>
     <tr><td>Tamaño por posición</td><td>hasta ${(s.max_position_pct*100).toFixed(0)} % del capital × ${s.exposure_leverage}x de exposición, redondeado al lote mínimo</td></tr>
     <tr><td>Máximo de posiciones</td><td>${s.max_positions}</td></tr>
+    <tr><td>Ciclos</td><td>cada hora, de domingo noche a viernes, desde GitHub Actions</td></tr>
+  </tbody>`;
+})();
+
+// ============================ FUSION / SWING ============================
+(function(){
+  const kp = document.getElementById("sw-kpis");
+  const fx = (v, sym) => v==null ? "—" : Number(v).toFixed(/USD$/.test(sym) && v < 10 ? 5 : v < 10 ? 4 : 2);
+  if (!SW.available) {
+    kp.innerHTML = `<div class="tile"><div class="label">Fusion Markets · cTrader demo · swing</div><div class="value">—</div><div class="sub">Aún no hay estado publicado: el primer ciclo del workflow lo genera.</div></div>`;
+    document.getElementById("badge-swing").textContent = "sin datos";
+    drawEquity("sw-track", "sw-tip", "sw-track-wrap", "sw-track-empty", [], 200, "Sin datos todavía.");
+    document.getElementById("sw-positions").innerHTML = ""; document.getElementById("sw-cycles").innerHTML = ""; document.getElementById("sw-settings").innerHTML = "";
+    return;
+  }
+  const base = SW.initial || 200;
+  document.getElementById("badge-swing").textContent = pct(SW.equity/base-1, 1);
+  const tiles = [
+    {label:"Capital (saldo + abierto)", value: fmtUSD2(SW.equity), sub: esc((SW.at||"").replace("T"," ").replace("Z"," UTC"))},
+    {label:"Saldo realizado", value: fmtUSD2(SW.balance), sub: "apalancamiento de la cuenta 1:" + Math.round(SW.leverage)},
+    {label:"Posiciones abiertas", value: String(SW.positions.length), sub: "P&L abierto " + fmtUSD2(SW.unrealized_pnl), cls: SW.unrealized_pnl>=0?"good":"bad"},
+    {label:"Desde el inicio", value: pct(SW.equity/base-1, 2), sub: fmtUSD2(base) + " iniciales", cls: SW.equity>=base?"good":"bad"},
+  ];
+  kp.innerHTML = tiles.map(k => `<div class="tile"><div class="label">${esc(k.label)}</div><div class="value">${esc(k.value)}</div><div class="sub ${k.cls||""}">${k.sub}</div></div>`).join("");
+  drawEquity("sw-track", "sw-tip", "sw-track-wrap", "sw-track-empty", SW.history, base, "Todavía no hay recorrido: la curva se dibuja con los ciclos del workflow.");
+  const s = SW.settings || {};
+  document.getElementById("sw-pos-lede").textContent = "Entrada, último precio, stop y objetivo enviados con la orden y vigilados por el broker, y resultado abierto.";
+  const pt = document.getElementById("sw-positions");
+  pt.innerHTML = SW.positions.length ? `<thead><tr><th>Par</th><th class="num">Unidades</th><th class="num">Entrada</th><th class="num">Actual</th><th class="num">Stop</th><th class="num">Objetivo</th><th class="num">P&L</th><th>Abierta</th></tr></thead><tbody>` + SW.positions.map(p=>`<tr><td class="mono">${esc(p.symbol)}</td><td class="num">${p.qty}</td><td class="num">${fx(p.avg,p.symbol)}</td><td class="num">${fx(p.price,p.symbol)}</td><td class="num">${p.stop?fx(p.stop,p.symbol):"—"}</td><td class="num">${p.target?fx(p.target,p.symbol):"—"}</td><td class="num ${p.pnl>=0?"pos":"neg"}">${fmtUSD2(p.pnl)}</td><td class="mono" style="font-size:12px">${esc((p.opened_at||"").replace("T"," ").replace("Z",""))}</td></tr>`).join("") + "</tbody>" : `<tbody><tr><td class="empty">Sin posiciones abiertas.</td></tr></tbody>`;
+  const lr = SW.last_run;
+  document.getElementById("sw-run-lede").textContent = lr ? `Ciclo del ${esc(lr.at)} UTC sobre la última barra de 4 h cerrada.` + (lr.event_window&&lr.event_window.length ? " Ventana de evento activa: " + lr.event_window.join(", ") : "") : "Aún no hay ciclos registrados.";
+  const why = d => d.reason ? esc(d.reason.replace("senal caducada", "señal caducada")) : (d.close!=null && d.bb_lo!=null ? (d.close < d.bb_lo ? "bajo la banda inferior" : "sobre la banda inferior") : "");
+  document.getElementById("sw-decisions").innerHTML = lr ? (lr.decisions||[]).map(d=>`<span class="chip ${d.action.toLowerCase()}"><span class="k mono">${esc(d.symbol)}</span><span class="act">${d.action==="BUY"?"Comprar":"Esperar"}</span><span class="m">RSI ${d.rsi!=null?Number(d.rsi).toFixed(0):"—"} · ${why(d)}${d.bar_age_h!=null?` · barra de hace ${Number(d.bar_age_h).toFixed(1)} h`:""}</span></span>`).join("") : "";
+  document.getElementById("sw-cycles").innerHTML = cyclesTable(SW.cycles);
+  document.getElementById("sw-settings").innerHTML = `<tbody>
+    <tr><td>Universo</td><td class="mono" style="font-size:12.5px">${esc((SW.symbols||[]).join(", "))}</td></tr>
+    <tr><td>Entrada</td><td>cierre de la barra de 4 h bajo la banda inferior de Bollinger (20, 2) con RSI &lt; 30, solo largos</td></tr>
+    <tr><td>Señal vigente</td><td>solo si la barra cerró hace menos de ${s.max_signal_age_hours} h</td></tr>
+    <tr><td>Stop y objetivo</td><td>stop a ${s.stop_atr} ATR bajo la entrada, objetivo en la media de las bandas; ambos en el broker</td></tr>
+    <tr><td>Riesgo por operación</td><td>${(s.risk_per_trade*100).toFixed(1)} % del capital real (tope ${(s.max_risk_pct*100).toFixed(1)} % para aceptar el lote mínimo)</td></tr>
+    <tr><td>Salida por tiempo</td><td>a los ${s.max_hold_days} días</td></tr>
     <tr><td>Ciclos</td><td>cada hora, de domingo noche a viernes, desde GitHub Actions</td></tr>
   </tbody>`;
 })();

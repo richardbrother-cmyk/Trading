@@ -248,7 +248,8 @@ simular una operativa agresiva; el tope `SWING_MAX_RISK_PCT` de 7.5 % decide si 
 mínimo que arriesgue más). No hay techo de equity, así que el tamaño crece o se reduce con la cuenta
 (`EQUITY_CAP` permite fijar uno). Compra con stop a 2 ATR y objetivo en la media de las bandas enviados
 con la orden, cierra a los 3 días, y etiqueta sus posiciones para no mezclarse con el bot
-tendencial ni con operaciones manuales. Oro y petróleo se descartan solos porque su lote mínimo
+tendencial ni con operaciones manuales. Cada ciclo publica `docs/swing_state.json` y el panel
+muestra la cuenta en la pestaña "Fusion · swing 200 USD". Oro y petróleo se descartan solos porque su lote mínimo
 arriesga más del tope mientras la cuenta sea pequeña.
 
 ## Estructura de estado

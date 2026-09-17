@@ -30,6 +30,7 @@ UNIVERSES = [
 
 ALPACA_CACHE = "docs/alpaca_state.json"
 CTRADER_STATE = "docs/ctrader_state.json"
+SWING_STATE = "docs/swing_state.json"
 
 
 def collect(no_live: bool) -> dict:
@@ -99,6 +100,10 @@ def collect(no_live: bool) -> dict:
     if os.path.exists(CTRADER_STATE):
         with open(CTRADER_STATE, encoding="utf-8") as fh:
             ctrader = json.load(fh)
+    swing = {"available": False}
+    if os.path.exists(SWING_STATE):
+        with open(SWING_STATE, encoding="utf-8") as fh:
+            swing = json.load(fh)
     last_run = None
     cycles = []
     log = os.path.join(s.state_dir, "run_log.jsonl")
@@ -141,7 +146,7 @@ def collect(no_live: bool) -> dict:
         "min_gain": s.event_min_gain, "trail_pct": s.event_trail_pct}, "settings": {
         "fast_sma": s.fast_sma, "slow_sma": s.slow_sma, "rsi_max_entry": s.rsi_max_entry, "risk_per_trade": s.risk_per_trade,
         "stop_loss_pct": s.stop_loss_pct, "max_daily_loss_pct": s.max_daily_loss_pct, "initial_cash": s.initial_cash},
-        "backtests": backtests, "live": live, "last_run": last_run, "cycles": cycles, "ctrader": ctrader}
+        "backtests": backtests, "live": live, "last_run": last_run, "cycles": cycles, "ctrader": ctrader, "swing": swing}
 
 
 def render(d: dict) -> str:

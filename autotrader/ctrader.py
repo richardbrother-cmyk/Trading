@@ -119,6 +119,7 @@ class OpenPosition:
     stop_loss: float = 0.0
     label: str = ""
     opened_at: datetime | None = None
+    take_profit: float = 0.0
 
     @property
     def is_bot(self) -> bool:
@@ -254,7 +255,8 @@ class CTraderSession:
                 continue
             opened = datetime.fromtimestamp(int(td.openTimestamp) / 1000, tz=timezone.utc) if td.HasField("openTimestamp") else None
             out.append(OpenPosition(int(p.positionId), name, int(td.volume) / VOLUME_SCALE, side, float(p.price),
-                                    float(p.stopLoss) if p.HasField("stopLoss") else 0.0, label, opened))
+                                    float(p.stopLoss) if p.HasField("stopLoss") else 0.0, label, opened,
+                                    float(p.takeProfit) if p.HasField("takeProfit") else 0.0))
         return out
 
     def amend_stop(self, position_id: int, stop_price: float) -> None:

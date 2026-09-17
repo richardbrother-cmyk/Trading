@@ -63,6 +63,22 @@ jobs:
         run: python -m pytest -q
       - name: Ciclo swing
         run: python -m autotrader.cli --env /dev/null swing-run ${{ inputs.dry_run && '--dry-run' || '' }}
+      - name: Estado de la cuenta y panel
+        if: ${{ !inputs.dry_run }}
+        run: |
+          python scripts/ctrader_state.py --swing --initial 200 --out docs/swing_state.json
+          python scripts/dashboard.py --no-live --out reports/dashboard.html
+          cp reports/dashboard.html docs/index.html
+          cp reports/dashboard.html docs/dashboard.html
+      - name: Publicar panel
+        if: ${{ !inputs.dry_run }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add docs/swing_state.json docs/index.html docs/dashboard.html
+          if git diff --cached --quiet; then echo "sin cambios"; exit 0; fi
+          git commit -m "Panel: actualización automática (swing)"
+          for i in 1 2 3; do git pull --rebase -q origin "${GITHUB_REF_NAME}" && git push && break || sleep 5; done
       - uses: actions/upload-artifact@v4
         if: always()
         with:
