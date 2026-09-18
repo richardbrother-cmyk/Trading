@@ -321,9 +321,23 @@ class CTraderSession:
                                     float(p.takeProfit) if p.HasField("takeProfit") else 0.0))
         return out
 
-    def amend_stop(self, position_id: int, stop_price: float) -> None:
-        self.call("ProtoOAAmendPositionSLTPReq", timeout=30, ctidTraderAccountId=self.account_id,
-                  positionId=position_id, stopLoss=float(stop_price))
+    def amend_stop(self, position_id: int, stop_price: float, take_profit: float = 0.0) -> None:
+        """Cambia el stop de una posicion. La API sustituye stop y objetivo a la vez: si la posicion tiene take profit
+        hay que reenviarlo, de lo contrario el broker lo borra."""
+        params = {"ctidTraderAccountId": self.account_id, "positionId": position_id, "stopLoss": float(stop_price)}
+        if take_profit and take_profit > 0:
+            params["takeProfit"] = float(take_profit)
+        self.call("ProtoOAAmendPositionSLTPReq", timeout=30, **params)
+
+    def last_price(self, symbol: str, now: datetime | None = None) -> float | None:
+        """Ultimo precio (bid) del simbolo: cierre de la ultima barra de 1 minuto disponible."""
+        now = now or datetime.now(timezone.utc)
+        info = self.symbols[symbol.upper()]
+        res = self.call("ProtoOAGetTrendbarsReq", timeout=40, ctidTraderAccountId=self.account_id,
+                        fromTimestamp=int((now - timedelta(hours=6)).timestamp() * 1000), toTimestamp=int(now.timestamp() * 1000),
+                        period=1, symbolId=info.symbol_id)
+        df = decode_trendbars(list(res.trendbar), period_minutes=1)
+        return float(df["close"].iloc[-1]) if not df.empty else None
 
     def daily_bars(self, symbol: str, days: int = 400) -> pd.DataFrame:
         info = self.symbols[symbol.upper()]
@@ -414,7 +428,7 @@ class CTraderBroker:
         n = 0
         for p in self.session.positions():
             if p.symbol == symbol.upper() and p.side == "buy":
-                self.session.amend_stop(p.position_id, stop_price)
+                self.session.amend_stop(p.position_id, stop_price, p.take_profit)
                 n += 1
         return {"symbol": symbol, "stop_price": stop_price, "status": f"amended x{n}"}
 
@@ -427,7 +441,7 @@ class CTraderBroker:
             info = self.session.symbols[p.symbol]
             stop_price = round(p.price * (1 - self.stop_loss_pct), info.digits)
             try:
-                self.session.amend_stop(p.position_id, stop_price)
+                self.session.amend_stop(p.position_id, stop_price, p.take_profit)
                 placed.append({"symbol": p.symbol, "qty": p.units, "stop_price": stop_price, "status": "amended"})
             except Exception as exc:  # noqa: BLE001
                 placed.append({"symbol": p.symbol, "qty": p.units, "stop_price": stop_price, "status": f"error: {exc}"})

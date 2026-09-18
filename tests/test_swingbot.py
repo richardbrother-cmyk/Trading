@@ -41,6 +41,9 @@ class FakeSession:
         self.calls.append((name, kw))
         return SimpleNamespace(executionType=1)
 
+    def amend_stop(self, position_id, stop_price, take_profit=0.0):
+        self.calls.append(("ProtoOAAmendPositionSLTPReq", {"positionId": position_id, "stopLoss": stop_price, "takeProfit": take_profit}))
+
 
 def test_swing_buys_on_band_signal_with_stop_and_target(tmp_path, monkeypatch):
     import autotrader.swingbot as sb
@@ -186,3 +189,60 @@ def test_aggressive_profile_respects_max_positions(tmp_path, monkeypatch):
     summary = run_swing_cycle(s, sess, params=p, now=now, label="autotrader-aggr", max_positions=3)
     assert summary["decisions"][0]["action"] == "HOLD" and "maximo de 3" in summary["decisions"][0]["reason"]
     assert not [c for c in sess.calls if c[0] == "ProtoOANewOrderReq"]
+
+
+def test_breakeven_moves_stop_to_entry_once_and_keeps_target(tmp_path, monkeypatch):
+    import autotrader.swingbot as sb
+    from autotrader.swing import SwingParams
+    bars = _h4(crash_last=False)
+    monkeypatch.setattr(sb, "closed_h4_bars", lambda session, symbol, days=60, now=None: bars)
+    now = bars.index[-1] + timedelta(hours=5)
+    # entrada 7000, stop 6950 (R = 50), objetivo 7300; precio actual 7060 = 1,2 R ganados
+    pos = OpenPosition(7, "US500", 0.05, "buy", 7000.0, 6950.0, "autotrader-aggr", (now - timedelta(hours=8)).to_pydatetime(), 7300.0)
+    s = Settings(broker="sim", symbols=["US500"], state_dir=str(tmp_path), event_mode="off", risk_per_trade=0.06, max_drawdown_pct=0)
+    p = SwingParams("breakout", "H4", stop_atr=0.75, tp_atr=4.5, pure_rr=True, allow_short=False, max_hold_days=7.0, risk_pct=0.06,
+                    max_risk_pct=0.09, breakeven_r=1.0, breakeven_lock_r=0.1)
+    sess = FakeSession(bars, [pos])
+    sess.last_price = lambda symbol, now=None: 7060.0
+    summary = run_swing_cycle(s, sess, params=p, now=now, label="autotrader-aggr", max_positions=3)
+    amends = [c for c in sess.calls if c[0] == "ProtoOAAmendPositionSLTPReq"]
+    assert len(amends) == 1
+    assert amends[0][1]["positionId"] == 7 and amends[0][1]["stopLoss"] == 7005.0 and amends[0][1]["takeProfit"] == 7300.0
+    assert summary["stops_moved"][0]["gained_r"] == 1.2 and summary["stops_moved"][0]["status"] == "amended"
+    # segunda pasada: el stop ya esta en break even, no se vuelve a tocar
+    pos2 = OpenPosition(7, "US500", 0.05, "buy", 7000.0, 7005.0, "autotrader-aggr", pos.opened_at, 7300.0)
+    sess2 = FakeSession(bars, [pos2])
+    sess2.last_price = lambda symbol, now=None: 7100.0
+    summary2 = run_swing_cycle(s, sess2, params=p, now=now, label="autotrader-aggr", max_positions=3)
+    assert not [c for c in sess2.calls if c[0] == "ProtoOAAmendPositionSLTPReq"] and "stops_moved" not in summary2
+
+
+def test_breakeven_waits_until_gain_reaches_threshold(tmp_path, monkeypatch):
+    import autotrader.swingbot as sb
+    from autotrader.swing import SwingParams
+    bars = _h4(crash_last=False)
+    monkeypatch.setattr(sb, "closed_h4_bars", lambda session, symbol, days=60, now=None: bars)
+    now = bars.index[-1] + timedelta(hours=5)
+    pos = OpenPosition(7, "US500", 0.05, "buy", 7000.0, 6950.0, "autotrader-aggr", (now - timedelta(hours=8)).to_pydatetime(), 7300.0)
+    s = Settings(broker="sim", symbols=["US500"], state_dir=str(tmp_path), event_mode="off", risk_per_trade=0.06, max_drawdown_pct=0)
+    p = SwingParams("breakout", "H4", stop_atr=0.75, tp_atr=4.5, pure_rr=True, allow_short=False, max_hold_days=7.0, risk_pct=0.06,
+                    max_risk_pct=0.09, breakeven_r=1.0, breakeven_lock_r=0.1)
+    sess = FakeSession(bars, [pos])
+    sess.last_price = lambda symbol, now=None: 7040.0  # 0,8 R: todavia no
+    summary = run_swing_cycle(s, sess, params=p, now=now, label="autotrader-aggr", max_positions=3)
+    assert not [c for c in sess.calls if c[0] == "ProtoOAAmendPositionSLTPReq"] and "stops_moved" not in summary
+    # perfil sin break even (swing de 200 USD): nunca toca el stop aunque vaya muy en ganancia
+    sess3 = FakeSession(bars, [pos])
+    sess3.last_price = lambda symbol, now=None: 7200.0
+    p0 = SwingParams("breakout", "H4", stop_atr=0.75, tp_atr=4.5, pure_rr=True, allow_short=False, max_hold_days=7.0, risk_pct=0.06, max_risk_pct=0.09)
+    run_swing_cycle(s, sess3, params=p0, now=now, label="autotrader-aggr", max_positions=3)
+    assert not [c for c in sess3.calls if c[0] == "ProtoOAAmendPositionSLTPReq"]
+
+
+def test_params_from_env_reads_breakeven(monkeypatch):
+    from autotrader.swingbot import params_from_env, describe
+    monkeypatch.setenv("SWING_BREAKEVEN_R", "1.5")
+    monkeypatch.setenv("SWING_BREAKEVEN_LOCK_R", "0.1")
+    s = Settings(broker="sim", symbols=["US500"], risk_per_trade=0.06)
+    p = params_from_env(s)
+    assert p.breakeven_r == 1.5 and p.breakeven_lock_r == 0.1 and "break even tras 1.5 R" in describe(p)

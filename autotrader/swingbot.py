@@ -78,7 +78,8 @@ def params_from_env(settings, max_risk_pct: float | None = None) -> SwingParams:
                        pure_rr=os.getenv("SWING_PURE_RR", "false").lower() in {"1", "true", "yes"}, allow_short=False,
                        breakout_bars=int(os.getenv("SWING_BREAKOUT_BARS", "20")), bands_rsi=float(os.getenv("SWING_BANDS_RSI", "30")),
                        max_hold_days=float(os.getenv("SWING_MAX_HOLD_DAYS", "3")), risk_pct=settings.risk_per_trade,
-                       max_risk_pct=max_risk_pct or default_max_risk_pct(settings.risk_per_trade))
+                       max_risk_pct=max_risk_pct or default_max_risk_pct(settings.risk_per_trade),
+                       breakeven_r=float(os.getenv("SWING_BREAKEVEN_R", "0") or 0), breakeven_lock_r=float(os.getenv("SWING_BREAKEVEN_LOCK_R", "0") or 0))
 
 
 def describe(p: SwingParams) -> str:
@@ -86,7 +87,46 @@ def describe(p: SwingParams) -> str:
     entry = {"bands": f"cierre bajo la banda inferior ({p.bb_period}/{p.bb_std:g}) con RSI < {p.bands_rsi:g}",
              "breakout": f"cierre sobre el maximo de {p.breakout_bars} barras y sobre la EMA200",
              "pullback": f"tendencia EMA50>EMA200 y RSI que vuelve sobre {p.rsi_entry:g}"}.get(p.strategy, p.strategy)
-    return f"{entry}; stop {p.stop_atr:g} ATR, objetivo {tp}, salida a los {p.max_hold_days:g} dias"
+    be = f", stop a break even tras {p.breakeven_r:g} R" if p.breakeven_r > 0 else ""
+    return f"{entry}; stop {p.stop_atr:g} ATR, objetivo {tp}{be}, salida a los {p.max_hold_days:g} dias"
+
+
+def move_stops_to_breakeven(session: CTraderSession, positions, p: SwingParams, summary: dict, dry_run: bool = False,
+                            now: datetime | None = None) -> None:
+    """Si una posicion larga del bot ya lleva ganados `breakeven_r` R (R = distancia entre entrada y stop original), sube el
+    stop a la entrada mas `breakeven_lock_r` R. Solo actua una vez por posicion (cuando el stop sigue por debajo de la entrada)
+    y reenvia el take profit para que el broker no lo borre."""
+    if p.breakeven_r <= 0:
+        return
+    for pos in positions:
+        if pos.side != "buy" or pos.stop_loss <= 0 or pos.stop_loss >= pos.price:
+            continue  # sin stop conocido o ya en break even
+        info = session.symbols.get(pos.symbol)
+        if info is None:
+            continue
+        risk_dist = pos.price - pos.stop_loss
+        try:
+            price = session.last_price(pos.symbol, now)
+        except Exception as exc:  # noqa: BLE001
+            summary["skipped"].append(f"{pos.symbol}: sin precio para revisar break even: {exc}")
+            continue
+        if price is None:
+            continue
+        gained_r = (price - pos.price) / risk_dist
+        if gained_r < p.breakeven_r:
+            continue
+        new_stop = round(pos.price + p.breakeven_lock_r * risk_dist, info.digits)
+        rec = {"symbol": pos.symbol, "entry": pos.price, "old_stop": pos.stop_loss, "new_stop": new_stop, "price": price,
+               "gained_r": round(gained_r, 2), "target": pos.take_profit}
+        if dry_run:
+            rec["status"] = "dry_run"
+        else:
+            try:
+                session.amend_stop(pos.position_id, new_stop, pos.take_profit)
+                rec["status"] = "amended"
+            except Exception as exc:  # noqa: BLE001
+                rec["status"] = f"error: {exc}"
+        summary.setdefault("stops_moved", []).append(rec)
 
 
 def run_swing_cycle(settings, session: CTraderSession, params: SwingParams | None = None, equity_cap: float | None = None,
@@ -137,6 +177,9 @@ def run_swing_cycle(settings, session: CTraderSession, params: SwingParams | Non
                     summary["skipped"].append(f"{pos.symbol}: error al cerrar ({reason}): {exc}")
             else:
                 summary["closed"].append({"symbol": pos.symbol, "units": pos.units, "reason": reason + " (dry run)"})
+
+    # 1b) stop a break even en las posiciones que ya llevan ganancia
+    move_stops_to_breakeven(session, [pos for pos in own if pos.symbol in held], p, summary, dry_run=dry_run, now=now)
 
     # 2) entradas
     for symbol in settings.symbols:

@@ -272,6 +272,11 @@ footer { color: var(--muted); font-size: 12.5px; }
       <div class="tbl-wrap"><table id="sw-kronos"></table></div>
       <p class="note" id="sw-kr-note" style="margin:10px 0 0"></p>
     </section>
+    <section id="sw-be-section" style="display:none">
+      <div class="sec-head"><div><h2>Investigación: stop a break even</h2><p class="lede" id="sw-be-lede"></p></div></div>
+      <div class="tbl-wrap"><table id="sw-breakeven"></table></div>
+      <p class="note" id="sw-be-note" style="margin:10px 0 0"></p>
+    </section>
     <section>
       <div class="sec-head"><div><h2>Configuración activa</h2><p class="lede">Reversión a la media en bandas de Bollinger de 4 h, solo largos, salida por stop, objetivo o a los 3 días.</p></div></div>
       <div class="tbl-wrap"><table id="sw-settings"></table></div>
@@ -573,7 +578,8 @@ function renderSwingTab(prefix, SW, badgeId, base0, research){
   const pt = $("sw-positions");
   pt.innerHTML = SW.positions.length ? `<thead><tr><th>Par</th><th class="num">Unidades</th><th class="num">Entrada</th><th class="num">Actual</th><th class="num">Stop</th><th class="num">Objetivo</th><th class="num">P&L</th><th>Abierta</th></tr></thead><tbody>` + SW.positions.map(p=>`<tr><td class="mono">${esc(p.symbol)}</td><td class="num">${p.qty}</td><td class="num">${fx(p.avg,p.symbol)}</td><td class="num">${fx(p.price,p.symbol)}</td><td class="num">${p.stop?fx(p.stop,p.symbol):"—"}</td><td class="num">${p.target?fx(p.target,p.symbol):"—"}</td><td class="num ${p.pnl>=0?"pos":"neg"}">${fmtUSD2(p.pnl)}</td><td class="mono" style="font-size:12px">${esc((p.opened_at||"").replace("T"," ").replace("Z",""))}</td></tr>`).join("") + "</tbody>" : `<tbody><tr><td class="empty">Sin posiciones abiertas.</td></tr></tbody>`;
   const lr = SW.last_run;
-  $("sw-run-lede").textContent = lr ? `Ciclo del ${esc(lr.at)} UTC sobre la última barra de 4 h cerrada.` + (lr.event_window&&lr.event_window.length ? " Ventana de evento activa: " + lr.event_window.join(", ") : "") : "Aún no hay ciclos registrados.";
+  const moved = lr ? (lr.stops_moved||[]).filter(m=>m.status==="amended") : [];
+  $("sw-run-lede").textContent = lr ? `Ciclo del ${esc(lr.at)} UTC sobre la última barra de 4 h cerrada.` + (lr.event_window&&lr.event_window.length ? " Ventana de evento activa: " + lr.event_window.join(", ") : "") + (moved.length ? " Stop subido a break even en " + moved.map(m=>`${m.symbol} (${m.gained_r} R ganados, stop ${m.old_stop} → ${m.new_stop})`).join(", ") + "." : "") : "Aún no hay ciclos registrados.";
   const why = d => d.reason ? esc(d.reason.replace("senal caducada", "señal caducada")) : (d.close!=null && d.bb_lo!=null ? (d.close < d.bb_lo ? "bajo la banda inferior" : "sobre la banda inferior") : "");
   $("sw-decisions").innerHTML = lr ? (lr.decisions||[]).map(d=>`<span class="chip ${d.action.toLowerCase()}"><span class="k mono">${esc(d.symbol)}</span><span class="act">${d.action==="BUY"?"Comprar":"Esperar"}</span><span class="m">RSI ${d.rsi!=null?Number(d.rsi).toFixed(0):"—"} · ${why(d)}${d.bar_age_h!=null?` · barra de hace ${Number(d.bar_age_h).toFixed(1)} h`:""}</span></span>`).join("") : "";
   $("sw-cycles").innerHTML = cyclesTable(SW.cycles);
@@ -605,12 +611,21 @@ function renderSwingTab(prefix, SW, badgeId, base0, research){
     $("sw-kr-lede").textContent = "Sin resultados todavía.";
     $("sw-kronos").innerHTML = "";
   }
+  const bg = SW.breakeven_grid;
+  if (bg && bg.length) {
+    $("sw-be-section").style.display = "";
+    $("sw-be-lede").textContent = `Mismo perfil (ruptura de 4 h, stop 0,75 ATR, objetivo 6R, 7 días) sobre los 12 meses de histórico de los seis símbolos, variando cuántos R de ganancia hacen falta para subir el stop a la entrada (más 0,1 R). Resultados en R por operación; la curva al 6 % de riesgo encadena las operaciones sin solapes.`;
+    const active = Number(s.breakeven_r||0);
+    $("sw-breakeven").innerHTML = `<thead><tr><th>Regla</th><th class="num">Ops.</th><th class="num">Acierto</th><th class="num">Llega al 6R</th><th class="num">Sale en BE</th><th class="num">Stop</th><th class="num">R medio</th><th class="num">R total</th><th class="num">PF</th><th class="num">Racha sin ganar</th><th class="num">Caída máx. (6 %)</th><th class="num">P(caer 50 %)</th></tr></thead><tbody>` + bg.map(r=>`<tr${Math.abs(Number(r.be_r)-active)<1e-9?' class="active"':""}><td>${r.be_r>0?`BE tras ${Number(r.be_r).toFixed(1)} R`:"Sin break even"}</td><td class="num">${r.ops}</td><td class="num">${(r.win*100).toFixed(0)} %</td><td class="num">${(r.tp_rate*100).toFixed(0)} %</td><td class="num">${(r.be_rate*100).toFixed(0)} %</td><td class="num">${(r.stop_rate*100).toFixed(0)} %</td><td class="num ${r.avg_r>=0?"pos":"neg"}">${Number(r.avg_r).toFixed(2)}</td><td class="num">${Number(r.sum_r).toFixed(0)}</td><td class="num">${r.pf_r==null?"—":Number(r.pf_r).toFixed(2)}</td><td class="num">${r.streak}</td><td class="num neg">${pct(r.dd_6pct)}</td><td class="num">${(r.p_dd50_6pct*100).toFixed(0)} %</td></tr>`).join("") + "</tbody>";
+    $("sw-be-note").textContent = "Lectura: con un objetivo de 6R el precio vuelve a la entrada muy a menudo antes de llegar, así que cualquier regla de break even reduce las operaciones que alcanzan el objetivo y la ganancia media por operación; a cambio acorta las rachas de pérdidas y la caída máxima. La fila resaltada es la regla activa; se cambia con la variable AGGR_BREAKEVEN_R del repositorio.";
+  }
   $("sw-settings").innerHTML = `<tbody>
     <tr><td>Universo</td><td class="mono" style="font-size:12.5px">${esc((SW.symbols||[]).join(", "))}</td></tr>
     <tr><td>Entrada y salidas</td><td>${esc(s.description || "cierre de la barra de 4 h bajo la banda inferior de Bollinger (20, 2) con RSI < 30; stop 2 ATR, objetivo en la media de las bandas, 3 días")}, solo largos${s.max_positions?` · máximo ${s.max_positions} posiciones abiertas`:""}</td></tr>
     <tr><td>Señal vigente</td><td>solo si la barra cerró hace menos de ${s.max_signal_age_hours} h</td></tr>
     <tr><td>Riesgo por operación</td><td>${(s.risk_per_trade*100).toFixed(1)} % del capital real (tope ${(s.max_risk_pct*100).toFixed(1)} % para aceptar el lote mínimo)</td></tr>
     <tr><td>Salida por tiempo</td><td>a los ${s.max_hold_days} días</td></tr>
+    <tr><td>Stop a break even</td><td>${s.breakeven_r>0?`cuando la posición lleva ganado ${Number(s.breakeven_r).toFixed(1)} R (R = distancia al stop inicial) el stop sube a la entrada${s.breakeven_lock_r>0?` más ${Number(s.breakeven_lock_r).toFixed(2)} R`:""}; se revisa cada ciclo con el último precio de 1 min`:"no (stop y objetivo fijos hasta el cierre)"}</td></tr>
     <tr><td>Freno</td><td>interruptor manual BOT_HALT (${esc(s.halt_mode||"off")}) y freno automático si el equity cae ${((s.max_drawdown_pct||0)*100).toFixed(0)} % desde su máximo</td></tr>
     <tr><td>Ciclos</td><td>cada hora, de domingo noche a viernes, desde GitHub Actions</td></tr>
   </tbody>`;

@@ -68,7 +68,7 @@ def test_ctrader_ensure_stops_amends_only_unprotected_positions():
         def positions(self):
             return [OpenPosition(11, "COFARA", 80, "buy", 298.46, 0.0), OpenPosition(12, "WHEAT", 8, "buy", 702.9, 681.68)]
 
-        def amend_stop(self, pid, price):
+        def amend_stop(self, pid, price, take_profit=0.0):
             self.amended.append((pid, price))
 
     b = CTraderBroker.__new__(CTraderBroker)

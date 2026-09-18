@@ -58,6 +58,10 @@ jobs:
       SWING_TP_ATR: "4.5"
       SWING_PURE_RR: "true"
       SWING_MAX_HOLD_DAYS: "7"
+      # Stop a break even: cuando la posicion lleva ganado 1 R (la distancia al stop inicial) el stop sube a la entrada
+      # mas 0,1 R para cubrir spread y comision; se revisa cada hora con el ultimo precio de 1 minuto.
+      SWING_BREAKEVEN_R: ${{ vars.AGGR_BREAKEVEN_R || '1.0' }}
+      SWING_BREAKEVEN_LOCK_R: ${{ vars.AGGR_BREAKEVEN_LOCK_R || '0.1' }}
       SWING_LABEL: "autotrader-aggr"
       SWING_MAX_POSITIONS: "3"
       RISK_PER_TRADE: ${{ vars.AGGR_RISK_PER_TRADE || '0.03' }}

@@ -40,6 +40,8 @@ class SwingParams:
     bb_std: float = 2.0
     bands_rsi: float = 30.0  # bands: RSI por debajo (largo) / por encima de 100-nivel (corto)
     pure_rr: bool = False  # True: salida solo por stop, objetivo (tp_atr) o tiempo; sin salida por EMA20 ni por la media de bandas
+    breakeven_r: float = 0.0  # > 0: cuando el precio lleva ganados N R (N veces la distancia al stop) el stop sube a la entrada
+    breakeven_lock_r: float = 0.0  # fraccion de R que se asegura por encima de la entrada al mover el stop (cubre spread/comision)
     allow_short: bool = True
     risk_pct: float = 0.01
     max_risk_pct: float = 0.03
@@ -145,11 +147,13 @@ def backtest_symbol(df15: pd.DataFrame, sym: str, p: SwingParams, initial: float
         t.costs = entry * units * p.commission_side
         j_end = min(n - 1, i + 1 + p.max_hold_bars())
         exit_price, reason, j_exit = None, "", None
+        risk_dist = abs(entry - stop)
+        be_done = False
         for j in range(i + 1, j_end + 1):
             if side == 1 and l[j] <= stop:
-                exit_price, reason, j_exit = stop, "stop", j; break
+                exit_price, reason, j_exit = stop, ("break even" if be_done else "stop"), j; break
             if side == -1 and h[j] >= stop:
-                exit_price, reason, j_exit = stop, "stop", j; break
+                exit_price, reason, j_exit = stop, ("break even" if be_done else "stop"), j; break
             if p.strategy != "bands" or True:
                 if side == 1 and h[j] >= tp:
                     exit_price, reason, j_exit = tp, "objetivo", j; break
@@ -158,6 +162,10 @@ def backtest_symbol(df15: pd.DataFrame, sym: str, p: SwingParams, initial: float
             if p.strategy == "breakout" and not p.pure_rr and j > i + 1:
                 if (side == 1 and c[j] < d["ema20"].iloc[j]) or (side == -1 and c[j] > d["ema20"].iloc[j]):
                     exit_price, reason, j_exit = c[j], "salida ema20", j; break
+            # Stop a break even: al cerrar una barra que ya recorrio `breakeven_r` R a favor, el stop pasa a la entrada
+            # (mas `breakeven_lock_r` R) y rige desde la barra siguiente, igual que el bot en vivo que revisa cada hora.
+            if p.breakeven_r > 0 and not be_done and (h[j] - entry if side == 1 else entry - l[j]) >= p.breakeven_r * risk_dist:
+                stop, be_done = entry + side * p.breakeven_lock_r * risk_dist, True
         if exit_price is None:
             exit_price, reason, j_exit = c[j_end], "tiempo maximo", j_end
         t.exit_time, t.reason = idx[j_exit], reason

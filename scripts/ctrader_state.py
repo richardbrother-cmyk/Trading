@@ -90,12 +90,15 @@ def swing_cycle(rec: dict) -> dict:
     errors = sum(1 for o in rec.get("orders", []) if str(o.get("status", "")).startswith("error"))
     stale = [d for d in rec.get("decisions", []) if str(d.get("reason", "")).startswith("senal caducada")]
     guard = rec.get("guard") or {}
+    moved = [m for m in rec.get("stops_moved", []) if m.get("status") == "amended"]
     if guard.get("mode") and guard["mode"] != "off":
         note = f"freno {guard['mode']}: {guard.get('reason', '')}"[:80]
     elif rec.get("skipped"):
         note = rec["skipped"][0][:60] + (f" (+{len(rec['skipped']) - 1})" if len(rec["skipped"]) > 1 else "")
     elif ok_orders:
         note = "compra " + ", ".join(o["symbol"] for o in ok_orders)
+    elif moved:
+        note = "stop a break even: " + ", ".join(m["symbol"] for m in moved)
     elif stale:
         note = "señal caducada en " + ", ".join(d["symbol"] for d in stale)
     else:
@@ -107,6 +110,8 @@ def swing_cycle(rec: dict) -> dict:
                           for d in rec.get("decisions", [])],
             "orders": [{"symbol": o["symbol"], "units": o.get("units"), "entry": o.get("entry_ref"), "stop": o.get("stop"), "target": o.get("target"),
                         "risk_usd": o.get("risk_usd"), "status": o.get("status")} for o in rec.get("orders", [])],
+            "stops_moved": [{"symbol": m["symbol"], "entry": m.get("entry"), "old_stop": m.get("old_stop"), "new_stop": m.get("new_stop"),
+                             "gained_r": m.get("gained_r"), "status": m.get("status")} for m in rec.get("stops_moved", [])],
             "closed": rec.get("closed", []), "event_window": rec.get("event_window", []), "guard": rec.get("guard")}
 
 
@@ -179,7 +184,8 @@ def collect(s: Settings, swing: bool = False, initial: float | None = None, labe
                                 "max_signal_age_hours": float(os.getenv("SWING_MAX_SIGNAL_AGE_HOURS", str(DEFAULT_MAX_SIGNAL_AGE_HOURS))),
                                 "stop_atr": prm.stop_atr, "tp_atr": prm.tp_atr if (prm.pure_rr or prm.strategy != "bands") else None,
                                 "strategy": prm.strategy, "description": describe(prm), "max_hold_days": prm.max_hold_days,
-                                "max_positions": int(os.getenv("SWING_MAX_POSITIONS", "0")), "label": label}
+                                "max_positions": int(os.getenv("SWING_MAX_POSITIONS", "0")), "label": label,
+                                "breakeven_r": prm.breakeven_r, "breakeven_lock_r": prm.breakeven_lock_r}
         rec = last_cycle(s.state_dir, swing=True, label=label)
         cycle = swing_cycle(rec) if rec else None
         if cycle:
