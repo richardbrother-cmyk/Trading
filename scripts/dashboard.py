@@ -140,6 +140,16 @@ def collect(no_live: bool) -> dict:
                            "errors": sum(1 for o in rec["orders"] if str(o["status"]).startswith("error")),
                            "note": (rec["skipped"][0][:60] + (f" (+{len(rec['skipped']) - 1})" if len(rec["skipped"]) > 1 else "")) if rec["skipped"] else ("sin cambios" if not rec["orders"] else "")})
         cycles = cycles[-30:]
+        # Curva de capital por ciclo (equity del broker en cada ejecucion del bot) + valor actual.
+        # La serie diaria de Alpaca marca cada dia con el capital de apertura, es decir, el cierre del dia
+        # anterior, y confundia: se conserva aparte como history_daily.
+        curve = [[rec["timestamp"][:16] + "Z", round(float(rec["equity"]), 2)] for rec in map(json.loads, lines)
+                 if rec.get("broker", "").startswith("alpaca") and rec.get("kind") != "preopen" and rec.get("equity")]
+        if live.get("available") and len(curve) >= 2:
+            live["history_daily"] = live.get("history", [])
+            if not live.get("stale") and live.get("equity"):
+                curve.append([datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%MZ"), round(float(live["equity"]), 2)])
+            live["history"] = curve
     now = datetime.now(timezone.utc)
     evs = load_events(s.events_path or None)
     active_names = {e.name for e in active_events(evs, now, s.event_hours_before, s.event_hours_after)} if s.event_mode != "off" else set()
