@@ -2,7 +2,7 @@
  "available": true,
  "broker": "Fusion Markets · cTrader demo · swing",
  "account": 10138759,
- "at": "2026-09-18T18:47Z",
+ "at": "2026-09-18T19:00Z",
  "balance": 492.84,
  "equity": 492.84,
  "unrealized_pnl": 0,
@@ -40,11 +40,11 @@
   "stop_atr": 0.75,
   "tp_atr": 4.5,
   "strategy": "breakout",
-  "description": "cierre sobre el maximo de 20 barras y sobre la EMA200; stop 0.75 ATR, objetivo 4.5 ATR, stop a break even tras 1 R, salida a los 7 dias",
+  "description": "cierre sobre el maximo de 20 barras y sobre la EMA200; stop 0.75 ATR, objetivo 4.5 ATR, stop a break even tras 2 R, salida a los 7 dias",
   "max_hold_days": 7.0,
   "max_positions": 3,
   "label": "autotrader-aggr",
-  "breakeven_r": 1.0,
+  "breakeven_r": 2.0,
   "breakeven_lock_r": 0.1,
   "max_drawdown_pct": 0.3,
   "halt_mode": "off"
@@ -78,7 +78,7 @@
   "entries_before": "2026-09-15T00:00Z"
  },
  "last_run": {
-  "at": "2026-09-18 18:46",
+  "at": "2026-09-18 19:00",
   "equity": 492.84,
   "positions": 0,
   "buys": 0,
@@ -94,7 +94,7 @@
     "bb_lo": 7564.74,
     "bb_mid": 7616.48,
     "bar": "2026-09-18 13:00",
-    "bar_age_h": 1.78,
+    "bar_age_h": 2.0,
     "reason": null
    },
    {
@@ -105,7 +105,7 @@
     "bb_lo": 28812.62,
     "bb_mid": 29236.19,
     "bar": "2026-09-18 13:00",
-    "bar_age_h": 1.78,
+    "bar_age_h": 2.0,
     "reason": null
    },
    {
@@ -116,7 +116,7 @@
     "bb_lo": 1.14332,
     "bb_mid": 1.15008,
     "bar": "2026-09-18 13:00",
-    "bar_age_h": 1.78,
+    "bar_age_h": 2.0,
     "reason": null
    },
    {
@@ -127,7 +127,7 @@
     "bb_lo": 1.33071,
     "bb_mid": 1.34111,
     "bar": "2026-09-18 13:00",
-    "bar_age_h": 1.78,
+    "bar_age_h": 2.0,
     "reason": null
    },
    {
@@ -138,7 +138,7 @@
     "bb_lo": 4251.97,
     "bb_mid": 4330.13,
     "bar": "2026-09-18 13:00",
-    "bar_age_h": 1.78,
+    "bar_age_h": 2.0,
     "reason": null
    },
    {
@@ -149,7 +149,7 @@
     "bb_lo": 98.773,
     "bb_mid": 102.575,
     "bar": "2026-09-18 13:00",
-    "bar_age_h": 1.78,
+    "bar_age_h": 2.0,
     "reason": null
    }
   ],
@@ -185,6 +185,10 @@
   ],
   [
    "2026-09-18T18:47Z",
+   492.84
+  ],
+  [
+   "2026-09-18T19:00Z",
    492.84
   ]
  ],
@@ -350,6 +354,95 @@
      "bb_mid": 102.575,
      "bar": "2026-09-18 13:00",
      "bar_age_h": 1.78,
+     "reason": null
+    }
+   ],
+   "orders": [],
+   "stops_moved": [],
+   "closed": [],
+   "event_window": [
+    "Vencimiento trimestral de opciones y futuros (triple witching) + rebalanceo S&P"
+   ],
+   "guard": {
+    "mode": "off",
+    "reason": "",
+    "peak": 492.84,
+    "drawdown": 0.0
+   }
+  },
+  {
+   "at": "2026-09-18 19:00",
+   "equity": 492.84,
+   "positions": 0,
+   "buys": 0,
+   "sells": 0,
+   "errors": 0,
+   "note": "sin cambios",
+   "decisions": [
+    {
+     "symbol": "US500",
+     "action": "HOLD",
+     "rsi": 49.3,
+     "close": 7623.59,
+     "bb_lo": 7564.74,
+     "bb_mid": 7616.48,
+     "bar": "2026-09-18 13:00",
+     "bar_age_h": 2.0,
+     "reason": null
+    },
+    {
+     "symbol": "NAS100",
+     "action": "HOLD",
+     "rsi": 56.5,
+     "close": 29439.03,
+     "bb_lo": 28812.62,
+     "bb_mid": 29236.19,
+     "bar": "2026-09-18 13:00",
+     "bar_age_h": 2.0,
+     "reason": null
+    },
+    {
+     "symbol": "EURUSD",
+     "action": "HOLD",
+     "rsi": 35.1,
+     "close": 1.14737,
+     "bb_lo": 1.14332,
+     "bb_mid": 1.15008,
+     "bar": "2026-09-18 13:00",
+     "bar_age_h": 2.0,
+     "reason": null
+    },
+    {
+     "symbol": "GBPUSD",
+     "action": "HOLD",
+     "rsi": 40.2,
+     "close": 1.33823,
+     "bb_lo": 1.33071,
+     "bb_mid": 1.34111,
+     "bar": "2026-09-18 13:00",
+     "bar_age_h": 2.0,
+     "reason": null
+    },
+    {
+     "symbol": "XAUUSD",
+     "action": "HOLD",
+     "rsi": 57.3,
+     "close": 4382.83,
+     "bb_lo": 4251.97,
+     "bb_mid": 4330.13,
+     "bar": "2026-09-18 13:00",
+     "bar_age_h": 2.0,
+     "reason": null
+    },
+    {
+     "symbol": "XTIUSD",
+     "action": "HOLD",
+     "rsi": 46.4,
+     "close": 100.691,
+     "bb_lo": 98.773,
+     "bb_mid": 102.575,
+     "bar": "2026-09-18 13:00",
+     "bar_age_h": 2.0,
      "reason": null
     }
    ],
