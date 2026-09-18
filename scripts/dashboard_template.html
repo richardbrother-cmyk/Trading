@@ -365,13 +365,14 @@ function cyclesTable(cycles){
 (function(){
   const es = D.event_settings || {}, evs = D.events || [];
   const modeTxt = {trail: "subir el stop de las posiciones ganadoras", close: "cerrar las posiciones ganadoras", off: "sin protección"}[es.mode] || es.mode;
-  document.getElementById("events-lede").textContent = `Desde ${es.hours_before} h antes hasta ${es.hours_after} h después de cada evento el bot no abre posiciones y aplica la protección: ${modeTxt} (ganancia mínima ${(es.min_gain*100).toFixed(1)} %, stop a ${(es.trail_pct*100).toFixed(1)} % bajo el precio).`;
+  document.getElementById("events-lede").textContent = `Desde ${es.hours_before} h antes hasta ${es.hours_after} h después de cada dato macro el bot no abre posiciones y aplica la protección: ${modeTxt} (ganancia mínima ${(es.min_gain*100).toFixed(1)} %, stop a ${(es.trail_pct*100).toFixed(1)} % bajo el precio). En los vencimientos de opciones (tercer viernes) solo congela: sin entradas desde 2 h antes del cierre de Nueva York y sin tocar stops; el swing tampoco entra en la barra que contiene ese cierre.`;
   const t = document.getElementById("events");
   const act = evs.filter(e=>e.active);
   if (act.length) { const p = document.getElementById("event-pill"); p.hidden = false; document.getElementById("event-text").textContent = "Ventana de evento activa: " + act[0].name; }
   if (!evs.length) { t.innerHTML = `<tbody><tr><td class="empty">Sin eventos en las próximas tres semanas.</td></tr></tbody>`; return; }
   const now = Date.now();
-  t.innerHTML = `<thead><tr><th>Cuándo</th><th>Evento</th><th>Estado</th></tr></thead><tbody>` + evs.map(e=>{ const d = new Date(e.at); const h = (d-now)/36e5; const when = d.toLocaleString("es-ES",{weekday:"short",day:"numeric",month:"short",hour:"2-digit",minute:"2-digit",timeZone:"UTC"}) + " UTC"; const s = e.active ? `<span class="status accepted">ventana activa</span>` : h < 0 ? `<span class="status canceled">pasado</span>` : h < 24 ? `<span class="status filled">en ${h.toFixed(0)} h</span>` : `<span class="status">en ${(h/24).toFixed(0)} días</span>`; return `<tr${e.active?' class="active"':''}><td class="mono" style="font-size:12px">${esc(when)}</td><td>${esc(e.name)}</td><td>${s}</td></tr>`; }).join("") + "</tbody>";
+  const modeName = {trail:"subir stops ganadores", close:"cerrar ganadores", freeze:"congelar", off:"sin protección"};
+  t.innerHTML = `<thead><tr><th>Cuándo</th><th>Evento</th><th>Ventana</th><th>Estado</th></tr></thead><tbody>` + evs.map(e=>{ const d = new Date(e.at); const h = (d-now)/36e5; const when = d.toLocaleString("es-ES",{weekday:"short",day:"numeric",month:"short",hour:"2-digit",minute:"2-digit",timeZone:"UTC"}) + " UTC"; const s = e.active ? `<span class="status accepted">ventana activa</span>` : h < 0 ? `<span class="status canceled">pasado</span>` : h < 24 ? `<span class="status filled">en ${h.toFixed(0)} h</span>` : `<span class="status">en ${(h/24).toFixed(0)} días</span>`; const w = `−${e.hours_before} h / +${e.hours_after} h · ${modeName[e.mode]||e.mode||""}`; return `<tr${e.active?' class="active"':''}><td class="mono" style="font-size:12px">${esc(when)}</td><td>${esc(e.name)}</td><td style="font-size:12.5px;color:var(--ink-2)">${esc(w)}</td><td>${s}</td></tr>`; }).join("") + "</tbody>";
 })();
 
 // ============================ ALPACA ============================

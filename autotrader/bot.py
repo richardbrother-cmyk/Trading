@@ -11,7 +11,7 @@ import pandas as pd
 from .broker import Broker, SimulatedBroker
 from .config import Settings
 from .data import DataProvider
-from .events import active_events, load_events, trailed_stop
+from .events import active_events, effective_mode, load_events, trailed_stop
 from .guard import evaluate as evaluate_guard
 from .preopen import gap_verdict
 from .risk import RiskParams, daily_loss_breached, position_size, stop_hit
@@ -69,8 +69,10 @@ def run_cycle(settings: Settings, broker: Broker, provider: DataProvider, dry_ru
     if settings.event_mode != "off":
         events_now = active_events(load_events(settings.events_path or None), datetime.now(timezone.utc),
                                    settings.event_hours_before, settings.event_hours_after)
+    ev_mode = effective_mode(events_now, settings.event_mode) if events_now else settings.event_mode
     if events_now:
         summary["event_window"] = [f"{e.name} ({e.at.strftime('%Y-%m-%d %H:%M')} UTC)" for e in events_now]
+        summary["event_mode"] = ev_mode
         summary["protection"] = []
     current_stops = {}
     if events_now and hasattr(broker, "current_stops"):
@@ -102,9 +104,9 @@ def run_cycle(settings: Settings, broker: Broker, provider: DataProvider, dry_ru
         if events_now and pos is not None and decision["action"] != "SELL" and market_open:
             gain = price / pos.avg_price - 1
             if gain >= settings.event_min_gain:
-                if settings.event_mode == "close":
+                if ev_mode == "close":
                     decision = {**decision, "action": "SELL", "reason": f"cierre preventivo antes de evento (+{gain * 100:.2f} %)"}
-                elif settings.event_mode == "trail":
+                elif ev_mode == "trail":
                     cur = current_stops.get(symbol, pos.avg_price * (1 - risk.stop_loss_pct))
                     new = trailed_stop(cur, price, settings.event_trail_pct)
                     if new > cur + 1e-9 and not dry_run:

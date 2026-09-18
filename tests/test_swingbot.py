@@ -127,3 +127,18 @@ def test_swing_drawdown_brake_from_published_history(tmp_path, monkeypatch):
     sess = FakeSession(bars, [])
     summary = run_swing_cycle(s, sess, now=bars.index[-1] + timedelta(hours=5))
     assert summary["guard"]["mode"] == "freeze" and not sess.calls
+
+
+def test_swing_skips_entry_on_bar_containing_opex_close(tmp_path, monkeypatch):
+    import json
+    import autotrader.swingbot as sb
+    bars = _h4()
+    monkeypatch.setattr(sb, "closed_h4_bars", lambda session, symbol, days=60, now=None: bars)
+    last_open = bars.index[-1]
+    ev_path = tmp_path / "events.json"
+    ev_path.write_text(json.dumps({"opex": False, "events": [{"name": "OPEX", "at": (last_open + timedelta(hours=3)).isoformat(), "tags": ["opex"],
+                                                                "mode": "freeze", "hours_before": 2, "hours_after": 0.5}]}))
+    s = Settings(broker="sim", symbols=["US500"], state_dir=str(tmp_path), events_path=str(ev_path), event_mode="trail", max_drawdown_pct=0)
+    sess = FakeSession(bars, [])
+    summary = run_swing_cycle(s, sess, now=last_open + timedelta(hours=5))  # fuera de la ventana (cerro hace 1 h, evento hace 2 h)
+    assert summary["decisions"][0]["action"] == "HOLD" and "vencimiento" in summary["decisions"][0]["reason"] and not sess.calls

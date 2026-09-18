@@ -83,10 +83,12 @@ def run_swing_cycle(settings, session: CTraderSession, params: SwingParams | Non
     summary = {"timestamp": now.isoformat(timespec="seconds"), "kind": "swing", "broker": "ctrader-swing", "equity": round(equity, 2),
                "sizing_equity": round(sizing_equity, 2), "dry_run": dry_run, "decisions": [], "orders": [], "closed": [], "skipped": []}
     events_now = []
+    all_events = load_events(settings.events_path or None, now) if settings.event_mode != "off" else []
     if settings.event_mode != "off":
-        events_now = active_events(load_events(settings.events_path or None), now, settings.event_hours_before, settings.event_hours_after)
+        events_now = active_events(all_events, now, settings.event_hours_before, settings.event_hours_after)
     if events_now:
         summary["event_window"] = [e.name for e in events_now]
+    opex_times = [e.at for e in all_events if e.is_opex]
     # Freno global: interruptor manual (BOT_HALT) o drawdown acumulado desde el maximo
     guard = evaluate_guard(equity, settings.halt_mode, settings.max_drawdown_pct, settings.history_path("docs/swing_state.json"), settings.state_dir)
     summary["guard"] = guard.as_dict()
@@ -146,6 +148,9 @@ def run_swing_cycle(settings, session: CTraderSession, params: SwingParams | Non
         elif signal and events_now:
             dec["action"] = "HOLD"
             dec["reason"] = "ventana de evento"
+        elif signal and any(bars.index[-1].to_pydatetime() <= t <= bar_closed for t in opex_times):
+            dec["action"] = "HOLD"
+            dec["reason"] = "la barra contiene el cierre de un dia de vencimiento de opciones"
         elif signal and age_h > max_signal_age_hours:
             dec["action"] = "HOLD"
             dec["reason"] = f"senal caducada: la barra cerro hace {age_h:.1f} h (maximo {max_signal_age_hours:g} h)"

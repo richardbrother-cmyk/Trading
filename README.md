@@ -287,6 +287,16 @@ predicciones se guardan en `data/research/kronos_predictions.json` y los informe
 Lectura honesta: sugerente pero no robusto con 126 señales de un solo año; no se despliega. Merece
 repetirse con más historia y con Kronos-base cuando la demo lleve unos meses.
 
+### Vencimientos de opciones
+
+El calendario genera solo el tercer viernes de cada mes (trimestral en marzo, junio, septiembre y
+diciembre, cuando vencen también futuros de índices y el S&P aplica su rebalanceo) como evento con
+modo propio "congelar": desde 2 h antes hasta 30 min después del cierre de Nueva York ningún bot abre
+posiciones y ninguno toca los stops, porque con el precio anclado a los strikes subir stops es
+regalar la posición al ruido. Si un dato macro coincide, manda su protección. El bot swing, además,
+no entra con la señal de la barra de 4 h que contiene ese cierre. Se desactiva con `"opex": false`
+en `data/events.json`.
+
 ### Freno global
 
 Los tres bots comparten un freno (`autotrader/guard.py`): la variable `BOT_HALT` (`off`, `freeze` para

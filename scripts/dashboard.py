@@ -183,7 +183,9 @@ def collect(no_live: bool) -> dict:
     now = datetime.now(timezone.utc)
     evs = load_events(s.events_path or None)
     active_names = {e.name for e in active_events(evs, now, s.event_hours_before, s.event_hours_after)} if s.event_mode != "off" else set()
-    events = [{"name": e.name, "at": e.at.strftime("%Y-%m-%dT%H:%MZ"), "tags": list(e.tags), "active": e.name in active_names}
+    events = [{"name": e.name, "at": e.at.strftime("%Y-%m-%dT%H:%MZ"), "tags": list(e.tags), "active": e.name in active_names,
+               "mode": e.mode or s.event_mode, "hours_before": e.hours_before if e.hours_before is not None else s.event_hours_before,
+               "hours_after": e.hours_after if e.hours_after is not None else s.event_hours_after}
               for e in upcoming_events(evs, now, days=21)]
     return {"generated_at": datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC"), "events": events, "event_settings": {
         "mode": s.event_mode, "hours_before": s.event_hours_before, "hours_after": s.event_hours_after,
