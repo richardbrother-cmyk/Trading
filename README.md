@@ -274,6 +274,17 @@ en las otras). El máximo se lee del historial publicado del panel y se persiste
 (Settings → Secrets and variables → Actions → Variables) sin tocar el código; en la rutina de Alpaca,
 con las mismas variables de entorno. El freno nunca toca posiciones abiertas a mano.
 
+### Atribución: bot, manual y excluidas
+
+`autotrader/attribution.py` clasifica cada operación cerrada y cada posición abierta. En cTrader el
+origen sale de la etiqueta con la que se abrió la posición (el historial de órdenes la conserva aunque
+la posición ya esté cerrada), así que las manuales quedan fuera sin estimar por tamaño. Las entradas
+anteriores a la fecha de corte de `data/exclusions.json` (14 de septiembre de 2026, el fallo del filtro
+de huecos) se marcan como excluidas. En Alpaca las operaciones cerradas se reconstruyen por FIFO sobre
+las ejecuciones. Cada pestaña muestra una tarjeta "Bot ajustado" con el capital y el retorno que
+tendría la cuenta contando solo las operaciones del bot con la lógica vigente, y las tablas de
+operaciones marcan el origen de cada una.
+
 ### Ejecución frente a señal
 
 La cuenta swing registra, en cada compra, la diferencia entre el cierre de la barra que dio la señal y

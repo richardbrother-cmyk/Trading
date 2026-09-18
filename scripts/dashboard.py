@@ -15,6 +15,7 @@ from datetime import datetime, timezone
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from autotrader.backtest import run_backtest  # noqa: E402
+from autotrader.attribution import bot_metrics, classify, cutoff_for, fifo_trades, load_exclusions
 from autotrader.config import Settings  # noqa: E402
 from autotrader.data import DataProvider  # noqa: E402
 from autotrader.events import active_events, load_events, upcoming_events  # noqa: E402
@@ -76,7 +77,7 @@ def collect(no_live: bool) -> dict:
         hist = b._get("/v2/account/portfolio/history", period="3M", timeframe="1D")
         history = [[datetime.fromtimestamp(t, tz=timezone.utc).strftime("%Y-%m-%d"), round(float(e), 2)]
                    for t, e in zip(hist.get("timestamp", []), hist.get("equity", [])) if e and float(e) > 0]
-        all_orders = b._get("/v2/orders", status="all", limit=100, direction="desc")
+        all_orders = b._get("/v2/orders", status="all", limit=500, direction="desc")
         live = {
             "history": history,
             "orders_all": [{"symbol": o["symbol"], "side": o["side"], "qty": int(float(o["qty"])), "type": o["type"],
@@ -92,6 +93,24 @@ def collect(no_live: bool) -> dict:
             "positions": [{"symbol": p["symbol"], "qty": int(float(p["qty"])), "avg": float(p["avg_entry_price"]),
                            "price": float(p["current_price"]), "pnl": float(p["unrealized_pl"])} for p in positions],
         }
+    if live.get("available"):
+        # Operaciones cerradas (FIFO sobre las ejecuciones) y metricas del bot sin las entradas excluidas
+        exclusions = load_exclusions()
+        cutoff = cutoff_for("alpaca", exclusions)
+        fills = [{"symbol": o["symbol"], "side": o["side"], "qty": o["qty"], "price": o["filled_price"], "at": o["at"]}
+                 for o in live.get("orders_all", []) if o.get("status") == "filled" and o.get("filled_price")]
+        trades, lots = fifo_trades(fills)
+        for t in trades:
+            t["origin"] = classify(True, t["opened_at"], cutoff)
+        price_by = {p["symbol"]: p["price"] for p in live.get("positions", [])}
+        open_items = [{"symbol": l["symbol"], "origin": classify(True, l["opened_at"], cutoff),
+                       "pnl": round((price_by.get(l["symbol"], l["entry"]) - l["entry"]) * l["qty"], 2)} for l in lots]
+        for pos in live.get("positions", []):
+            origins = {l["origin"] for l in open_items if l["symbol"] == pos["symbol"]}
+            pos["origin"] = "excluded" if origins == {"excluded"} else ("mixed" if len(origins) > 1 else "bot")
+        live["trades"] = trades
+        live["bot_metrics"] = bot_metrics(trades, open_items, s.initial_cash)
+        live["exclusions"] = {"reason": exclusions.get("reason", ""), "entries_before": cutoff.strftime("%Y-%m-%dT%H:%MZ") if cutoff else None}
     if live.get("available") and not live.get("stale"):
         live["at"] = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%MZ")
         os.makedirs("docs", exist_ok=True)

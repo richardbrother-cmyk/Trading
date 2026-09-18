@@ -1,0 +1,5 @@
+{
+  "reason": "Entradas del 14 de septiembre de 2026: el filtro de huecos comparaba el precio en vivo con la barra diaria parcial y dejo pasar compras que no debia. Se excluyen de las metricas del bot para medir la operativa corregida.",
+  "alpaca": {"entries_before": "2026-09-15T00:00Z"},
+  "ctrader": {"entries_before": "2026-09-15T00:00Z"}
+}

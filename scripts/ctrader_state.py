@@ -20,6 +20,8 @@ from autotrader.ctrader import CTraderSession  # noqa: E402
 from autotrader.ctrader_auth import load_access_token  # noqa: E402
 from autotrader.events import active_events, load_events  # noqa: E402
 from autotrader.swingbot import DEFAULT_MAX_SIGNAL_AGE_HOURS, SWING_LABEL, default_max_risk_pct  # noqa: E402
+from autotrader.attribution import bot_metrics, classify, cutoff_for, load_exclusions  # noqa: E402
+from autotrader.ctrader import BOT_LABEL  # noqa: E402
 
 MAX_HISTORY = 400
 MAX_CYCLES = 60
@@ -109,6 +111,8 @@ def swing_cycle(rec: dict) -> dict:
 
 
 def collect(s: Settings, swing: bool = False, initial: float | None = None) -> tuple[dict, dict | None]:
+    exclusions = load_exclusions()
+    cutoff = cutoff_for("ctrader", exclusions)
     token = load_access_token(os.path.join(s.state_dir, "ctrader_tokens.json"), s.ctrader_client_id, s.ctrader_client_secret,
                               s.ctrader_access_token, s.ctrader_refresh_token)
     session = CTraderSession(s.ctrader_client_id, s.ctrader_client_secret, token, s.ctrader_account_login or None, demo=s.ctrader_demo)
@@ -134,16 +138,21 @@ def collect(s: Settings, swing: bool = False, initial: float | None = None) -> t
                         prices[p.symbol] = p.price
                 px = prices[p.symbol]
                 pos_pnl = (px - p.price) * p.units
+            own_label = SWING_LABEL if swing else BOT_LABEL
             positions.append({"symbol": p.symbol, "qty": p.units, "avg": p.price, "price": round(px, 6), "stop": p.stop_loss,
                               "target": p.take_profit or None, "opened_at": p.opened_at.strftime("%Y-%m-%dT%H:%MZ") if p.opened_at else None,
-                              "pnl": round(pos_pnl, 2), "position_id": p.position_id, "bot": p.is_bot})
+                              "pnl": round(pos_pnl, 2), "position_id": p.position_id, "bot": p.label == own_label,
+                              "origin": classify(p.label == own_label, p.opened_at, cutoff)})
         trades = []
         try:
             for d in session.deals(days=14):
                 if d["closes"]:
+                    is_bot = d.get("label") == (SWING_LABEL if swing else BOT_LABEL)
                     trades.append({"symbol": d["symbol"], "at": d["at"].strftime("%Y-%m-%dT%H:%MZ"), "units": d["units"], "entry": d["entry_price"],
                                    "exit": d["price"], "gross": round(d["gross"], 2), "swap": round(d["swap"], 2),
-                                   "commission": round(d["close_commission"], 2), "net": d["net"], "balance_after": d["balance_after"]})
+                                   "commission": round(d["close_commission"], 2), "net": d["net"], "balance_after": d["balance_after"],
+                                   "label": d.get("label", ""), "opened_at": d["opened_at"].strftime("%Y-%m-%dT%H:%MZ") if d.get("opened_at") else None,
+                                   "origin": classify(is_bot, d.get("opened_at"), cutoff)})
         except Exception as exc:  # noqa: BLE001
             trades = [{"error": str(exc)[:120]}]
     finally:
@@ -157,7 +166,9 @@ def collect(s: Settings, swing: bool = False, initial: float | None = None) -> t
         "unrealized_pnl": round(pnl, 2), "leverage": leverage, "positions": positions, "symbols": s.symbols, "trades": trades,
         "settings": {"stop_loss_pct": s.stop_loss_pct, "max_positions": s.max_positions, "max_position_pct": s.max_position_pct,
                      "exposure_leverage": s.exposure_leverage, "risk_per_trade": s.risk_per_trade},
-        "event_window": active,
+        "event_window": active, "initial": initial,
+        "bot_metrics": bot_metrics([t for t in trades if "error" not in t], positions, initial or 0.0),
+        "exclusions": {"reason": exclusions.get("reason", ""), "entries_before": cutoff.strftime("%Y-%m-%dT%H:%MZ") if cutoff else None},
     }
     if swing:
         snapshot["broker"] = "Fusion Markets · cTrader demo · swing"
@@ -191,7 +202,7 @@ def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--out", default="docs/ctrader_state.json")
     ap.add_argument("--swing", action="store_true", help="cuenta del bot swing: solo posiciones con su etiqueta y su ultimo ciclo")
-    ap.add_argument("--initial", type=float, default=200.0, help="capital inicial de la cuenta swing, para el % desde el inicio")
+    ap.add_argument("--initial", type=float, default=None, help="capital inicial de la cuenta (10000 tendencial, 200 swing)")
     args = ap.parse_args()
     s = Settings.from_env("/dev/null")
     s.broker = "ctrader"
@@ -200,7 +211,8 @@ def main() -> int:
     if os.path.exists(args.out):
         with open(args.out, encoding="utf-8") as fh:
             prev = json.load(fh)
-    snapshot, cycle = collect(s, swing=args.swing, initial=args.initial if args.swing else None)
+    initial = args.initial if args.initial is not None else (200.0 if args.swing else 10_000.0)
+    snapshot, cycle = collect(s, swing=args.swing, initial=initial)
     if args.swing:
         snapshot["slippage"] = merge_slippage(prev, realized_slippage(cycle, snapshot["positions"]))
         snapshot["guard"] = (cycle or {}).get("guard")

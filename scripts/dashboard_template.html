@@ -152,6 +152,11 @@ footer { color: var(--muted); font-size: 12.5px; }
           <div class="chips" id="decisions"></div>
         </div>
       </div>
+      <div style="margin-top:16px">
+        <div class="eyebrow" style="margin-bottom:8px">Operaciones cerradas (FIFO sobre las ejecuciones)</div>
+        <div class="tbl-wrap"><table id="al-trades"></table></div>
+        <p class="note" style="margin:8px 0 0">"Excluida" marca las entradas del fallo del filtro de huecos (14 de septiembre), que no cuentan en el bot ajustado. Las posiciones abiertas de ese día tampoco.</p>
+      </div>
       <div class="two" style="margin-top:16px">
         <div>
           <div class="eyebrow" style="margin-bottom:8px">Historial de órdenes</div>
@@ -208,7 +213,7 @@ footer { color: var(--muted); font-size: 12.5px; }
         <div>
           <div class="eyebrow" style="margin-bottom:8px">Operaciones cerradas (últimos 14 días, según el broker)</div>
           <div class="tbl-wrap"><table id="ct-trades"></table></div>
-          <p class="note" style="margin:8px 0 0">Incluye las cerradas a mano: el broker no distingue el origen. Las del bot tienen su tamaño habitual (12 % del capital × 5 de exposición, redondeado al lote).</p>
+          <p class="note" style="margin:8px 0 0">El origen sale de la etiqueta con la que se abrió cada posición: las manuales no la llevan. "Excluida" marca las entradas del fallo del filtro de huecos (14 de septiembre), que no cuentan en el bot ajustado.</p>
         </div>
         <div>
           <div class="eyebrow" style="margin-bottom:8px">Ciclos del bot</div>
@@ -330,11 +335,21 @@ function decisionChips(list){
   return list.map(d=>`<span class="chip ${d.action.toLowerCase()}"><span class="k mono">${esc(d.symbol)}</span><span class="act">${d.action==="BUY"?"Comprar":d.action==="SELL"?"Vender":"Esperar"}</span><span class="m">RSI ${d.rsi!=null?Number(d.rsi).toFixed(0):"—"} · ${d.trend_up?"tendencia alcista":"tendencia bajista"}</span></span>`).join("");
 }
 const fxPrice = (v, sym) => v==null ? "—" : Number(v).toFixed(/USD$/.test(sym||"") && v < 10 ? 5 : v < 10 ? 4 : 2);
-function tradesTable(tr){
+const ORIGIN = {bot: ["bot","filled"], manual: ["manual",""], excluded: ["excluida","canceled"], mixed: ["mixta",""]};
+const originBadge = (o, reason) => { const [txt, cls] = ORIGIN[o] || [o||"bot",""]; return `<span class="status ${cls}" title="${esc(o==="excluded" ? (reason||"") : o==="manual" ? "Abierta a mano: el bot no la gestiona ni la cuenta" : "")}">${txt}</span>`; };
+function tradesTable(tr, reason){
   tr = (tr||[]).filter(t=>!t.error);
   if (!tr.length) return `<tbody><tr><td class="empty">Sin operaciones cerradas todavía.</td></tr></tbody>`;
-  const net = tr.reduce((a,t)=>a+t.net, 0);
-  return `<thead><tr><th>Cerrada (UTC)</th><th>Activo</th><th class="num">Unid.</th><th class="num">Entrada</th><th class="num">Salida</th><th class="num">Bruto</th><th class="num">Swap + com.</th><th class="num">Neto</th></tr></thead><tbody>` + [...tr].reverse().map(t=>`<tr><td class="mono" style="font-size:12px">${esc((t.at||"").replace("T"," ").replace("Z",""))}</td><td class="mono">${esc(t.symbol)}</td><td class="num">${t.units}</td><td class="num">${fxPrice(t.entry,t.symbol)}</td><td class="num">${fxPrice(t.exit,t.symbol)}</td><td class="num ${t.gross>=0?"pos":"neg"}">${fmtUSD2(t.gross)}</td><td class="num">${fmtUSD2(t.swap+t.commission)}</td><td class="num ${t.net>=0?"pos":"neg"}">${fmtUSD2(t.net)}</td></tr>`).join("") + `<tr class="active"><td colspan="7"><b>Total realizado</b></td><td class="num ${net>=0?"pos":"neg"}"><b>${fmtUSD2(net)}</b></td></tr></tbody>`;
+  const sum = o => tr.filter(t=>(t.origin||"bot")===o).reduce((a,t)=>a+t.net, 0);
+  const net = tr.reduce((a,t)=>a+t.net, 0), bot = sum("bot"), man = sum("manual"), exc = sum("excluded");
+  return `<thead><tr><th>Cerrada (UTC)</th><th>Activo</th><th>Origen</th><th class="num">Unid.</th><th class="num">Entrada</th><th class="num">Salida</th><th class="num">Bruto</th><th class="num">Swap + com.</th><th class="num">Neto</th></tr></thead><tbody>` + [...tr].reverse().map(t=>`<tr><td class="mono" style="font-size:12px">${esc((t.at||"").replace("T"," ").replace("Z",""))}</td><td class="mono">${esc(t.symbol)}</td><td>${originBadge(t.origin, reason)}</td><td class="num">${t.units}</td><td class="num">${fxPrice(t.entry,t.symbol)}</td><td class="num">${fxPrice(t.exit,t.symbol)}</td><td class="num ${t.gross>=0?"pos":"neg"}">${fmtUSD2(t.gross)}</td><td class="num">${fmtUSD2(t.swap+t.commission)}</td><td class="num ${t.net>=0?"pos":"neg"}">${fmtUSD2(t.net)}</td></tr>`).join("") + `<tr class="active"><td colspan="8"><b>Total realizado</b> · bot ${fmtUSD2(bot)} · manual ${fmtUSD2(man)} · excluidas ${fmtUSD2(exc)}</td><td class="num ${net>=0?"pos":"neg"}"><b>${fmtUSD2(net)}</b></td></tr></tbody>`;
+}
+function adjustedTile(bm, initial){
+  if (!bm) return null;
+  const r = bm.realized||{}, o = bm.open||{};
+  return {label:"Bot ajustado (sin manuales ni entradas excluidas)", value: pct(bm.adjusted_return, 2),
+          sub: `${fmtUSD2(bm.adjusted_equity)} sobre ${fmtUSD(bm.initial||initial)} · realizado bot ${fmtUSD2(r.bot||0)} · abierto bot ${fmtUSD2(o.bot||0)} · manual ${fmtUSD2((r.manual||0)+(o.manual||0))} · excluido ${fmtUSD2((r.excluded||0)+(o.excluded||0))}`,
+          cls: bm.adjusted_return>=0?"good":"bad"};
 }
 function cyclesTable(cycles){
   if (!cycles || !cycles.length) return `<tbody><tr><td class="empty">Sin ciclos registrados.</td></tr></tbody>`;
@@ -363,7 +378,8 @@ function cyclesTable(cycles){
     kp.push({label:"Capital de la cuenta", value: fmtUSD(live.equity), sub: (live.broker||"Alpaca paper") + (live.stale ? " · última lectura " + esc((live.at||"").replace("T"," ").replace("Z"," UTC")) : "")});
     kp.push({label:"Efectivo disponible", value: fmtUSD(live.cash), sub: pending.length ? `${pending.length} órdenes en cola` : "sin órdenes en cola"});
     kp.push({label:"Posiciones abiertas", value: String((live.positions||[]).length), sub: (live.positions||[]).length ? "P&L abierto " + fmtUSD2(pnl) : "sin posiciones", cls: pnl>=0?"good":"bad"});
-    kp.push({label:"Desde el inicio", value: pct(live.equity/D.settings.initial_cash-1, 2), sub: fmtUSD(D.settings.initial_cash) + " iniciales", cls: live.equity>=D.settings.initial_cash?"good":"bad"});
+    kp.push({label:"Desde el inicio", value: pct(live.equity/D.settings.initial_cash-1, 2), sub: fmtUSD(D.settings.initial_cash) + " iniciales, con todo incluido", cls: live.equity>=D.settings.initial_cash?"good":"bad"});
+    const alAdj = adjustedTile(live.bot_metrics, D.settings.initial_cash); if (alAdj) kp.push(alAdj);
     const open = live.is_open, pill = document.getElementById("market-pill");
     pill.classList.toggle("open", !!open);
     const nextOpen = new Date(live.next_open);
@@ -382,7 +398,7 @@ function cyclesTable(cycles){
   if (!live.available) { lede.textContent = "El panel se generó sin acceso a la cuenta."; t.innerHTML = ""; }
   else if ((live.positions||[]).length) {
     lede.textContent = `Precio medio de entrada, resultado no realizado y stop loss vigente en el broker (${(D.settings.stop_loss_pct*100).toFixed(0)} % bajo la entrada, o más alto si el bot lo subió).`;
-    t.innerHTML = `<thead><tr><th>Activo</th><th class="num">Cant.</th><th class="num">Entrada</th><th class="num">Actual</th><th class="num">Stop</th><th class="num">P&L</th></tr></thead><tbody>` + live.positions.map(p=>{ const stop = (live.stops && live.stops[p.symbol]) || p.avg*(1-D.settings.stop_loss_pct); return `<tr><td class="mono">${esc(p.symbol)}</td><td class="num">${p.qty}</td><td class="num">${fmtUSD2(p.avg)}</td><td class="num">${fmtUSD2(p.price)}</td><td class="num">${fmtUSD2(stop)}</td><td class="num ${p.pnl>=0?"pos":"neg"}">${fmtUSD2(p.pnl)} <span style="color:var(--muted)">(${pct(p.pnl/(p.avg*p.qty))})</span></td></tr>`; }).join("") + "</tbody>";
+    t.innerHTML = `<thead><tr><th>Activo</th><th class="num">Cant.</th><th class="num">Entrada</th><th class="num">Actual</th><th class="num">Stop</th><th class="num">P&L</th></tr></thead><tbody>` + live.positions.map(p=>{ const stop = (live.stops && live.stops[p.symbol]) || p.avg*(1-D.settings.stop_loss_pct); return `<tr><td class="mono">${esc(p.symbol)}${p.origin&&p.origin!=="bot"?` <span style="margin-left:4px">${originBadge(p.origin,(live.exclusions||{}).reason)}</span>`:""}</td><td class="num">${p.qty}</td><td class="num">${fmtUSD2(p.avg)}</td><td class="num">${fmtUSD2(p.price)}</td><td class="num">${fmtUSD2(stop)}</td><td class="num ${p.pnl>=0?"pos":"neg"}">${fmtUSD2(p.pnl)} <span style="color:var(--muted)">(${pct(p.pnl/(p.avg*p.qty))})</span></td></tr>`; }).join("") + "</tbody>";
   } else {
     document.getElementById("live-title").textContent = "Órdenes en cola";
     lede.textContent = live.orders.length ? "Aceptadas por el broker; se ejecutan a precio de mercado en la próxima apertura. Cada compra lleva un stop loss vinculado." : "No hay posiciones ni órdenes pendientes.";
@@ -393,6 +409,7 @@ function cyclesTable(cycles){
   if (!r) rl.textContent = "Aún no hay ciclos registrados.";
   else { rl.textContent = `Ciclo del ${new Date(r.timestamp).toLocaleString("es-ES",{day:"numeric",month:"short",hour:"2-digit",minute:"2-digit",timeZone:"UTC"})} UTC. Compra si la SMA rápida supera la lenta con RSI < ${D.settings.rsi_max_entry}; vende si el cruce se invierte.`; box.innerHTML = decisionChips(r.decisions); }
 
+  document.getElementById("al-trades").innerHTML = live.available ? tradesTable(live.trades, (live.exclusions||{}).reason) : "";
   const oa = document.getElementById("orders-all");
   oa.innerHTML = live.available && (live.orders_all||[]).length ? `<thead><tr><th>Cuándo (UTC)</th><th>Activo</th><th>Lado</th><th class="num">Cant.</th><th class="num">Precio</th><th>Estado</th></tr></thead><tbody>` + live.orders_all.map(o=>`<tr><td class="mono" style="font-size:12px">${esc(o.at)}</td><td class="mono">${esc(o.symbol)}</td><td>${o.side==="buy"?"Compra":"Venta"}</td><td class="num">${o.qty}</td><td class="num">${o.filled_price?fmtUSD2(o.filled_price):(o.type==="stop"&&o.stop_price?"stop "+fmtUSD2(o.stop_price):"mercado")}</td><td><span class="status ${esc(o.status)}">${st(o.status)}</span></td></tr>`).join("") + "</tbody>" : `<tbody><tr><td class="empty">Sin órdenes todavía.</td></tr></tbody>`;
   document.getElementById("cycles").innerHTML = cyclesTable(D.cycles);
@@ -482,20 +499,21 @@ function cyclesTable(cycles){
     {label:"Capital (saldo + abierto)", value: fmtUSD(CT.equity), sub: CT.broker + " · " + esc((CT.at||"").replace("T"," ").replace("Z"," UTC"))},
     {label:"Saldo realizado", value: fmtUSD(CT.balance), sub: "apalancamiento de la cuenta 1:" + Math.round(CT.leverage)},
     {label:"Posiciones abiertas", value: String(CT.positions.length), sub: "P&L abierto " + fmtUSD2(CT.unrealized_pnl), cls: CT.unrealized_pnl>=0?"good":"bad"},
-    {label:"Desde el inicio", value: pct(CT.equity/base-1, 2), sub: fmtUSD(base) + " iniciales", cls: CT.equity>=base?"good":"bad"},
+    {label:"Desde el inicio", value: pct(CT.equity/base-1, 2), sub: fmtUSD(base) + " iniciales, con todo incluido", cls: CT.equity>=base?"good":"bad"},
   ];
+  const ctAdj = adjustedTile(CT.bot_metrics, base); if (ctAdj) tiles.push(ctAdj);
   kp.innerHTML = tiles.map(k => `<div class="tile"><div class="label">${esc(k.label)}</div><div class="value">${esc(k.value)}</div><div class="sub ${k.cls||""}">${k.sub}</div></div>`).join("");
   drawEquity("ct-track", "ct-tip", "ct-track-wrap", "ct-track-empty", CT.history, base, "Todavía no hay recorrido: la curva se dibuja con los ciclos del workflow.");
   const s = CT.settings || {};
   const manual = CT.positions.filter(p=>p.bot===false).length;
   document.getElementById("ct-pos-lede").textContent = `Entrada media, último precio diario, stop vigente en el broker (${(s.stop_loss_pct*100).toFixed(0)} % bajo la entrada, o más alto si el bot lo subió) y resultado.` + (manual ? ` ${manual} posición(es) marcadas como manuales se abrieron desde cTrader: el bot no las gestiona.` : "");
   const pt = document.getElementById("ct-positions");
-  pt.innerHTML = CT.positions.length ? `<thead><tr><th>Activo</th><th class="num">Cant.</th><th class="num">Entrada</th><th class="num">Actual</th><th class="num">Stop</th><th class="num">Nominal</th><th class="num">P&L</th></tr></thead><tbody>` + CT.positions.map(p=>`<tr><td class="mono">${esc(p.symbol)}${p.bot===false?'<span class="status" style="margin-left:6px">manual</span>':""}</td><td class="num">${p.qty}</td><td class="num">${p.avg.toFixed(p.avg<10?4:2)}</td><td class="num">${p.price.toFixed(p.price<10?4:2)}</td><td class="num">${p.stop?p.stop.toFixed(p.stop<10?4:2):"—"}</td><td class="num">${fmtUSD(p.qty*p.avg)}</td><td class="num ${p.pnl>=0?"pos":"neg"}">${fmtUSD2(p.pnl)} <span style="color:var(--muted)">(${pct(p.pnl/(p.avg*p.qty))})</span></td></tr>`).join("") + "</tbody>" : `<tbody><tr><td class="empty">Sin posiciones abiertas.</td></tr></tbody>`;
+  pt.innerHTML = CT.positions.length ? `<thead><tr><th>Activo</th><th class="num">Cant.</th><th class="num">Entrada</th><th class="num">Actual</th><th class="num">Stop</th><th class="num">Nominal</th><th class="num">P&L</th></tr></thead><tbody>` + CT.positions.map(p=>`<tr><td class="mono">${esc(p.symbol)}${p.origin&&p.origin!=="bot"?` <span style="margin-left:4px">${originBadge(p.origin,(CT.exclusions||{}).reason)}</span>`:""}</td><td class="num">${p.qty}</td><td class="num">${p.avg.toFixed(p.avg<10?4:2)}</td><td class="num">${p.price.toFixed(p.price<10?4:2)}</td><td class="num">${p.stop?p.stop.toFixed(p.stop<10?4:2):"—"}</td><td class="num">${fmtUSD(p.qty*p.avg)}</td><td class="num ${p.pnl>=0?"pos":"neg"}">${fmtUSD2(p.pnl)} <span style="color:var(--muted)">(${pct(p.pnl/(p.avg*p.qty))})</span></td></tr>`).join("") + "</tbody>" : `<tbody><tr><td class="empty">Sin posiciones abiertas.</td></tr></tbody>`;
   const lr = CT.last_run;
   document.getElementById("ct-run-lede").textContent = lr ? `Ciclo del ${esc(lr.at)} UTC.` + (CT.event_window&&CT.event_window.length ? " Ventana de evento activa: " + CT.event_window.join(", ") : "") : "Aún no hay ciclos registrados.";
   document.getElementById("ct-decisions").innerHTML = lr ? decisionChips(lr.decisions||[]) : "";
   document.getElementById("ct-cycles").innerHTML = cyclesTable(CT.cycles);
-  document.getElementById("ct-trades").innerHTML = tradesTable(CT.trades);
+  document.getElementById("ct-trades").innerHTML = tradesTable(CT.trades, (CT.exclusions||{}).reason);
   document.getElementById("ct-settings").innerHTML = `<tbody>
     <tr><td>Universo</td><td class="mono" style="font-size:12.5px">${esc((CT.symbols||[]).join(", "))}</td></tr>
     <tr><td>Stop loss</td><td>${(s.stop_loss_pct*100).toFixed(1)} % bajo la entrada, enviado con la orden</td></tr>
@@ -527,6 +545,7 @@ function cyclesTable(cycles){
   ];
   const s = SW.settings || {}, g = SW.guard || {}, sl = SW.slippage || {};
   if (g.mode) tiles.push({label:"Freno", value: g.mode==="off" ? "libre" : g.mode==="freeze" ? "congelado" : "cerrando", sub: g.mode==="off" ? `drawdown ${pct(g.drawdown||0, 1)} desde el máximo de ${fmtUSD2(g.peak||base)} · límite ${((s.max_drawdown_pct||0)*100).toFixed(0)} %` : esc(g.reason||""), cls: g.mode==="off"?"":"bad"});
+  const swAdj = adjustedTile(SW.bot_metrics, base); if (swAdj) tiles.push(swAdj);
   if (sl.count) tiles.push({label:"Slippage acumulado", value: fmtUSD2(sl.total_usd), sub: `${sl.count} entrada(s) · media ${Number(sl.avg_bps).toFixed(1)} pb`, cls: sl.total_usd<=0?"good":"bad"});
   kp.innerHTML = tiles.map(k => `<div class="tile"><div class="label">${esc(k.label)}</div><div class="value">${esc(k.value)}</div><div class="sub ${k.cls||""}">${k.sub}</div></div>`).join("");
   drawEquity("sw-track", "sw-tip", "sw-track-wrap", "sw-track-empty", SW.history, base, "Todavía no hay recorrido: la curva se dibuja con los ciclos del workflow.");
@@ -538,7 +557,7 @@ function cyclesTable(cycles){
   const why = d => d.reason ? esc(d.reason.replace("senal caducada", "señal caducada")) : (d.close!=null && d.bb_lo!=null ? (d.close < d.bb_lo ? "bajo la banda inferior" : "sobre la banda inferior") : "");
   document.getElementById("sw-decisions").innerHTML = lr ? (lr.decisions||[]).map(d=>`<span class="chip ${d.action.toLowerCase()}"><span class="k mono">${esc(d.symbol)}</span><span class="act">${d.action==="BUY"?"Comprar":"Esperar"}</span><span class="m">RSI ${d.rsi!=null?Number(d.rsi).toFixed(0):"—"} · ${why(d)}${d.bar_age_h!=null?` · barra de hace ${Number(d.bar_age_h).toFixed(1)} h`:""}</span></span>`).join("") : "";
   document.getElementById("sw-cycles").innerHTML = cyclesTable(SW.cycles);
-  document.getElementById("sw-trades").innerHTML = tradesTable(SW.trades);
+  document.getElementById("sw-trades").innerHTML = tradesTable(SW.trades, (SW.exclusions||{}).reason);
   const sli = sl.items || [];
   document.getElementById("sw-slippage").innerHTML = sli.length ? `<thead><tr><th>Entrada (UTC)</th><th>Par</th><th>Barra de la señal</th><th class="num">Retraso</th><th class="num">Señal</th><th class="num">Real</th><th class="num">Diferencia</th><th class="num">Coste</th></tr></thead><tbody>` + [...sli].reverse().map(i=>`<tr><td class="mono" style="font-size:12px">${esc(i.at)}</td><td class="mono">${esc(i.symbol)}</td><td class="mono" style="font-size:12px">${esc(i.bar||"")}</td><td class="num">${i.bar_age_h!=null?Number(i.bar_age_h).toFixed(1)+" h":"—"}</td><td class="num">${fx(i.signal,i.symbol)}</td><td class="num">${fx(i.fill,i.symbol)}</td><td class="num ${i.slip_bps<=0?"pos":"neg"}">${(i.slip_bps>0?"+":"")+Number(i.slip_bps).toFixed(1)} pb</td><td class="num ${i.slip_usd<=0?"pos":"neg"}">${fmtUSD2(i.slip_usd)}</td></tr>`).join("") + "</tbody>" : `<tbody><tr><td class="empty">Todavía no hay entradas medidas: se registra a partir de la primera compra del bot desde que existe esta métrica.</td></tr></tbody>`;
   const wf = SW.walkforward;

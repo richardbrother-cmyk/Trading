@@ -242,12 +242,36 @@ class CTraderSession:
             return {}
         return {int(p.positionId): money(int(p.netUnrealizedPnL), int(res.moneyDigits)) for p in res.positionUnrealizedPnL}
 
+    def position_meta(self, days: int = 45) -> dict[int, dict]:
+        """position_id -> {label, opened_at} a partir del historial de ordenes (incluye posiciones ya cerradas)."""
+        now = datetime.now(timezone.utc)
+        meta: dict[int, dict] = {}
+        try:
+            res = self.call("ProtoOAOrderListReq", timeout=40, ctidTraderAccountId=self.account_id,
+                            fromTimestamp=int((now - timedelta(days=days)).timestamp() * 1000), toTimestamp=int(now.timestamp() * 1000))
+        except Exception:  # noqa: BLE001
+            return meta
+        for o in res.order:
+            if not o.HasField("positionId"):
+                continue
+            pid = int(o.positionId)
+            td = o.tradeData
+            label = td.label if td.HasField("label") else ""
+            opened = datetime.fromtimestamp(int(td.openTimestamp) / 1000, tz=timezone.utc) if td.HasField("openTimestamp") else None
+            cur = meta.setdefault(pid, {"label": "", "opened_at": None})
+            if label and not cur["label"]:
+                cur["label"] = label
+            if opened and (cur["opened_at"] is None or opened < cur["opened_at"]):
+                cur["opened_at"] = opened
+        return meta
+
     def deals(self, days: int = 14) -> list[dict]:
         """Operaciones ejecutadas en los ultimos dias; las que cierran posicion llevan el resultado realizado."""
         now = datetime.now(timezone.utc)
         res = self.call("ProtoOADealListReq", timeout=40, ctidTraderAccountId=self.account_id,
                         fromTimestamp=int((now - timedelta(days=days)).timestamp() * 1000), toTimestamp=int(now.timestamp() * 1000), maxRows=500)
         id_to_name = {info.symbol_id: name for name, info in self.symbols.items()}
+        pos_meta = self.position_meta(days=max(days, 45))
         unknown = {int(d.symbolId) for d in res.deal} - set(id_to_name)
         if unknown:  # operaciones manuales en simbolos que el bot no carga: resolver el nombre
             try:
@@ -264,7 +288,8 @@ class CTraderSession:
                    "side": "buy" if d.tradeSide == self.model.ProtoOATradeSide.BUY else "sell",
                    "units": int(d.filledVolume) / VOLUME_SCALE, "price": float(d.executionPrice),
                    "at": datetime.fromtimestamp(int(d.executionTimestamp) / 1000, tz=timezone.utc),
-                   "commission": money(int(d.commission), md) if d.HasField("commission") else 0.0, "closes": False}
+                   "commission": money(int(d.commission), md) if d.HasField("commission") else 0.0, "closes": False,
+                   "label": pos_meta.get(int(d.positionId), {}).get("label", ""), "opened_at": pos_meta.get(int(d.positionId), {}).get("opened_at")}
             if d.HasField("closePositionDetail"):
                 c = d.closePositionDetail
                 cmd = int(c.moneyDigits) if c.HasField("moneyDigits") else md
