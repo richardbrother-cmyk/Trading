@@ -11,7 +11,7 @@ def test_peak_uses_history_state_and_now(tmp_path):
     assert peak_equity(198.0, str(hist), str(tmp_path)) == 220.0
     # el maximo persiste aunque el historial desaparezca
     hist.unlink()
-    assert peak_equity(199.0, str(hist), str(tmp_path)) == 210.0
+    assert peak_equity(199.0, str(hist), str(tmp_path)) == 220.0
     assert peak_equity(250.0, str(hist), str(tmp_path)) == 250.0
 
 
