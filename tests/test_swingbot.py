@@ -142,3 +142,47 @@ def test_swing_skips_entry_on_bar_containing_opex_close(tmp_path, monkeypatch):
     sess = FakeSession(bars, [])
     summary = run_swing_cycle(s, sess, now=last_open + timedelta(hours=5))  # fuera de la ventana (cerro hace 1 h, evento hace 2 h)
     assert summary["decisions"][0]["action"] == "HOLD" and "vencimiento" in summary["decisions"][0]["reason"] and not sess.calls
+
+
+def _h4_breakout(n=300, seed=3):
+    rng = np.random.default_rng(seed)
+    idx = pd.date_range("2026-06-01", periods=n, freq="4h", tz="UTC")
+    close = 7000 + np.cumsum(rng.normal(0.8, 6, n))  # tendencia alcista: cierre sobre la EMA200
+    close[-1] = close[-25:-1].max() + 40  # ultima barra rompe el maximo de 20 barras
+    o = np.concatenate([[close[0]], close[:-1]])
+    return pd.DataFrame({"open": o, "high": np.maximum(o, close) + 3, "low": np.minimum(o, close) - 3, "close": close, "volume": 1.0}, index=idx)
+
+
+def test_aggressive_profile_breakout_with_fixed_6r_target(tmp_path, monkeypatch):
+    import autotrader.swingbot as sb
+    from autotrader.swing import SwingParams
+    bars = _h4_breakout()
+    monkeypatch.setattr(sb, "closed_h4_bars", lambda session, symbol, days=60, now=None: bars)
+    s = Settings(broker="sim", symbols=["US500"], state_dir=str(tmp_path), event_mode="off", risk_per_trade=0.03, max_drawdown_pct=0)
+    p = SwingParams("breakout", "H4", stop_atr=0.75, tp_atr=4.5, pure_rr=True, allow_short=False, max_hold_days=7.0, risk_pct=0.03, max_risk_pct=0.045)
+    sess = FakeSession(bars, [])
+    summary = run_swing_cycle(s, sess, params=p, now=bars.index[-1] + timedelta(hours=5), label="autotrader-aggr", max_positions=3)
+    dec = summary["decisions"][0]
+    assert dec["action"] == "BUY", dec
+    order = summary["orders"][0]
+    stop_dist = order["entry_ref"] - order["stop"]
+    assert abs((order["target"] - order["entry_ref"]) / stop_dist - 6.0) < 0.05  # objetivo 6R
+    assert order["risk_usd"] <= 200 * 0.045 + 1e-6
+    sent = [c for c in sess.calls if c[0] == "ProtoOANewOrderReq"]
+    assert len(sent) == 1 and sent[0][1]["label"] == "autotrader-aggr" and "posiciones" not in summary.get("strategy", "")
+    assert "ruptura" in summary["strategy"] or "maximo" in summary["strategy"]
+
+
+def test_aggressive_profile_respects_max_positions(tmp_path, monkeypatch):
+    import autotrader.swingbot as sb
+    from autotrader.swing import SwingParams
+    bars = _h4_breakout()
+    monkeypatch.setattr(sb, "closed_h4_bars", lambda session, symbol, days=60, now=None: bars)
+    now = bars.index[-1] + timedelta(hours=5)
+    held = [OpenPosition(i, sym, 0.05, "buy", 7000.0, 6950.0, "autotrader-aggr", (now - timedelta(hours=6)).to_pydatetime()) for i, sym in enumerate(["EURUSD", "GBPUSD", "XAUUSD"])]
+    s = Settings(broker="sim", symbols=["US500"], state_dir=str(tmp_path), event_mode="off", risk_per_trade=0.03, max_drawdown_pct=0)
+    p = SwingParams("breakout", "H4", stop_atr=0.75, tp_atr=4.5, pure_rr=True, allow_short=False, max_hold_days=7.0, risk_pct=0.03, max_risk_pct=0.045)
+    sess = FakeSession(bars, held)
+    summary = run_swing_cycle(s, sess, params=p, now=now, label="autotrader-aggr", max_positions=3)
+    assert summary["decisions"][0]["action"] == "HOLD" and "maximo de 3" in summary["decisions"][0]["reason"]
+    assert not [c for c in sess.calls if c[0] == "ProtoOANewOrderReq"]

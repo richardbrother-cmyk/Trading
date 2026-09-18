@@ -1,0 +1,104 @@
+name: ctrader-aggr
+
+# Bot AGRESIVO (ruptura de 4 h, solo largos, stop 0,75 ATR, objetivo 6R fijo en el broker, hasta 7 dias) sobre una
+# TERCERA cuenta demo de cTrader fondeada con 500 USD y apalancamiento 1:500. Mismo motor que el bot swing con otro
+# perfil. Corre cada hora y solo entra si la ultima barra de 4 h cerro hace menos de 2 h.
+# Secrets: CTRADER_CLIENT_ID, CTRADER_CLIENT_SECRET, CTRADER_ACCESS_TOKEN (token que incluya esta cuenta),
+#          CTRADER_AGGR_ACCOUNT_LOGIN (numero de la cuenta demo de 500 USD).
+on:
+  schedule:
+    - cron: "9 * * * 0-5"
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "Solo decidir, sin enviar ordenes"
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+
+env:
+  SCHEDULE_ENABLED: "true"
+
+jobs:
+  gate:
+    runs-on: ubuntu-latest
+    outputs:
+      enabled: ${{ steps.check.outputs.enabled }}
+    steps:
+      - id: check
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ] || [ "$SCHEDULE_ENABLED" = "true" ]; then echo "enabled=true" >> "$GITHUB_OUTPUT"; else echo "enabled=false" >> "$GITHUB_OUTPUT"; fi
+
+  aggr:
+    needs: gate
+    if: ${{ needs.gate.outputs.enabled == 'true' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      BROKER: ctrader
+      DATA_PROVIDER: ctrader
+      CTRADER_DEMO: "true"
+      CTRADER_CLIENT_ID: ${{ secrets.CTRADER_CLIENT_ID }}
+      CTRADER_CLIENT_SECRET: ${{ secrets.CTRADER_CLIENT_SECRET }}
+      CTRADER_ACCOUNT_LOGIN: ${{ secrets.CTRADER_AGGR_ACCOUNT_LOGIN }}
+      CTRADER_ACCESS_TOKEN: ${{ secrets.CTRADER_ACCESS_TOKEN }}
+      # Freno global: BOT_HALT (variable del repositorio: off | freeze | close) y freno por drawdown desde el maximo
+      BOT_HALT: ${{ vars.AGGR_BOT_HALT || vars.BOT_HALT || 'off' }}
+      MAX_DRAWDOWN_PCT: ${{ vars.AGGR_MAX_DRAWDOWN_PCT || '0.30' }}
+      # Indices y forex son operables con 200 USD; oro y petroleo se saltan solos si el lote minimo arriesga
+      # mas de SWING_MAX_RISK_PCT
+      SYMBOLS: "US500,NAS100,EURUSD,GBPUSD,XAUUSD,XTIUSD"
+      # Perfil: ruptura H4 con stop corto y objetivo 6R fijo. Riesgo por operacion configurable (RISK_PER_TRADE) con
+      # maximo de 3 posiciones abiertas; el freno por drawdown se fija en el 30 % desde el maximo.
+      SWING_STRATEGY: "breakout"
+      SWING_BREAKOUT_BARS: "20"
+      SWING_STOP_ATR: "0.75"
+      SWING_TP_ATR: "4.5"
+      SWING_PURE_RR: "true"
+      SWING_MAX_HOLD_DAYS: "7"
+      SWING_LABEL: "autotrader-aggr"
+      SWING_MAX_POSITIONS: "3"
+      RISK_PER_TRADE: ${{ vars.AGGR_RISK_PER_TRADE || '0.03' }}
+      SWING_MAX_RISK_PCT: ${{ vars.AGGR_MAX_RISK_PCT || '0.045' }}
+      SWING_MAX_SIGNAL_AGE_HOURS: "2"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install -r requirements.txt
+      - name: Tests
+        run: python -m pytest -q
+      - name: Ciclo swing
+        run: python -m autotrader.cli --env /dev/null swing-run ${{ inputs.dry_run && '--dry-run' || '' }}
+      - name: Estado de la cuenta y panel
+        if: ${{ !inputs.dry_run }}
+        run: |
+          python scripts/ctrader_state.py --swing --initial 500 --label autotrader-aggr --out docs/aggr_state.json
+          python scripts/dashboard.py --no-live --out reports/dashboard.html
+          cp reports/dashboard.html docs/index.html
+          cp reports/dashboard.html docs/dashboard.html
+      - name: Publicar panel
+        if: ${{ !inputs.dry_run }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add docs/aggr_state.json docs/index.html docs/dashboard.html
+          if git diff --cached --quiet; then echo "sin cambios"; exit 0; fi
+          git commit -m "Panel: actualización automática (agresiva)"
+          # Los ficheros del panel los regeneran varios workflows: ante conflicto gana la version recien generada.
+          ok=0
+          for i in 1 2 3 4; do
+            if git pull --rebase -X theirs -q origin "${GITHUB_REF_NAME}" && git push; then ok=1; break; fi
+            git rebase --abort 2>/dev/null || true
+            sleep $((i * 5))
+          done
+          [ "$ok" = "1" ] || { echo "::error::no se pudo publicar el panel tras 4 intentos"; exit 1; }
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: aggr-log-${{ github.run_id }}
+          path: state/run_log.jsonl
+          if-no-files-found: ignore

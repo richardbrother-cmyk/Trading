@@ -252,6 +252,23 @@ tendencial ni con operaciones manuales. Cada ciclo publica `docs/swing_state.jso
 muestra la cuenta en la pestaña "Fusion · swing 200 USD". Oro y petróleo se descartan solos porque su lote mínimo
 arriesga más del tope mientras la cuenta sea pequeña.
 
+### Cuenta agresiva (500 USD)
+
+Tercera cuenta demo, workflow `ctrader-aggr.yml`, mismo motor que el bot swing con otro perfil
+(`SWING_STRATEGY`, `SWING_STOP_ATR`, `SWING_TP_ATR`, `SWING_PURE_RR`, `SWING_MAX_HOLD_DAYS`,
+`SWING_LABEL`, `SWING_MAX_POSITIONS`): ruptura de 4 h (cierre sobre el máximo de 20 barras y sobre la
+EMA200), solo largos, stop a 0,75 ATR y objetivo fijo a 6 veces el stop enviados con la orden, salida a
+los 7 días, máximo 3 posiciones abiertas, etiqueta `autotrader-aggr`. El riesgo por operación se fija
+con la variable `AGGR_RISK_PER_TRADE` (3 % por defecto) y el freno por drawdown con
+`AGGR_MAX_DRAWDOWN_PCT` (30 %). Estado en `docs/aggr_state.json` y pestaña propia en el panel.
+
+Por qué 3 % y no 10 %: con la única combinación que mostró borde en 12 meses (factor de beneficio 1,73,
+148 operaciones, solo el 20 % llega al objetivo, rachas de 14 pérdidas), una simulación de una cuenta
+de 500 USD con máximo 3 posiciones y 3.000 remuestreos del orden de las operaciones da: al 2 % de
+riesgo, mediana final 2.146 USD y 2 % de probabilidad de caer a la mitad; al 3 %, 3.805 USD y 18 %;
+al 5 %, 9.048 USD y 72 %; al 10 %, 20.615 USD de mediana pero 100 % de probabilidad de pasar por una
+caída del 50 % y un peor decil de 470 USD. Es la misma estrategia; solo cambia si sobrevive.
+
 ### Walk-forward de la estrategia swing
 
 `scripts/swing_walkforward.py` reparte los 12 meses de barras en ventanas rodantes (4 meses para elegir

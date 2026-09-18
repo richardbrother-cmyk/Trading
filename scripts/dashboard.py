@@ -32,6 +32,7 @@ UNIVERSES = [
 ALPACA_CACHE = "docs/alpaca_state.json"
 CTRADER_STATE = "docs/ctrader_state.json"
 SWING_STATE = "docs/swing_state.json"
+AGGR_STATE = "docs/aggr_state.json"
 SWING_WALKFORWARD = "docs/swing_walkforward.json"
 KRONOS_REPORT = "docs/kronos_report.json"
 
@@ -128,6 +129,10 @@ def collect(no_live: bool) -> dict:
     if os.path.exists(SWING_WALKFORWARD):
         with open(SWING_WALKFORWARD, encoding="utf-8") as fh:
             swing["walkforward"] = json.load(fh)
+    aggr = {"available": False}
+    if os.path.exists(AGGR_STATE):
+        with open(AGGR_STATE, encoding="utf-8") as fh:
+            aggr = json.load(fh)
     if os.path.exists(KRONOS_REPORT):
         with open(KRONOS_REPORT, encoding="utf-8") as fh:
             swing["kronos"] = json.load(fh)
@@ -192,7 +197,7 @@ def collect(no_live: bool) -> dict:
         "min_gain": s.event_min_gain, "trail_pct": s.event_trail_pct}, "settings": {
         "fast_sma": s.fast_sma, "slow_sma": s.slow_sma, "rsi_max_entry": s.rsi_max_entry, "risk_per_trade": s.risk_per_trade,
         "stop_loss_pct": s.stop_loss_pct, "max_daily_loss_pct": s.max_daily_loss_pct, "initial_cash": s.initial_cash},
-        "backtests": backtests, "live": live, "last_run": last_run, "cycles": cycles, "ctrader": ctrader, "swing": swing}
+        "backtests": backtests, "live": live, "last_run": last_run, "cycles": cycles, "ctrader": ctrader, "swing": swing, "aggr": aggr}
 
 
 def render(d: dict) -> str:

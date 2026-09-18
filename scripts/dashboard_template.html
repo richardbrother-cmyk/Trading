@@ -130,6 +130,7 @@ footer { color: var(--muted); font-size: 12.5px; }
     <button class="tab" role="tab" id="tab-alpaca" aria-selected="true" aria-controls="panel-alpaca">Alpaca · acciones y ETFs <span class="badge" id="badge-alpaca"></span></button>
     <button class="tab" role="tab" id="tab-ctrader" aria-selected="false" aria-controls="panel-ctrader">Fusion Markets · CFDs <span class="badge" id="badge-ctrader"></span></button>
     <button class="tab" role="tab" id="tab-swing" aria-selected="false" aria-controls="panel-swing">Fusion · swing 200 USD <span class="badge" id="badge-swing"></span></button>
+    <button class="tab" role="tab" id="tab-aggr" aria-selected="false" aria-controls="panel-aggr">Fusion · agresiva 500 USD <span class="badge" id="badge-aggr"></span></button>
   </div>
 
   <!-- ============================ ALPACA ============================ -->
@@ -289,6 +290,18 @@ const SERIES = ["var(--s1)","var(--s2)","var(--s3)"];
 const active = D.backtests.findIndex(b => b.name.includes("activo"));
 const live = D.live, CT = D.ctrader || {available:false}, SW = D.swing || {available:false};
 const nice = r => { const p = Math.pow(10, Math.floor(Math.log10(r))); const m = r/p; return (m<1.5?1:m<3.5?2:m<7.5?5:10)*p; };
+
+// --- Panel de la cuenta agresiva: clon del panel swing con ids ag-* ---
+(function(){
+  const src = document.getElementById("panel-swing");
+  const clone = src.cloneNode(true);
+  clone.id = "panel-aggr"; clone.setAttribute("aria-labelledby", "tab-aggr"); clone.hidden = true;
+  clone.querySelectorAll("[id]").forEach(el => { el.id = el.id.replace(/^sw-/, "ag-"); });
+  // sin secciones de investigacion (walk-forward, Kronos) en la cuenta agresiva
+  clone.querySelectorAll("#ag-walkforward, #ag-kronos").forEach(el => { const sec = el.closest("section"); if (sec) sec.remove(); });
+  const lede = clone.querySelector("#ag-track-lede"); if (lede) lede.textContent = "Capital (saldo más resultado abierto) registrado en cada ciclo del bot agresivo desde GitHub Actions. Cuenta demo de 500 USD con apalancamiento 1:500.";
+  src.parentNode.insertBefore(clone, src.nextSibling);
+})();
 
 // --- Tabs ---
 (function(){
@@ -530,19 +543,20 @@ function cyclesTable(cycles){
   </tbody>`;
 })();
 
-// ============================ FUSION / SWING ============================
-(function(){
-  const kp = document.getElementById("sw-kpis");
+// ============================ FUSION / SWING y AGRESIVA ============================
+function renderSwingTab(prefix, SW, badgeId, base0, research){
+  const $ = id => document.getElementById(id.replace(/^sw-/, prefix + "-"));
+  const kp = $("sw-kpis");
   const fx = fxPrice;
   if (!SW.available) {
     kp.innerHTML = `<div class="tile"><div class="label">Fusion Markets · cTrader demo · swing</div><div class="value">—</div><div class="sub">Aún no hay estado publicado: el primer ciclo del workflow lo genera.</div></div>`;
-    document.getElementById("badge-swing").textContent = "sin datos";
-    drawEquity("sw-track", "sw-tip", "sw-track-wrap", "sw-track-empty", [], 200, "Sin datos todavía.");
-    document.getElementById("sw-positions").innerHTML = ""; document.getElementById("sw-cycles").innerHTML = ""; document.getElementById("sw-settings").innerHTML = "";
+    document.getElementById(badgeId).textContent = "sin datos";
+    drawEquity(prefix+"-track", prefix+"-tip", prefix+"-track-wrap", prefix+"-track-empty", [], base0, "Sin datos todavía.");
+    $("sw-positions").innerHTML = ""; $("sw-cycles").innerHTML = ""; $("sw-settings").innerHTML = "";
     return;
   }
-  const base = SW.initial || 200;
-  document.getElementById("badge-swing").textContent = pct(SW.equity/base-1, 1);
+  const base = SW.initial || base0;
+  document.getElementById(badgeId).textContent = pct(SW.equity/base-1, 1);
   const tiles = [
     {label:"Capital (saldo + abierto)", value: fmtUSD2(SW.equity), sub: esc((SW.at||"").replace("T"," ").replace("Z"," UTC"))},
     {label:"Saldo realizado", value: fmtUSD2(SW.balance), sub: "apalancamiento de la cuenta 1:" + Math.round(SW.leverage)},
@@ -554,52 +568,53 @@ function cyclesTable(cycles){
   const swAdj = adjustedTile(SW.bot_metrics, base); if (swAdj) tiles.push(swAdj);
   if (sl.count) tiles.push({label:"Slippage acumulado", value: fmtUSD2(sl.total_usd), sub: `${sl.count} entrada(s) · media ${Number(sl.avg_bps).toFixed(1)} pb`, cls: sl.total_usd<=0?"good":"bad"});
   kp.innerHTML = tiles.map(k => `<div class="tile"><div class="label">${esc(k.label)}</div><div class="value">${esc(k.value)}</div><div class="sub ${k.cls||""}">${k.sub}</div></div>`).join("");
-  drawEquity("sw-track", "sw-tip", "sw-track-wrap", "sw-track-empty", SW.history, base, "Todavía no hay recorrido: la curva se dibuja con los ciclos del workflow.");
-  document.getElementById("sw-pos-lede").textContent = "Entrada, último precio, stop y objetivo enviados con la orden y vigilados por el broker, y resultado abierto.";
-  const pt = document.getElementById("sw-positions");
+  drawEquity(prefix+"-track", prefix+"-tip", prefix+"-track-wrap", prefix+"-track-empty", SW.history, base, "Todavía no hay recorrido: la curva se dibuja con los ciclos del workflow.");
+  $("sw-pos-lede").textContent = "Entrada, último precio, stop y objetivo enviados con la orden y vigilados por el broker, y resultado abierto.";
+  const pt = $("sw-positions");
   pt.innerHTML = SW.positions.length ? `<thead><tr><th>Par</th><th class="num">Unidades</th><th class="num">Entrada</th><th class="num">Actual</th><th class="num">Stop</th><th class="num">Objetivo</th><th class="num">P&L</th><th>Abierta</th></tr></thead><tbody>` + SW.positions.map(p=>`<tr><td class="mono">${esc(p.symbol)}</td><td class="num">${p.qty}</td><td class="num">${fx(p.avg,p.symbol)}</td><td class="num">${fx(p.price,p.symbol)}</td><td class="num">${p.stop?fx(p.stop,p.symbol):"—"}</td><td class="num">${p.target?fx(p.target,p.symbol):"—"}</td><td class="num ${p.pnl>=0?"pos":"neg"}">${fmtUSD2(p.pnl)}</td><td class="mono" style="font-size:12px">${esc((p.opened_at||"").replace("T"," ").replace("Z",""))}</td></tr>`).join("") + "</tbody>" : `<tbody><tr><td class="empty">Sin posiciones abiertas.</td></tr></tbody>`;
   const lr = SW.last_run;
-  document.getElementById("sw-run-lede").textContent = lr ? `Ciclo del ${esc(lr.at)} UTC sobre la última barra de 4 h cerrada.` + (lr.event_window&&lr.event_window.length ? " Ventana de evento activa: " + lr.event_window.join(", ") : "") : "Aún no hay ciclos registrados.";
+  $("sw-run-lede").textContent = lr ? `Ciclo del ${esc(lr.at)} UTC sobre la última barra de 4 h cerrada.` + (lr.event_window&&lr.event_window.length ? " Ventana de evento activa: " + lr.event_window.join(", ") : "") : "Aún no hay ciclos registrados.";
   const why = d => d.reason ? esc(d.reason.replace("senal caducada", "señal caducada")) : (d.close!=null && d.bb_lo!=null ? (d.close < d.bb_lo ? "bajo la banda inferior" : "sobre la banda inferior") : "");
-  document.getElementById("sw-decisions").innerHTML = lr ? (lr.decisions||[]).map(d=>`<span class="chip ${d.action.toLowerCase()}"><span class="k mono">${esc(d.symbol)}</span><span class="act">${d.action==="BUY"?"Comprar":"Esperar"}</span><span class="m">RSI ${d.rsi!=null?Number(d.rsi).toFixed(0):"—"} · ${why(d)}${d.bar_age_h!=null?` · barra de hace ${Number(d.bar_age_h).toFixed(1)} h`:""}</span></span>`).join("") : "";
-  document.getElementById("sw-cycles").innerHTML = cyclesTable(SW.cycles);
-  document.getElementById("sw-trades").innerHTML = tradesTable(SW.trades, (SW.exclusions||{}).reason);
+  $("sw-decisions").innerHTML = lr ? (lr.decisions||[]).map(d=>`<span class="chip ${d.action.toLowerCase()}"><span class="k mono">${esc(d.symbol)}</span><span class="act">${d.action==="BUY"?"Comprar":"Esperar"}</span><span class="m">RSI ${d.rsi!=null?Number(d.rsi).toFixed(0):"—"} · ${why(d)}${d.bar_age_h!=null?` · barra de hace ${Number(d.bar_age_h).toFixed(1)} h`:""}</span></span>`).join("") : "";
+  $("sw-cycles").innerHTML = cyclesTable(SW.cycles);
+  $("sw-trades").innerHTML = tradesTable(SW.trades, (SW.exclusions||{}).reason);
   const sli = sl.items || [];
-  document.getElementById("sw-slippage").innerHTML = sli.length ? `<thead><tr><th>Entrada (UTC)</th><th>Par</th><th>Barra de la señal</th><th class="num">Retraso</th><th class="num">Señal</th><th class="num">Real</th><th class="num">Diferencia</th><th class="num">Coste</th></tr></thead><tbody>` + [...sli].reverse().map(i=>`<tr><td class="mono" style="font-size:12px">${esc(i.at)}</td><td class="mono">${esc(i.symbol)}</td><td class="mono" style="font-size:12px">${esc(i.bar||"")}</td><td class="num">${i.bar_age_h!=null?Number(i.bar_age_h).toFixed(1)+" h":"—"}</td><td class="num">${fx(i.signal,i.symbol)}</td><td class="num">${fx(i.fill,i.symbol)}</td><td class="num ${i.slip_bps<=0?"pos":"neg"}">${(i.slip_bps>0?"+":"")+Number(i.slip_bps).toFixed(1)} pb</td><td class="num ${i.slip_usd<=0?"pos":"neg"}">${fmtUSD2(i.slip_usd)}</td></tr>`).join("") + "</tbody>" : `<tbody><tr><td class="empty">Todavía no hay entradas medidas: se registra a partir de la primera compra del bot desde que existe esta métrica.</td></tr></tbody>`;
-  const wf = SW.walkforward;
+  $("sw-slippage").innerHTML = sli.length ? `<thead><tr><th>Entrada (UTC)</th><th>Par</th><th>Barra de la señal</th><th class="num">Retraso</th><th class="num">Señal</th><th class="num">Real</th><th class="num">Diferencia</th><th class="num">Coste</th></tr></thead><tbody>` + [...sli].reverse().map(i=>`<tr><td class="mono" style="font-size:12px">${esc(i.at)}</td><td class="mono">${esc(i.symbol)}</td><td class="mono" style="font-size:12px">${esc(i.bar||"")}</td><td class="num">${i.bar_age_h!=null?Number(i.bar_age_h).toFixed(1)+" h":"—"}</td><td class="num">${fx(i.signal,i.symbol)}</td><td class="num">${fx(i.fill,i.symbol)}</td><td class="num ${i.slip_bps<=0?"pos":"neg"}">${(i.slip_bps>0?"+":"")+Number(i.slip_bps).toFixed(1)} pb</td><td class="num ${i.slip_usd<=0?"pos":"neg"}">${fmtUSD2(i.slip_usd)}</td></tr>`).join("") + "</tbody>" : `<tbody><tr><td class="empty">Todavía no hay entradas medidas: se registra a partir de la primera compra del bot desde que existe esta métrica.</td></tr></tbody>`;
+  const wf = research ? SW.walkforward : null;
   const pfTxt = v => v==null ? "—" : Number(v).toFixed(2);
   if (wf) {
-    document.getElementById("sw-wf-lede").textContent = `Ventanas rodantes de ${wf.windows.train_months} meses de entrenamiento y ${wf.windows.test_months} de prueba sobre ${wf.symbols.join(", ")}, ${wf.grid_size} combinaciones por tramo, ${fmtUSD(wf.equity)} y ${(wf.risk_pct*100).toFixed(0)} % de riesgo. Generado el ${wf.generated_at}.`;
+    $("sw-wf-lede").textContent = `Ventanas rodantes de ${wf.windows.train_months} meses de entrenamiento y ${wf.windows.test_months} de prueba sobre ${wf.symbols.join(", ")}, ${wf.grid_size} combinaciones por tramo, ${fmtUSD(wf.equity)} y ${(wf.risk_pct*100).toFixed(0)} % de riesgo. Generado el ${wf.generated_at}.`;
     const rows = wf.folds.map(f=>`<tr><td class="mono" style="font-size:12px">${esc(f.test_window[0])} → ${esc(f.test_window[1])}</td><td style="font-size:12.5px">${esc(f.chosen)}</td><td class="num">${pfTxt(f.train.profit_factor)}</td><td class="num">${f.test.trades||0}</td><td class="num ${(f.test.profit_factor||0)>=1?"pos":"neg"}">${pfTxt(f.test.profit_factor)}</td><td class="num ${(f.test.return||0)>=0?"pos":"neg"}">${pct(f.test.return||0)}</td><td class="num ${(f.deployed_test.profit_factor||0)>=1?"pos":"neg"}">${pfTxt(f.deployed_test.profit_factor)}</td><td class="num ${(f.deployed_test.return||0)>=0?"pos":"neg"}">${pct(f.deployed_test.return||0)}</td></tr>`).join("");
     const o = wf.oos_walkforward, d = wf.oos_deployed, i = wf.insample_deployed;
-    document.getElementById("sw-walkforward").innerHTML = `<thead><tr><th>Tramo de prueba</th><th>Parámetros elegidos en el entrenamiento</th><th class="num">PF entren.</th><th class="num">Ops.</th><th class="num">PF prueba</th><th class="num">Ret. prueba</th><th class="num">PF config. actual</th><th class="num">Ret. config. actual</th></tr></thead><tbody>${rows}<tr class="active"><td colspan="3"><b>Fuera de muestra encadenado</b></td><td class="num">${o.trades||0}</td><td class="num ${(o.profit_factor||0)>=1?"pos":"neg"}">${pfTxt(o.profit_factor)}</td><td class="num ${(o.return||0)>=0?"pos":"neg"}">${pct(o.return||0)}</td><td class="num ${(d.profit_factor||0)>=1?"pos":"neg"}">${pfTxt(d.profit_factor)}</td><td class="num ${(d.return||0)>=0?"pos":"neg"}">${pct(d.return||0)}</td></tr></tbody>`;
-    document.getElementById("sw-wf-note").textContent = `Configuración actual en todo el año (dentro de muestra): PF ${pfTxt(i.profit_factor)}, ${pct(i.return||0)}, drawdown ${pct(i.max_drawdown||0)}. Eficiencia fuera/dentro de muestra del PF: ${wf.efficiency_pf==null?"—":wf.efficiency_pf}. Lectura: ${wf.verdict}.`;
-  } else {
-    document.getElementById("sw-wf-lede").textContent = "Sin resultados todavía.";
-    document.getElementById("sw-walkforward").innerHTML = "";
+    $("sw-walkforward").innerHTML = `<thead><tr><th>Tramo de prueba</th><th>Parámetros elegidos en el entrenamiento</th><th class="num">PF entren.</th><th class="num">Ops.</th><th class="num">PF prueba</th><th class="num">Ret. prueba</th><th class="num">PF config. actual</th><th class="num">Ret. config. actual</th></tr></thead><tbody>${rows}<tr class="active"><td colspan="3"><b>Fuera de muestra encadenado</b></td><td class="num">${o.trades||0}</td><td class="num ${(o.profit_factor||0)>=1?"pos":"neg"}">${pfTxt(o.profit_factor)}</td><td class="num ${(o.return||0)>=0?"pos":"neg"}">${pct(o.return||0)}</td><td class="num ${(d.profit_factor||0)>=1?"pos":"neg"}">${pfTxt(d.profit_factor)}</td><td class="num ${(d.return||0)>=0?"pos":"neg"}">${pct(d.return||0)}</td></tr></tbody>`;
+    $("sw-wf-note").textContent = `Configuración actual en todo el año (dentro de muestra): PF ${pfTxt(i.profit_factor)}, ${pct(i.return||0)}, drawdown ${pct(i.max_drawdown||0)}. Eficiencia fuera/dentro de muestra del PF: ${wf.efficiency_pf==null?"—":wf.efficiency_pf}. Lectura: ${wf.verdict}.`;
+  } else if (research) {
+    $("sw-wf-lede").textContent = "Sin resultados todavía.";
+    $("sw-walkforward").innerHTML = "";
   }
-  const kr = SW.kronos;
+  const kr = research ? SW.kronos : null;
   if (kr) {
     const inf = kr.information || {};
-    document.getElementById("sw-kr-lede").textContent = `${kr.model}: en cada señal de compra se pide la predicción de las siguientes ${kr.horizon_bars} barras de 4 h (${kr.samples} muestras, ${kr.lookback_bars} barras de contexto) y solo se entra si la subida prevista supera un umbral. ${inf.signals} señales con predicción. Generado el ${kr.generated_at}.`;
+    $("sw-kr-lede").textContent = `${kr.model}: en cada señal de compra se pide la predicción de las siguientes ${kr.horizon_bars} barras de 4 h (${kr.samples} muestras, ${kr.lookback_bars} barras de contexto) y solo se entra si la subida prevista supera un umbral. ${inf.signals} señales con predicción. Generado el ${kr.generated_at}.`;
     const names = {todas_las_senales_con_prediccion:"Sin filtro (señales con predicción)", "kronos_sube_mas_de_0.25_atr":"Subida prevista > 0,25 ATR", "kronos_sube_mas_de_0.5_atr":"Subida prevista > 0,5 ATR", "kronos_sube_mas_de_1_atr":"Subida prevista > 1 ATR", kronos_tercil_superior:"Tercil superior de subida prevista", kronos_tercil_inferior:"Tercil inferior (control)"};
     const rows = Object.entries(kr.variants||{}).map(([k,v])=>{ const rr=v.random_same_pass_rate; return `<tr><td>${esc(names[k]||k)}</td><td class="num">${v.trades||0}</td><td class="num ${(v.profit_factor||0)>=1?"pos":"neg"}">${pfTxt(v.profit_factor)}</td><td class="num ${(v.return||0)>=0?"pos":"neg"}">${pct(v.return||0)}</td><td class="num">${pct(v.max_drawdown||0)}</td><td class="num" style="color:var(--ink-2)">${rr?`${pfTxt(rr.profit_factor_mean)} (${pfTxt(rr.profit_factor_p10_p90[0])}–${pfTxt(rr.profit_factor_p10_p90[1])})`:"—"}</td><td class="num" style="color:var(--ink-2)">${rr?pct(rr.return_mean):"—"}</td></tr>`; }).join("");
-    document.getElementById("sw-kronos").innerHTML = `<thead><tr><th>Variante</th><th class="num">Ops.</th><th class="num">PF</th><th class="num">Retorno</th><th class="num">Drawdown</th><th class="num">PF azar misma tasa (p10–p90)</th><th class="num">Ret. azar</th></tr></thead><tbody>${rows}</tbody>`;
+    $("sw-kronos").innerHTML = `<thead><tr><th>Variante</th><th class="num">Ops.</th><th class="num">PF</th><th class="num">Retorno</th><th class="num">Drawdown</th><th class="num">PF azar misma tasa (p10–p90)</th><th class="num">Ret. azar</th></tr></thead><tbody>${rows}</tbody>`;
     const rb = kr.robustness || {}; const halves = (rb.halves||[]).map(h=>`${h.name}: ${h.top_tercile.trades||0} ops, PF ${pfTxt(h.top_tercile.profit_factor)}, ${pct(h.top_tercile.return||0)}`).join(" · ");
-    document.getElementById("sw-kr-note").textContent = `Kronos prevé subida en el ${((inf.pred_up_rate||0)*100).toFixed(0)} % de las señales, así que el signo no filtra; la magnitud prevista sí correlaciona con el rebote real (IC de Spearman ${inf.ic_spearman}). Retorno real medio en ATR por tercil de predicción: ${(inf.real_atr_by_pred_tercile||[]).join(" / ")}. Tercil superior por mitades: ${halves}.` + (kr.horizon3 ? ` Con horizonte de 3 barras el efecto desaparece: IC ${kr.horizon3.ic_spearman}, tercil superior PF ${pfTxt(kr.horizon3.top_tercile_pf)} y ${pct(kr.horizon3.top_tercile_return||0)}, sin superar al azar.` : "") + ` Lectura: ${kr.verdict}. Conclusión: sugerente pero no robusto; no se despliega.`;
-  } else {
-    document.getElementById("sw-kr-lede").textContent = "Sin resultados todavía.";
-    document.getElementById("sw-kronos").innerHTML = "";
+    $("sw-kr-note").textContent = `Kronos prevé subida en el ${((inf.pred_up_rate||0)*100).toFixed(0)} % de las señales, así que el signo no filtra; la magnitud prevista sí correlaciona con el rebote real (IC de Spearman ${inf.ic_spearman}). Retorno real medio en ATR por tercil de predicción: ${(inf.real_atr_by_pred_tercile||[]).join(" / ")}. Tercil superior por mitades: ${halves}.` + (kr.horizon3 ? ` Con horizonte de 3 barras el efecto desaparece: IC ${kr.horizon3.ic_spearman}, tercil superior PF ${pfTxt(kr.horizon3.top_tercile_pf)} y ${pct(kr.horizon3.top_tercile_return||0)}, sin superar al azar.` : "") + ` Lectura: ${kr.verdict}. Conclusión: sugerente pero no robusto; no se despliega.`;
+  } else if (research) {
+    $("sw-kr-lede").textContent = "Sin resultados todavía.";
+    $("sw-kronos").innerHTML = "";
   }
-  document.getElementById("sw-settings").innerHTML = `<tbody>
+  $("sw-settings").innerHTML = `<tbody>
     <tr><td>Universo</td><td class="mono" style="font-size:12.5px">${esc((SW.symbols||[]).join(", "))}</td></tr>
-    <tr><td>Entrada</td><td>cierre de la barra de 4 h bajo la banda inferior de Bollinger (20, 2) con RSI &lt; 30, solo largos</td></tr>
+    <tr><td>Entrada y salidas</td><td>${esc(s.description || "cierre de la barra de 4 h bajo la banda inferior de Bollinger (20, 2) con RSI < 30; stop 2 ATR, objetivo en la media de las bandas, 3 días")}, solo largos${s.max_positions?` · máximo ${s.max_positions} posiciones abiertas`:""}</td></tr>
     <tr><td>Señal vigente</td><td>solo si la barra cerró hace menos de ${s.max_signal_age_hours} h</td></tr>
-    <tr><td>Stop y objetivo</td><td>stop a ${s.stop_atr} ATR bajo la entrada, objetivo en la media de las bandas; ambos en el broker</td></tr>
     <tr><td>Riesgo por operación</td><td>${(s.risk_per_trade*100).toFixed(1)} % del capital real (tope ${(s.max_risk_pct*100).toFixed(1)} % para aceptar el lote mínimo)</td></tr>
     <tr><td>Salida por tiempo</td><td>a los ${s.max_hold_days} días</td></tr>
     <tr><td>Freno</td><td>interruptor manual BOT_HALT (${esc(s.halt_mode||"off")}) y freno automático si el equity cae ${((s.max_drawdown_pct||0)*100).toFixed(0)} % desde su máximo</td></tr>
     <tr><td>Ciclos</td><td>cada hora, de domingo noche a viernes, desde GitHub Actions</td></tr>
   </tbody>`;
-})();
+}
+renderSwingTab("sw", SW, "badge-swing", 200, true);
+renderSwingTab("ag", D.aggr || {available:false}, "badge-aggr", 500, false);
 </script>

@@ -24,7 +24,7 @@ from .ctrader import PRICE_SCALE, VOLUME_SCALE, CTraderSession, decode_trendbars
 from .events import active_events, load_events
 from .guard import evaluate as evaluate_guard
 from .intraday import SPECS, SymbolSpec
-from .swing import SwingParams, indicators
+from .swing import SwingParams, indicators, signal as swing_signal
 
 SWING_LABEL = "autotrader-swing"
 PERIOD_H4 = 10
@@ -71,17 +71,36 @@ def default_max_risk_pct(risk_pct: float) -> float:
     return max(0.03, risk_pct * 1.5)
 
 
+def params_from_env(settings, max_risk_pct: float | None = None) -> SwingParams:
+    """Perfil del bot desde el entorno: por defecto bandas H4 (stop 2 ATR, objetivo en la media, 3 dias)."""
+    strategy = os.getenv("SWING_STRATEGY", "bands").lower()
+    return SwingParams(strategy, "H4", stop_atr=float(os.getenv("SWING_STOP_ATR", "2.0")), tp_atr=float(os.getenv("SWING_TP_ATR", "0") or 0),
+                       pure_rr=os.getenv("SWING_PURE_RR", "false").lower() in {"1", "true", "yes"}, allow_short=False,
+                       breakout_bars=int(os.getenv("SWING_BREAKOUT_BARS", "20")), bands_rsi=float(os.getenv("SWING_BANDS_RSI", "30")),
+                       max_hold_days=float(os.getenv("SWING_MAX_HOLD_DAYS", "3")), risk_pct=settings.risk_per_trade,
+                       max_risk_pct=max_risk_pct or default_max_risk_pct(settings.risk_per_trade))
+
+
+def describe(p: SwingParams) -> str:
+    tp = f"{p.tp_atr:g} ATR" if (p.pure_rr or p.strategy != "bands") else "media de las bandas"
+    entry = {"bands": f"cierre bajo la banda inferior ({p.bb_period}/{p.bb_std:g}) con RSI < {p.bands_rsi:g}",
+             "breakout": f"cierre sobre el maximo de {p.breakout_bars} barras y sobre la EMA200",
+             "pullback": f"tendencia EMA50>EMA200 y RSI que vuelve sobre {p.rsi_entry:g}"}.get(p.strategy, p.strategy)
+    return f"{entry}; stop {p.stop_atr:g} ATR, objetivo {tp}, salida a los {p.max_hold_days:g} dias"
+
+
 def run_swing_cycle(settings, session: CTraderSession, params: SwingParams | None = None, equity_cap: float | None = None,
                     dry_run: bool = False, now: datetime | None = None, max_risk_pct: float | None = None,
-                    max_signal_age_hours: float = DEFAULT_MAX_SIGNAL_AGE_HOURS) -> dict:
+                    max_signal_age_hours: float = DEFAULT_MAX_SIGNAL_AGE_HOURS, label: str = SWING_LABEL, max_positions: int = 0) -> dict:
     now = now or datetime.now(timezone.utc)
     p = params or SwingParams("bands", "H4", stop_atr=2.0, allow_short=False, risk_pct=settings.risk_per_trade,
                               max_risk_pct=max_risk_pct or default_max_risk_pct(settings.risk_per_trade), max_hold_days=3.0)
     balance, _d, _lev = session.trader()
     equity = balance + session.unrealized_pnl()
     sizing_equity = min(equity, equity_cap) if equity_cap else equity
-    summary = {"timestamp": now.isoformat(timespec="seconds"), "kind": "swing", "broker": "ctrader-swing", "equity": round(equity, 2),
-               "sizing_equity": round(sizing_equity, 2), "dry_run": dry_run, "decisions": [], "orders": [], "closed": [], "skipped": []}
+    summary = {"timestamp": now.isoformat(timespec="seconds"), "kind": "swing", "broker": "ctrader-swing", "label": label,
+               "strategy": describe(p), "equity": round(equity, 2), "sizing_equity": round(sizing_equity, 2), "dry_run": dry_run,
+               "decisions": [], "orders": [], "closed": [], "skipped": []}
     events_now = []
     all_events = load_events(settings.events_path or None, now) if settings.event_mode != "off" else []
     if settings.event_mode != "off":
@@ -95,7 +114,7 @@ def run_swing_cycle(settings, session: CTraderSession, params: SwingParams | Non
     if guard.blocks_entries:
         summary["skipped"].append(f"freno activo: {guard.reason}")
 
-    own = [pos for pos in session.positions(only_bot=False) if pos.label == SWING_LABEL and pos.side == "buy"]
+    own = [pos for pos in session.positions(only_bot=False) if pos.label == label and pos.side == "buy"]
     held = {pos.symbol for pos in own}
     summary["positions"] = {pos.symbol: pos.units for pos in own}
 
@@ -132,7 +151,7 @@ def run_swing_cycle(settings, session: CTraderSession, params: SwingParams | Non
             continue
         d = indicators(bars, p)
         last = d.iloc[-1]
-        signal = bool(last["close"] < last["bb_lo"] and last["rsi"] < 30)
+        signal = swing_signal(d, len(d) - 1, p) == 1
         dec = {"symbol": symbol, "close": round(float(last["close"]), info.digits), "bb_lo": round(float(last["bb_lo"]), info.digits),
                "bb_mid": round(float(last["bb_mid"]), info.digits), "rsi": round(float(last["rsi"]), 1), "atr": round(float(last["atr"]), info.digits),
                "bar": bars.index[-1].strftime("%Y-%m-%d %H:%M"), "action": "BUY" if signal else "HOLD"}
@@ -142,6 +161,9 @@ def run_swing_cycle(settings, session: CTraderSession, params: SwingParams | Non
         if symbol in held:
             dec["action"] = "HOLD"
             dec["reason"] = "posicion abierta"
+        elif signal and max_positions and len(held) >= max_positions:
+            dec["action"] = "HOLD"
+            dec["reason"] = f"maximo de {max_positions} posiciones abiertas"
         elif signal and guard.blocks_entries:
             dec["action"] = "HOLD"
             dec["reason"] = "freno activo"
@@ -164,7 +186,7 @@ def run_swing_cycle(settings, session: CTraderSession, params: SwingParams | Non
         if units <= 0:
             summary["skipped"].append(f"{symbol}: el lote minimo arriesga mas del {p.max_risk_pct:.0%} de {sizing_equity:.0f} USD")
             continue
-        tp_dist = float(last["bb_mid"]) - entry
+        tp_dist = (p.tp_atr * float(last["atr"])) if (p.pure_rr or p.strategy != "bands") else (float(last["bb_mid"]) - entry)
         if tp_dist <= 0:
             summary["skipped"].append(f"{symbol}: objetivo no valido")
             continue
@@ -173,7 +195,7 @@ def run_swing_cycle(settings, session: CTraderSession, params: SwingParams | Non
         rel_sl = relative_stop(entry, stop_dist / entry, info.digits)
         rel_tp = max(int(round(tp_dist * PRICE_SCALE / tick)) * tick, tick)
         order = {"symbol": symbol, "units": volume / VOLUME_SCALE, "entry_ref": entry, "stop": round(entry - stop_dist, info.digits),
-                 "target": round(float(last["bb_mid"]), info.digits), "risk_usd": round(units * stop_dist, 2),
+                 "target": round(entry + tp_dist, info.digits), "risk_usd": round(units * stop_dist, 2),
                  "bar": dec["bar"], "bar_age_h": dec["bar_age_h"]}
         if dry_run:
             order["status"] = "dry_run"
@@ -181,11 +203,13 @@ def run_swing_cycle(settings, session: CTraderSession, params: SwingParams | Non
             try:
                 res = session.call("ProtoOANewOrderReq", timeout=30, ctidTraderAccountId=session.account_id, symbolId=info.symbol_id,
                                    orderType=session.model.ProtoOAOrderType.MARKET, tradeSide=session.model.ProtoOATradeSide.BUY,
-                                   volume=volume, relativeStopLoss=rel_sl, relativeTakeProfit=rel_tp, label=SWING_LABEL)
+                                   volume=volume, relativeStopLoss=rel_sl, relativeTakeProfit=rel_tp, label=label)
                 order["status"] = session.model.ProtoOAExecutionType.Name(res.executionType).lower() if hasattr(res, "executionType") else "sent"
             except Exception as exc:  # noqa: BLE001
                 order["status"] = f"error: {exc}"
         summary["orders"].append(order)
+        if not str(order["status"]).startswith("error"):
+            held.add(symbol)
     os.makedirs(settings.state_dir, exist_ok=True)
     with open(os.path.join(settings.state_dir, "run_log.jsonl"), "a", encoding="utf-8") as fh:
         fh.write(json.dumps(summary, default=str) + "\n")
