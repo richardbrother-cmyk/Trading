@@ -16,6 +16,12 @@ on:
         type: boolean
         default: false
 
+# Un solo run a la vez por workflow: si un ciclo se retrasa y se solapa con el siguiente, el nuevo espera en cola
+# (no se cancela el que puede estar enviando ordenes). Evita ordenes duplicadas por ejecuciones solapadas.
+concurrency:
+  group: ${{ github.workflow }}
+  cancel-in-progress: false
+
 env:
   # Interruptor de los ciclos programados. Los lanzamientos manuales (workflow_dispatch) siempre corren.
   SCHEDULE_ENABLED: "true"

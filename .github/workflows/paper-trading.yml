@@ -8,6 +8,12 @@ on:
     - cron: "35 14-20 * * 1-5"
   workflow_dispatch:
 
+# Un solo run a la vez por workflow: si un ciclo se retrasa y se solapa con el siguiente, el nuevo espera en cola
+# (no se cancela el que puede estar enviando ordenes). Evita ordenes duplicadas por ejecuciones solapadas.
+concurrency:
+  group: ${{ github.workflow }}
+  cancel-in-progress: false
+
 jobs:
   cycle:
     runs-on: ubuntu-latest

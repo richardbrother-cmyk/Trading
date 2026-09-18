@@ -1,8 +1,13 @@
-pandas>=2.0
-numpy>=1.24
-requests>=2.31
-python-dotenv>=1.0
-pytest>=7
-ctrader-open-api>=0.9
-cffi>=1.15
-service_identity>=21
+# Versiones fijadas (==): el codigo envia ordenes a brokers desde GitHub Actions, asi que cada ciclo debe instalar
+# exactamente lo mismo que se probo. Para actualizar: cambiar el pin, correr `pytest` y un ciclo con dry_run.
+pandas==3.0.5
+numpy==2.4.6
+requests==2.32.3
+python-dotenv==1.2.3
+pytest==9.1.1
+# cTrader Open API (Fusion Markets demo) y su pila Twisted
+ctrader-open-api==0.9.2
+Twisted==24.3.0
+protobuf==3.20.1
+cffi==2.1.1
+service_identity==24.2.0

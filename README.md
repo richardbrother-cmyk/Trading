@@ -32,6 +32,14 @@ cp .env.example .env      # opcional: por defecto usa broker simulado + datos de
 pytest -q
 ```
 
+`requirements.txt` fija versiones exactas (`==`): los workflows instalan las dependencias en cada ciclo y el código
+envía órdenes a brokers, así que cada ejecución debe usar exactamente lo mismo que se probó. Para actualizar una
+librería: cambiar el pin, correr `pytest` y lanzar un ciclo con `dry_run` antes de dejarlo en producción.
+
+Los cuatro workflows programados (Alpaca, cTrader tendencia, swing y agresiva) llevan un grupo `concurrency` por
+workflow: si un ciclo se retrasa y se solapa con el siguiente, el nuevo espera en cola y nunca se cancela el que
+puede estar enviando órdenes, de modo que no hay dos ciclos del mismo bot operando a la vez.
+
 ## Uso
 
 ```bash
