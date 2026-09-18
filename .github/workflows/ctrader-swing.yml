@@ -81,7 +81,14 @@ jobs:
           git add docs/swing_state.json docs/index.html docs/dashboard.html
           if git diff --cached --quiet; then echo "sin cambios"; exit 0; fi
           git commit -m "Panel: actualización automática (swing)"
-          for i in 1 2 3; do git pull --rebase -q origin "${GITHUB_REF_NAME}" && git push && break || sleep 5; done
+          # Los ficheros del panel los regeneran varios workflows: ante conflicto gana la version recien generada.
+          ok=0
+          for i in 1 2 3 4; do
+            if git pull --rebase -X theirs -q origin "${GITHUB_REF_NAME}" && git push; then ok=1; break; fi
+            git rebase --abort 2>/dev/null || true
+            sleep $((i * 5))
+          done
+          [ "$ok" = "1" ] || { echo "::error::no se pudo publicar el panel tras 4 intentos"; exit 1; }
       - uses: actions/upload-artifact@v4
         if: always()
         with:
