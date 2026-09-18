@@ -252,6 +252,34 @@ tendencial ni con operaciones manuales. Cada ciclo publica `docs/swing_state.jso
 muestra la cuenta en la pestaña "Fusion · swing 200 USD". Oro y petróleo se descartan solos porque su lote mínimo
 arriesga más del tope mientras la cuenta sea pequeña.
 
+### Walk-forward de la estrategia swing
+
+`scripts/swing_walkforward.py` reparte los 12 meses de barras en ventanas rodantes (4 meses para elegir
+parámetros, 2 para probarlos, avanzando de 2 en 2) y encadena los tramos de prueba como resultado
+fuera de muestra. Deja `docs/swing_walkforward.json` y el panel lo muestra en la pestaña swing.
+Resultado con los datos hasta el 15 de septiembre de 2026: reoptimizar los parámetros en cada tramo
+pierde fuera de muestra (factor de beneficio 0,92 en 44 operaciones) y la combinación elegida cambia
+de un tramo a otro; la configuración desplegada (stop 2 ATR, bandas 20/2, RSI < 30, 3 días) mantiene
+un factor de beneficio de 1,34 en esos mismos tramos, pero fue elegida mirando todo el año, así que no
+cuenta como prueba independiente. Lectura honesta: el borde es débil y sensible a los parámetros; la
+demo de 8 semanas es la prueba que falta.
+
+### Freno global
+
+Los tres bots comparten un freno (`autotrader/guard.py`): la variable `BOT_HALT` (`off`, `freeze` para
+no abrir posiciones nuevas, `close` para además cerrar las del bot) y `MAX_DRAWDOWN_PCT`, que congela
+las entradas si el equity cae ese porcentaje desde su máximo histórico (10 % en la cuenta swing, 15 %
+en las otras). El máximo se lee del historial publicado del panel y se persiste en
+`state/peak_equity.json`. En GitHub Actions ambos se controlan con variables del repositorio
+(Settings → Secrets and variables → Actions → Variables) sin tocar el código; en la rutina de Alpaca,
+con las mismas variables de entorno. El freno nunca toca posiciones abiertas a mano.
+
+### Ejecución frente a señal
+
+La cuenta swing registra, en cada compra, la diferencia entre el cierre de la barra que dio la señal y
+el precio real de entrada, junto con el retraso con el que llegó el ciclo. El panel acumula ese
+deslizamiento en USD y puntos básicos: es el coste real del retraso de GitHub Actions más el spread.
+
 ## Estructura de estado
 
 ```

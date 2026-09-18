@@ -23,6 +23,7 @@ from autotrader.swingbot import DEFAULT_MAX_SIGNAL_AGE_HOURS, SWING_LABEL, defau
 
 MAX_HISTORY = 400
 MAX_CYCLES = 60
+MAX_SLIPPAGE = 200
 
 
 def merge_history(prev: dict | None, snapshot: dict, cycle: dict | None) -> dict:
@@ -36,6 +37,33 @@ def merge_history(prev: dict | None, snapshot: dict, cycle: dict | None) -> dict
         cycles.append(cycle)
     cycles = cycles[-MAX_CYCLES:]
     return {**snapshot, "history": history, "cycles": cycles}
+
+
+def realized_slippage(cycle: dict | None, positions: list[dict]) -> list[dict]:
+    """Compara el precio de la senal (cierre de la barra) con el precio real de entrada de la posicion abierta en este ciclo."""
+    out = []
+    if not cycle:
+        return out
+    by_symbol = {p["symbol"]: p for p in positions}
+    for o in cycle.get("orders", []):
+        st = str(o.get("status", ""))
+        pos = by_symbol.get(o["symbol"])
+        if st.startswith("error") or st == "dry_run" or not pos or not o.get("entry"):
+            continue
+        units = float(o.get("units") or pos["qty"])
+        diff = float(pos["avg"]) - float(o["entry"])
+        out.append({"symbol": o["symbol"], "at": cycle["at"], "bar": o.get("bar"), "bar_age_h": o.get("bar_age_h"),
+                    "signal": o["entry"], "fill": pos["avg"], "units": units, "slip_price": round(diff, 6),
+                    "slip_bps": round(diff / float(o["entry"]) * 1e4, 2), "slip_usd": round(diff * units, 2)})
+    return out
+
+
+def merge_slippage(prev: dict | None, new: list[dict]) -> dict:
+    items = list((prev or {}).get("slippage", {}).get("items", [])) + new
+    items = items[-MAX_SLIPPAGE:]
+    usd = round(sum(i["slip_usd"] for i in items), 2)
+    bps = round(sum(i["slip_bps"] for i in items) / len(items), 2) if items else 0.0
+    return {"items": items, "total_usd": usd, "avg_bps": bps, "count": len(items)}
 
 
 def last_cycle(state_dir: str, swing: bool = False) -> dict | None:
@@ -59,7 +87,10 @@ def swing_cycle(rec: dict) -> dict:
     ok_orders = [o for o in rec.get("orders", []) if not str(o.get("status", "")).startswith("error") and o.get("status") != "dry_run"]
     errors = sum(1 for o in rec.get("orders", []) if str(o.get("status", "")).startswith("error"))
     stale = [d for d in rec.get("decisions", []) if str(d.get("reason", "")).startswith("senal caducada")]
-    if rec.get("skipped"):
+    guard = rec.get("guard") or {}
+    if guard.get("mode") and guard["mode"] != "off":
+        note = f"freno {guard['mode']}: {guard.get('reason', '')}"[:80]
+    elif rec.get("skipped"):
         note = rec["skipped"][0][:60] + (f" (+{len(rec['skipped']) - 1})" if len(rec["skipped"]) > 1 else "")
     elif ok_orders:
         note = "compra " + ", ".join(o["symbol"] for o in ok_orders)
@@ -74,7 +105,7 @@ def swing_cycle(rec: dict) -> dict:
                           for d in rec.get("decisions", [])],
             "orders": [{"symbol": o["symbol"], "units": o.get("units"), "entry": o.get("entry_ref"), "stop": o.get("stop"), "target": o.get("target"),
                         "risk_usd": o.get("risk_usd"), "status": o.get("status")} for o in rec.get("orders", [])],
-            "closed": rec.get("closed", []), "event_window": rec.get("event_window", [])}
+            "closed": rec.get("closed", []), "event_window": rec.get("event_window", []), "guard": rec.get("guard")}
 
 
 def collect(s: Settings, swing: bool = False, initial: float | None = None) -> tuple[dict, dict | None]:
@@ -170,6 +201,11 @@ def main() -> int:
         with open(args.out, encoding="utf-8") as fh:
             prev = json.load(fh)
     snapshot, cycle = collect(s, swing=args.swing, initial=args.initial if args.swing else None)
+    if args.swing:
+        snapshot["slippage"] = merge_slippage(prev, realized_slippage(cycle, snapshot["positions"]))
+        snapshot["guard"] = (cycle or {}).get("guard")
+        snapshot["settings"]["max_drawdown_pct"] = s.max_drawdown_pct
+        snapshot["settings"]["halt_mode"] = s.halt_mode
     merged = merge_history(prev, snapshot, cycle)
     os.makedirs(os.path.dirname(args.out) or ".", exist_ok=True)
     with open(args.out, "w", encoding="utf-8") as fh:

@@ -1,0 +1,224 @@
+{
+ "generated_at": "2026-09-18 00:04 UTC",
+ "equity": 10000,
+ "risk_pct": 0.01,
+ "symbols": [
+  "EURUSD",
+  "GBPUSD",
+  "NAS100",
+  "US500",
+  "XAUUSD",
+  "XTIUSD"
+ ],
+ "windows": {
+  "train_months": 4,
+  "test_months": 2,
+  "step_months": 2,
+  "folds": 3
+ },
+ "grid_size": 48,
+ "deployed": "stop 2.0 ATR · bandas 20/2.0 · RSI<30 · 3 d",
+ "folds": [
+  {
+   "fold": 1,
+   "train_window": [
+    "2025-11-14",
+    "2026-03-14"
+   ],
+   "test_window": [
+    "2026-03-14",
+    "2026-05-14"
+   ],
+   "chosen": "stop 2.5 ATR · bandas 20/2.5 · RSI<35 · 2 d",
+   "chosen_params": {
+    "stop_atr": 2.5,
+    "bb_std": 2.5,
+    "bands_rsi": 35.0,
+    "max_hold_days": 2.0
+   },
+   "train": {
+    "from": "2025-11-14",
+    "to": "2026-03-14",
+    "trades": 26,
+    "win_rate": 0.615,
+    "profit_factor": 4.03,
+    "avg_r": 0.461,
+    "return": 0.118,
+    "max_drawdown": -0.0151,
+    "avg_hold_days": 1.71,
+    "trades_per_month": 6.5,
+    "costs": 68.78
+   },
+   "test": {
+    "from": "2026-03-14",
+    "to": "2026-05-14",
+    "trades": 8,
+    "win_rate": 0.125,
+    "profit_factor": 0.1,
+    "avg_r": -0.537,
+    "return": -0.0549,
+    "max_drawdown": -0.0549,
+    "avg_hold_days": 1.62,
+    "trades_per_month": 3.9,
+    "costs": 5.95
+   },
+   "deployed_test": {
+    "trades": 15,
+    "win_rate": 0.6,
+    "profit_factor": 2.24,
+    "avg_r": 0.447,
+    "return": 0.0715,
+    "max_drawdown": -0.0239,
+    "avg_hold_days": 1.53,
+    "trades_per_month": 7.4,
+    "costs": 15.91
+   }
+  },
+  {
+   "fold": 2,
+   "train_window": [
+    "2026-01-14",
+    "2026-05-14"
+   ],
+   "test_window": [
+    "2026-05-14",
+    "2026-07-14"
+   ],
+   "chosen": "stop 2.0 ATR · bandas 20/2.0 · RSI<30 · 2 d",
+   "chosen_params": {
+    "stop_atr": 2.0,
+    "bb_std": 2.0,
+    "bands_rsi": 30.0,
+    "max_hold_days": 2.0
+   },
+   "train": {
+    "from": "2026-01-14",
+    "to": "2026-05-14",
+    "trades": 30,
+    "win_rate": 0.6,
+    "profit_factor": 2.35,
+    "avg_r": 0.392,
+    "return": 0.1575,
+    "max_drawdown": -0.0456,
+    "avg_hold_days": 1.47,
+    "trades_per_month": 7.5,
+    "costs": 65.06
+   },
+   "test": {
+    "from": "2026-05-14",
+    "to": "2026-07-14",
+    "trades": 26,
+    "win_rate": 0.462,
+    "profit_factor": 1.04,
+    "avg_r": -0.004,
+    "return": 0.0047,
+    "max_drawdown": -0.0459,
+    "avg_hold_days": 1.63,
+    "trades_per_month": 12.8,
+    "costs": 68.47
+   },
+   "deployed_test": {
+    "trades": 25,
+    "win_rate": 0.32,
+    "profit_factor": 0.75,
+    "avg_r": -0.16,
+    "return": -0.0325,
+    "max_drawdown": -0.0734,
+    "avg_hold_days": 1.93,
+    "trades_per_month": 12.3,
+    "costs": 77.11
+   }
+  },
+  {
+   "fold": 3,
+   "train_window": [
+    "2026-03-14",
+    "2026-07-14"
+   ],
+   "test_window": [
+    "2026-07-14",
+    "2026-09-14"
+   ],
+   "chosen": "stop 1.5 ATR · bandas 20/2.0 · RSI<30 · 2 d",
+   "chosen_params": {
+    "stop_atr": 1.5,
+    "bb_std": 2.0,
+    "bands_rsi": 30.0,
+    "max_hold_days": 2.0
+   },
+   "train": {
+    "from": "2026-03-14",
+    "to": "2026-07-14",
+    "trades": 43,
+    "win_rate": 0.488,
+    "profit_factor": 1.96,
+    "avg_r": 0.349,
+    "return": 0.1696,
+    "max_drawdown": -0.0355,
+    "avg_hold_days": 1.34,
+    "trades_per_month": 10.6,
+    "costs": 93.61
+   },
+   "test": {
+    "from": "2026-07-14",
+    "to": "2026-09-14",
+    "trades": 10,
+    "win_rate": 0.5,
+    "profit_factor": 2.04,
+    "avg_r": 0.319,
+    "return": 0.034,
+    "max_drawdown": -0.0174,
+    "avg_hold_days": 2.23,
+    "trades_per_month": 4.8,
+    "costs": 75.29
+   },
+   "deployed_test": {
+    "trades": 10,
+    "win_rate": 0.6,
+    "profit_factor": 2.23,
+    "avg_r": 0.357,
+    "return": 0.0337,
+    "max_drawdown": -0.0211,
+    "avg_hold_days": 3.38,
+    "trades_per_month": 4.8,
+    "costs": 68.59
+   }
+  }
+ ],
+ "oos_walkforward": {
+  "trades": 44,
+  "win_rate": 0.409,
+  "profit_factor": 0.92,
+  "avg_r": -0.028,
+  "return": -0.0162,
+  "max_drawdown": -0.1008,
+  "avg_hold_days": 1.77,
+  "trades_per_month": 7.2,
+  "costs": 149.71
+ },
+ "oos_deployed": {
+  "trades": 50,
+  "win_rate": 0.46,
+  "profit_factor": 1.34,
+  "avg_r": 0.126,
+  "return": 0.0727,
+  "max_drawdown": -0.0799,
+  "avg_hold_days": 2.1,
+  "trades_per_month": 8.2,
+  "costs": 161.6
+ },
+ "insample_deployed": {
+  "trades": 72,
+  "win_rate": 0.472,
+  "profit_factor": 1.39,
+  "avg_r": 0.12,
+  "return": 0.1205,
+  "max_drawdown": -0.0755,
+  "avg_hold_days": 2.16,
+  "trades_per_month": 7.1,
+  "costs": 254.36
+ },
+ "efficiency_pf": 0.96,
+ "chosen_stable": false,
+ "verdict": "borde debil fuera de muestra; los parametros elegidos cambian entre tramos: sensibilidad alta"
+}

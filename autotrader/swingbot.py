@@ -22,6 +22,7 @@ import pandas as pd
 
 from .ctrader import PRICE_SCALE, VOLUME_SCALE, CTraderSession, decode_trendbars, relative_stop, round_volume
 from .events import active_events, load_events
+from .guard import evaluate as evaluate_guard
 from .intraday import SPECS, SymbolSpec
 from .swing import SwingParams, indicators
 
@@ -86,25 +87,35 @@ def run_swing_cycle(settings, session: CTraderSession, params: SwingParams | Non
         events_now = active_events(load_events(settings.events_path or None), now, settings.event_hours_before, settings.event_hours_after)
     if events_now:
         summary["event_window"] = [e.name for e in events_now]
+    # Freno global: interruptor manual (BOT_HALT) o drawdown acumulado desde el maximo
+    guard = evaluate_guard(equity, settings.halt_mode, settings.max_drawdown_pct, settings.history_path("docs/swing_state.json"), settings.state_dir)
+    summary["guard"] = guard.as_dict()
+    if guard.blocks_entries:
+        summary["skipped"].append(f"freno activo: {guard.reason}")
 
     own = [pos for pos in session.positions(only_bot=False) if pos.label == SWING_LABEL and pos.side == "buy"]
     held = {pos.symbol for pos in own}
     summary["positions"] = {pos.symbol: pos.units for pos in own}
 
-    # 1) salida por tiempo
+    # 1) salida por tiempo (o por el interruptor de cierre)
     for pos in own:
         opened = getattr(pos, "opened_at", None)
-        if opened is not None and now - opened > timedelta(days=p.max_hold_days):
+        reason = None
+        if guard.closes_positions:
+            reason = f"cierre por freno: {guard.reason}"
+        elif opened is not None and now - opened > timedelta(days=p.max_hold_days):
+            reason = "tiempo maximo"
+        if reason:
             if not dry_run:
                 try:
                     session.call("ProtoOAClosePositionReq", timeout=30, ctidTraderAccountId=session.account_id,
                                  positionId=pos.position_id, volume=int(pos.units * VOLUME_SCALE))
-                    summary["closed"].append({"symbol": pos.symbol, "units": pos.units, "reason": "tiempo maximo"})
+                    summary["closed"].append({"symbol": pos.symbol, "units": pos.units, "reason": reason})
                     held.discard(pos.symbol)
                 except Exception as exc:  # noqa: BLE001
-                    summary["skipped"].append(f"{pos.symbol}: error al cerrar por tiempo: {exc}")
+                    summary["skipped"].append(f"{pos.symbol}: error al cerrar ({reason}): {exc}")
             else:
-                summary["closed"].append({"symbol": pos.symbol, "units": pos.units, "reason": "tiempo maximo (dry run)"})
+                summary["closed"].append({"symbol": pos.symbol, "units": pos.units, "reason": reason + " (dry run)"})
 
     # 2) entradas
     for symbol in settings.symbols:
@@ -129,6 +140,9 @@ def run_swing_cycle(settings, session: CTraderSession, params: SwingParams | Non
         if symbol in held:
             dec["action"] = "HOLD"
             dec["reason"] = "posicion abierta"
+        elif signal and guard.blocks_entries:
+            dec["action"] = "HOLD"
+            dec["reason"] = "freno activo"
         elif signal and events_now:
             dec["action"] = "HOLD"
             dec["reason"] = "ventana de evento"
@@ -154,7 +168,8 @@ def run_swing_cycle(settings, session: CTraderSession, params: SwingParams | Non
         rel_sl = relative_stop(entry, stop_dist / entry, info.digits)
         rel_tp = max(int(round(tp_dist * PRICE_SCALE / tick)) * tick, tick)
         order = {"symbol": symbol, "units": volume / VOLUME_SCALE, "entry_ref": entry, "stop": round(entry - stop_dist, info.digits),
-                 "target": round(float(last["bb_mid"]), info.digits), "risk_usd": round(units * stop_dist, 2)}
+                 "target": round(float(last["bb_mid"]), info.digits), "risk_usd": round(units * stop_dist, 2),
+                 "bar": dec["bar"], "bar_age_h": dec["bar_age_h"]}
         if dry_run:
             order["status"] = "dry_run"
         else:

@@ -31,6 +31,7 @@ UNIVERSES = [
 ALPACA_CACHE = "docs/alpaca_state.json"
 CTRADER_STATE = "docs/ctrader_state.json"
 SWING_STATE = "docs/swing_state.json"
+SWING_WALKFORWARD = "docs/swing_walkforward.json"
 
 
 def collect(no_live: bool) -> dict:
@@ -104,6 +105,9 @@ def collect(no_live: bool) -> dict:
     if os.path.exists(SWING_STATE):
         with open(SWING_STATE, encoding="utf-8") as fh:
             swing = json.load(fh)
+    if os.path.exists(SWING_WALKFORWARD):
+        with open(SWING_WALKFORWARD, encoding="utf-8") as fh:
+            swing["walkforward"] = json.load(fh)
     last_run = None
     cycles = []
     log = os.path.join(s.state_dir, "run_log.jsonl")

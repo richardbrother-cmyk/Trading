@@ -50,6 +50,9 @@ jobs:
       CTRADER_CLIENT_SECRET: ${{ secrets.CTRADER_CLIENT_SECRET }}
       CTRADER_ACCOUNT_LOGIN: ${{ secrets.CTRADER_ACCOUNT_LOGIN }}
       CTRADER_ACCESS_TOKEN: ${{ secrets.CTRADER_ACCESS_TOKEN }}
+      # Freno global: BOT_HALT (variable del repositorio: off | freeze | close) y freno por drawdown desde el maximo
+      BOT_HALT: ${{ vars.BOT_HALT || 'off' }}
+      MAX_DRAWDOWN_PCT: ${{ vars.MAX_DRAWDOWN_PCT || '0.15' }}
       # Parametros para CFDs: stop mas corto que en acciones y exposicion nominal hasta 5x el equity
       # (el riesgo por operacion sigue siendo el 2 % del equity; el apalancamiento solo amplia el tamano).
       # Metales, energia, agricolas (cafe, algodon, trigo, maiz, azucar) e indices, todo como CFD en Fusion Markets

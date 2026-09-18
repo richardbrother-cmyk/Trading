@@ -38,6 +38,7 @@ class SwingParams:
     breakout_bars: int = 20
     bb_period: int = 20
     bb_std: float = 2.0
+    bands_rsi: float = 30.0  # bands: RSI por debajo (largo) / por encima de 100-nivel (corto)
     allow_short: bool = True
     risk_pct: float = 0.01
     max_risk_pct: float = 0.03
@@ -97,9 +98,9 @@ def signal(d: pd.DataFrame, i: int, p: SwingParams) -> int:
             return -1
         return 0
     if p.strategy == "bands":
-        if r["close"] < r["bb_lo"] and r["rsi"] < 30:
+        if r["close"] < r["bb_lo"] and r["rsi"] < p.bands_rsi:
             return 1
-        if p.allow_short and r["close"] > r["bb_up"] and r["rsi"] > 70:
+        if p.allow_short and r["close"] > r["bb_up"] and r["rsi"] > 100 - p.bands_rsi:
             return -1
         return 0
     raise ValueError(p.strategy)

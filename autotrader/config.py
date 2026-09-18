@@ -55,6 +55,9 @@ class Settings:
     ctrader_refresh_token: str = ""
     ctrader_account_login: int = 0
     ctrader_demo: bool = True
+    halt_mode: str = "off"  # off | freeze | close: interruptor manual (BOT_HALT)
+    max_drawdown_pct: float = 0.0  # 0 = sin freno; si el equity cae este % desde su maximo, no se abren posiciones
+    equity_history_path: str = ""  # JSON del panel con "history" [[fecha, equity], ...]; vacio = segun broker
 
     @classmethod
     def from_env(cls, dotenv_path: str | None = None) -> "Settings":
@@ -93,9 +96,20 @@ class Settings:
             ctrader_refresh_token=_env("CTRADER_REFRESH_TOKEN", ""),
             ctrader_account_login=int(_env("CTRADER_ACCOUNT_LOGIN", "0")),
             ctrader_demo=_env("CTRADER_DEMO", "true").lower() in {"1", "true", "yes"},
+            halt_mode=_env("BOT_HALT", "off").lower(),
+            max_drawdown_pct=float(_env("MAX_DRAWDOWN_PCT", "0")),
+            equity_history_path=_env("EQUITY_HISTORY", ""),
         )
         settings.validate()
         return settings
+
+    def history_path(self, default: str = "") -> str:
+        """Fichero de historial de equity para el freno por drawdown."""
+        if self.equity_history_path:
+            return self.equity_history_path
+        if default:
+            return default
+        return {"alpaca": "docs/alpaca_state.json", "ctrader": "docs/ctrader_state.json"}.get(self.broker, "")
 
     def validate(self) -> None:
         if self.broker not in {"sim", "alpaca", "ctrader"}:
@@ -117,6 +131,10 @@ class Settings:
                 raise ConfigError("Faltan ALPACA_API_KEY / ALPACA_SECRET_KEY")
         if self.event_mode not in {"trail", "close", "off"}:
             raise ConfigError("EVENT_MODE debe ser trail, close u off")
+        if self.halt_mode not in {"off", "freeze", "close"}:
+            raise ConfigError("BOT_HALT debe ser off, freeze o close")
+        if not 0 <= self.max_drawdown_pct < 1:
+            raise ConfigError("MAX_DRAWDOWN_PCT debe estar en [0, 1)")
         if not 1 <= self.exposure_leverage <= 10:
             raise ConfigError("EXPOSURE_LEVERAGE debe estar entre 1 y 10")
         if self.broker == "ctrader":

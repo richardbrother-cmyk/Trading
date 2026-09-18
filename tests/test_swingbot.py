@@ -97,3 +97,33 @@ def test_swing_risk_5pct_and_cap():
     assert abs(default_max_risk_pct(0.05) - 0.075) < 1e-9
     # 5 % de 200 USD = 10 USD de riesgo; con stop de 55 puntos en US500 (100 USD/punto por lote) entra 0.18 unidades
     assert size_units(200, 7600, 7600 - 55, SPECS["US500"], 0.05, 0.075) == 0.18
+
+
+def test_swing_guard_freeze_blocks_entries_and_close_flattens(tmp_path, monkeypatch):
+    import autotrader.swingbot as sb
+    bars = _h4()
+    monkeypatch.setattr(sb, "closed_h4_bars", lambda session, symbol, days=60, now=None: bars)
+    now = bars.index[-1] + timedelta(hours=5)
+    s = Settings(broker="sim", symbols=["US500"], state_dir=str(tmp_path), event_mode="off", halt_mode="freeze")
+    sess = FakeSession(bars, [])
+    summary = run_swing_cycle(s, sess, now=now)
+    assert summary["decisions"][0]["reason"] == "freno activo" and not sess.calls and summary["guard"]["mode"] == "freeze"
+    pos = OpenPosition(9, "US500", 0.05, "buy", 7500.0, 7400.0, SWING_LABEL, (now - timedelta(hours=6)).to_pydatetime())
+    s = Settings(broker="sim", symbols=["US500"], state_dir=str(tmp_path), event_mode="off", halt_mode="close")
+    sess = FakeSession(bars, [pos])
+    summary = run_swing_cycle(s, sess, now=now)
+    assert [c[0] for c in sess.calls] == ["ProtoOAClosePositionReq"] and summary["closed"][0]["reason"].startswith("cierre por freno")
+
+
+def test_swing_drawdown_brake_from_published_history(tmp_path, monkeypatch):
+    import json
+    import autotrader.swingbot as sb
+    bars = _h4()
+    monkeypatch.setattr(sb, "closed_h4_bars", lambda session, symbol, days=60, now=None: bars)
+    hist = tmp_path / "swing_state.json"
+    hist.write_text(json.dumps({"history": [["2026-09-01", 240.0]]}))  # equity actual 200 = -16.7 %
+    s = Settings(broker="sim", symbols=["US500"], state_dir=str(tmp_path), event_mode="off", max_drawdown_pct=0.10,
+                 equity_history_path=str(hist))
+    sess = FakeSession(bars, [])
+    summary = run_swing_cycle(s, sess, now=bars.index[-1] + timedelta(hours=5))
+    assert summary["guard"]["mode"] == "freeze" and not sess.calls

@@ -12,6 +12,7 @@ from .broker import Broker, SimulatedBroker
 from .config import Settings
 from .data import DataProvider
 from .events import active_events, load_events, trailed_stop
+from .guard import evaluate as evaluate_guard
 from .preopen import gap_verdict
 from .risk import RiskParams, daily_loss_breached, position_size, stop_hit
 from .strategy import StrategyParams, latest_decision
@@ -80,6 +81,11 @@ def run_cycle(settings: Settings, broker: Broker, provider: DataProvider, dry_ru
     halted = daily_loss_breached(account.equity, day_start, risk)
     if halted:
         summary["skipped"].append(f"limite de perdida diaria alcanzado ({account.equity:.2f} vs {day_start:.2f})")
+    # Freno global: interruptor manual (BOT_HALT) o drawdown acumulado desde el maximo
+    guard = evaluate_guard(account.equity, settings.halt_mode, settings.max_drawdown_pct, settings.history_path(), settings.state_dir)
+    summary["guard"] = guard.as_dict()
+    if guard.blocks_entries:
+        summary["skipped"].append(f"freno activo: {guard.reason}")
 
     open_slots = risk.max_positions - len(account.positions) - len(account.pending_buys)
     for symbol, df in data.items():
@@ -91,6 +97,8 @@ def run_cycle(settings: Settings, broker: Broker, provider: DataProvider, dry_ru
         price = prices[symbol]
         if pos is not None and stop_hit(pos.avg_price, price, risk):
             decision = {**decision, "action": "SELL", "reason": f"stop loss ({price:.2f} <= {pos.avg_price * (1 - risk.stop_loss_pct):.2f})"}
+        if pos is not None and guard.closes_positions:
+            decision = {**decision, "action": "SELL", "reason": f"cierre por freno: {guard.reason}"}
         if events_now and pos is not None and decision["action"] != "SELL" and market_open:
             gain = price / pos.avg_price - 1
             if gain >= settings.event_min_gain:
@@ -113,7 +121,11 @@ def run_cycle(settings: Settings, broker: Broker, provider: DataProvider, dry_ru
         decision["symbol"] = symbol
         summary["decisions"].append(decision)
 
-        if not market_open or halted or decision["action"] == "HOLD":
+        if not market_open or decision["action"] == "HOLD":
+            continue
+        if decision["action"] == "BUY" and (halted or guard.blocks_entries):
+            continue
+        if decision["action"] == "SELL" and halted and not guard.closes_positions:
             continue
         if decision["action"] == "BUY":
             quote = provider.quote(symbol)

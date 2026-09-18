@@ -246,6 +246,15 @@ footer { color: var(--muted); font-size: 12.5px; }
       </div>
     </section>
     <section>
+      <div class="sec-head"><div><h2>Ejecución frente a señal</h2><p class="lede">Diferencia entre el cierre de la barra que dio la señal y el precio real de entrada. Positivo = se pagó más caro. Mide lo que cuesta el retraso de GitHub Actions y el spread.</p></div></div>
+      <div class="tbl-wrap"><table id="sw-slippage"></table></div>
+    </section>
+    <section>
+      <div class="sec-head"><div><h2>Walk-forward de la estrategia</h2><p class="lede" id="sw-wf-lede"></p></div></div>
+      <div class="tbl-wrap"><table id="sw-walkforward"></table></div>
+      <p class="note" id="sw-wf-note" style="margin:10px 0 0"></p>
+    </section>
+    <section>
       <div class="sec-head"><div><h2>Configuración activa</h2><p class="lede">Reversión a la media en bandas de Bollinger de 4 h, solo largos, salida por stop, objetivo o a los 3 días.</p></div></div>
       <div class="tbl-wrap"><table id="sw-settings"></table></div>
     </section>
@@ -501,9 +510,11 @@ function cyclesTable(cycles){
     {label:"Posiciones abiertas", value: String(SW.positions.length), sub: "P&L abierto " + fmtUSD2(SW.unrealized_pnl), cls: SW.unrealized_pnl>=0?"good":"bad"},
     {label:"Desde el inicio", value: pct(SW.equity/base-1, 2), sub: fmtUSD2(base) + " iniciales", cls: SW.equity>=base?"good":"bad"},
   ];
+  const s = SW.settings || {}, g = SW.guard || {}, sl = SW.slippage || {};
+  if (g.mode) tiles.push({label:"Freno", value: g.mode==="off" ? "libre" : g.mode==="freeze" ? "congelado" : "cerrando", sub: g.mode==="off" ? `drawdown ${pct(g.drawdown||0, 1)} desde el máximo de ${fmtUSD2(g.peak||base)} · límite ${((s.max_drawdown_pct||0)*100).toFixed(0)} %` : esc(g.reason||""), cls: g.mode==="off"?"":"bad"});
+  if (sl.count) tiles.push({label:"Slippage acumulado", value: fmtUSD2(sl.total_usd), sub: `${sl.count} entrada(s) · media ${Number(sl.avg_bps).toFixed(1)} pb`, cls: sl.total_usd<=0?"good":"bad"});
   kp.innerHTML = tiles.map(k => `<div class="tile"><div class="label">${esc(k.label)}</div><div class="value">${esc(k.value)}</div><div class="sub ${k.cls||""}">${k.sub}</div></div>`).join("");
   drawEquity("sw-track", "sw-tip", "sw-track-wrap", "sw-track-empty", SW.history, base, "Todavía no hay recorrido: la curva se dibuja con los ciclos del workflow.");
-  const s = SW.settings || {};
   document.getElementById("sw-pos-lede").textContent = "Entrada, último precio, stop y objetivo enviados con la orden y vigilados por el broker, y resultado abierto.";
   const pt = document.getElementById("sw-positions");
   pt.innerHTML = SW.positions.length ? `<thead><tr><th>Par</th><th class="num">Unidades</th><th class="num">Entrada</th><th class="num">Actual</th><th class="num">Stop</th><th class="num">Objetivo</th><th class="num">P&L</th><th>Abierta</th></tr></thead><tbody>` + SW.positions.map(p=>`<tr><td class="mono">${esc(p.symbol)}</td><td class="num">${p.qty}</td><td class="num">${fx(p.avg,p.symbol)}</td><td class="num">${fx(p.price,p.symbol)}</td><td class="num">${p.stop?fx(p.stop,p.symbol):"—"}</td><td class="num">${p.target?fx(p.target,p.symbol):"—"}</td><td class="num ${p.pnl>=0?"pos":"neg"}">${fmtUSD2(p.pnl)}</td><td class="mono" style="font-size:12px">${esc((p.opened_at||"").replace("T"," ").replace("Z",""))}</td></tr>`).join("") + "</tbody>" : `<tbody><tr><td class="empty">Sin posiciones abiertas.</td></tr></tbody>`;
@@ -514,6 +525,20 @@ function cyclesTable(cycles){
   document.getElementById("sw-cycles").innerHTML = cyclesTable(SW.cycles);
   const tr = (SW.trades||[]).filter(t=>!t.error);
   document.getElementById("sw-trades").innerHTML = tr.length ? `<thead><tr><th>Cerrada (UTC)</th><th>Par</th><th class="num">Unid.</th><th class="num">Entrada</th><th class="num">Salida</th><th class="num">Bruto</th><th class="num">Swap + com.</th><th class="num">Neto</th></tr></thead><tbody>` + [...tr].reverse().map(t=>`<tr><td class="mono" style="font-size:12px">${esc((t.at||"").replace("T"," ").replace("Z",""))}</td><td class="mono">${esc(t.symbol)}</td><td class="num">${t.units}</td><td class="num">${fx(t.entry,t.symbol)}</td><td class="num">${fx(t.exit,t.symbol)}</td><td class="num ${t.gross>=0?"pos":"neg"}">${fmtUSD2(t.gross)}</td><td class="num">${fmtUSD2(t.swap+t.commission)}</td><td class="num ${t.net>=0?"pos":"neg"}">${fmtUSD2(t.net)}</td></tr>`).join("") + "</tbody>" : `<tbody><tr><td class="empty">Sin operaciones cerradas todavía.</td></tr></tbody>`;
+  const sli = sl.items || [];
+  document.getElementById("sw-slippage").innerHTML = sli.length ? `<thead><tr><th>Entrada (UTC)</th><th>Par</th><th>Barra de la señal</th><th class="num">Retraso</th><th class="num">Señal</th><th class="num">Real</th><th class="num">Diferencia</th><th class="num">Coste</th></tr></thead><tbody>` + [...sli].reverse().map(i=>`<tr><td class="mono" style="font-size:12px">${esc(i.at)}</td><td class="mono">${esc(i.symbol)}</td><td class="mono" style="font-size:12px">${esc(i.bar||"")}</td><td class="num">${i.bar_age_h!=null?Number(i.bar_age_h).toFixed(1)+" h":"—"}</td><td class="num">${fx(i.signal,i.symbol)}</td><td class="num">${fx(i.fill,i.symbol)}</td><td class="num ${i.slip_bps<=0?"pos":"neg"}">${(i.slip_bps>0?"+":"")+Number(i.slip_bps).toFixed(1)} pb</td><td class="num ${i.slip_usd<=0?"pos":"neg"}">${fmtUSD2(i.slip_usd)}</td></tr>`).join("") + "</tbody>" : `<tbody><tr><td class="empty">Todavía no hay entradas medidas: se registra a partir de la primera compra del bot desde que existe esta métrica.</td></tr></tbody>`;
+  const wf = SW.walkforward;
+  const pfTxt = v => v==null ? "—" : Number(v).toFixed(2);
+  if (wf) {
+    document.getElementById("sw-wf-lede").textContent = `Ventanas rodantes de ${wf.windows.train_months} meses de entrenamiento y ${wf.windows.test_months} de prueba sobre ${wf.symbols.join(", ")}, ${wf.grid_size} combinaciones por tramo, ${fmtUSD(wf.equity)} y ${(wf.risk_pct*100).toFixed(0)} % de riesgo. Generado el ${wf.generated_at}.`;
+    const rows = wf.folds.map(f=>`<tr><td class="mono" style="font-size:12px">${esc(f.test_window[0])} → ${esc(f.test_window[1])}</td><td style="font-size:12.5px">${esc(f.chosen)}</td><td class="num">${pfTxt(f.train.profit_factor)}</td><td class="num">${f.test.trades||0}</td><td class="num ${(f.test.profit_factor||0)>=1?"pos":"neg"}">${pfTxt(f.test.profit_factor)}</td><td class="num ${(f.test.return||0)>=0?"pos":"neg"}">${pct(f.test.return||0)}</td><td class="num ${(f.deployed_test.profit_factor||0)>=1?"pos":"neg"}">${pfTxt(f.deployed_test.profit_factor)}</td><td class="num ${(f.deployed_test.return||0)>=0?"pos":"neg"}">${pct(f.deployed_test.return||0)}</td></tr>`).join("");
+    const o = wf.oos_walkforward, d = wf.oos_deployed, i = wf.insample_deployed;
+    document.getElementById("sw-walkforward").innerHTML = `<thead><tr><th>Tramo de prueba</th><th>Parámetros elegidos en el entrenamiento</th><th class="num">PF entren.</th><th class="num">Ops.</th><th class="num">PF prueba</th><th class="num">Ret. prueba</th><th class="num">PF config. actual</th><th class="num">Ret. config. actual</th></tr></thead><tbody>${rows}<tr class="active"><td colspan="3"><b>Fuera de muestra encadenado</b></td><td class="num">${o.trades||0}</td><td class="num ${(o.profit_factor||0)>=1?"pos":"neg"}">${pfTxt(o.profit_factor)}</td><td class="num ${(o.return||0)>=0?"pos":"neg"}">${pct(o.return||0)}</td><td class="num ${(d.profit_factor||0)>=1?"pos":"neg"}">${pfTxt(d.profit_factor)}</td><td class="num ${(d.return||0)>=0?"pos":"neg"}">${pct(d.return||0)}</td></tr></tbody>`;
+    document.getElementById("sw-wf-note").textContent = `Configuración actual en todo el año (dentro de muestra): PF ${pfTxt(i.profit_factor)}, ${pct(i.return||0)}, drawdown ${pct(i.max_drawdown||0)}. Eficiencia fuera/dentro de muestra del PF: ${wf.efficiency_pf==null?"—":wf.efficiency_pf}. Lectura: ${wf.verdict}.`;
+  } else {
+    document.getElementById("sw-wf-lede").textContent = "Sin resultados todavía.";
+    document.getElementById("sw-walkforward").innerHTML = "";
+  }
   document.getElementById("sw-settings").innerHTML = `<tbody>
     <tr><td>Universo</td><td class="mono" style="font-size:12.5px">${esc((SW.symbols||[]).join(", "))}</td></tr>
     <tr><td>Entrada</td><td>cierre de la barra de 4 h bajo la banda inferior de Bollinger (20, 2) con RSI &lt; 30, solo largos</td></tr>
@@ -521,6 +546,7 @@ function cyclesTable(cycles){
     <tr><td>Stop y objetivo</td><td>stop a ${s.stop_atr} ATR bajo la entrada, objetivo en la media de las bandas; ambos en el broker</td></tr>
     <tr><td>Riesgo por operación</td><td>${(s.risk_per_trade*100).toFixed(1)} % del capital real (tope ${(s.max_risk_pct*100).toFixed(1)} % para aceptar el lote mínimo)</td></tr>
     <tr><td>Salida por tiempo</td><td>a los ${s.max_hold_days} días</td></tr>
+    <tr><td>Freno</td><td>interruptor manual BOT_HALT (${esc(s.halt_mode||"off")}) y freno automático si el equity cae ${((s.max_drawdown_pct||0)*100).toFixed(0)} % desde su máximo</td></tr>
     <tr><td>Ciclos</td><td>cada hora, de domingo noche a viernes, desde GitHub Actions</td></tr>
   </tbody>`;
 })();
