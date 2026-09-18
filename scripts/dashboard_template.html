@@ -267,6 +267,11 @@ footer { color: var(--muted); font-size: 12.5px; }
       <p class="note" id="sw-wf-note" style="margin:10px 0 0"></p>
     </section>
     <section>
+      <div class="sec-head"><div><h2>Investigación: Kronos como filtro de confirmación</h2><p class="lede" id="sw-kr-lede"></p></div></div>
+      <div class="tbl-wrap"><table id="sw-kronos"></table></div>
+      <p class="note" id="sw-kr-note" style="margin:10px 0 0"></p>
+    </section>
+    <section>
       <div class="sec-head"><div><h2>Configuración activa</h2><p class="lede">Reversión a la media en bandas de Bollinger de 4 h, solo largos, salida por stop, objetivo o a los 3 días.</p></div></div>
       <div class="tbl-wrap"><table id="sw-settings"></table></div>
     </section>
@@ -571,6 +576,19 @@ function cyclesTable(cycles){
   } else {
     document.getElementById("sw-wf-lede").textContent = "Sin resultados todavía.";
     document.getElementById("sw-walkforward").innerHTML = "";
+  }
+  const kr = SW.kronos;
+  if (kr) {
+    const inf = kr.information || {};
+    document.getElementById("sw-kr-lede").textContent = `${kr.model}: en cada señal de compra se pide la predicción de las siguientes ${kr.horizon_bars} barras de 4 h (${kr.samples} muestras, ${kr.lookback_bars} barras de contexto) y solo se entra si la subida prevista supera un umbral. ${inf.signals} señales con predicción. Generado el ${kr.generated_at}.`;
+    const names = {todas_las_senales_con_prediccion:"Sin filtro (señales con predicción)", "kronos_sube_mas_de_0.25_atr":"Subida prevista > 0,25 ATR", "kronos_sube_mas_de_0.5_atr":"Subida prevista > 0,5 ATR", "kronos_sube_mas_de_1_atr":"Subida prevista > 1 ATR", kronos_tercil_superior:"Tercil superior de subida prevista", kronos_tercil_inferior:"Tercil inferior (control)"};
+    const rows = Object.entries(kr.variants||{}).map(([k,v])=>{ const rr=v.random_same_pass_rate; return `<tr><td>${esc(names[k]||k)}</td><td class="num">${v.trades||0}</td><td class="num ${(v.profit_factor||0)>=1?"pos":"neg"}">${pfTxt(v.profit_factor)}</td><td class="num ${(v.return||0)>=0?"pos":"neg"}">${pct(v.return||0)}</td><td class="num">${pct(v.max_drawdown||0)}</td><td class="num" style="color:var(--ink-2)">${rr?`${pfTxt(rr.profit_factor_mean)} (${pfTxt(rr.profit_factor_p10_p90[0])}–${pfTxt(rr.profit_factor_p10_p90[1])})`:"—"}</td><td class="num" style="color:var(--ink-2)">${rr?pct(rr.return_mean):"—"}</td></tr>`; }).join("");
+    document.getElementById("sw-kronos").innerHTML = `<thead><tr><th>Variante</th><th class="num">Ops.</th><th class="num">PF</th><th class="num">Retorno</th><th class="num">Drawdown</th><th class="num">PF azar misma tasa (p10–p90)</th><th class="num">Ret. azar</th></tr></thead><tbody>${rows}</tbody>`;
+    const rb = kr.robustness || {}; const halves = (rb.halves||[]).map(h=>`${h.name}: ${h.top_tercile.trades||0} ops, PF ${pfTxt(h.top_tercile.profit_factor)}, ${pct(h.top_tercile.return||0)}`).join(" · ");
+    document.getElementById("sw-kr-note").textContent = `Kronos prevé subida en el ${((inf.pred_up_rate||0)*100).toFixed(0)} % de las señales, así que el signo no filtra; la magnitud prevista sí correlaciona con el rebote real (IC de Spearman ${inf.ic_spearman}). Retorno real medio en ATR por tercil de predicción: ${(inf.real_atr_by_pred_tercile||[]).join(" / ")}. Tercil superior por mitades: ${halves}.` + (kr.horizon3 ? ` Con horizonte de 3 barras el efecto desaparece: IC ${kr.horizon3.ic_spearman}, tercil superior PF ${pfTxt(kr.horizon3.top_tercile_pf)} y ${pct(kr.horizon3.top_tercile_return||0)}, sin superar al azar.` : "") + ` Lectura: ${kr.verdict}. Conclusión: sugerente pero no robusto; no se despliega.`;
+  } else {
+    document.getElementById("sw-kr-lede").textContent = "Sin resultados todavía.";
+    document.getElementById("sw-kronos").innerHTML = "";
   }
   document.getElementById("sw-settings").innerHTML = `<tbody>
     <tr><td>Universo</td><td class="mono" style="font-size:12.5px">${esc((SW.symbols||[]).join(", "))}</td></tr>

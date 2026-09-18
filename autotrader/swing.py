@@ -117,7 +117,8 @@ def _size(equity: float, entry: float, stop: float, spec: SymbolSpec, p: SwingPa
     return float(units)
 
 
-def backtest_symbol(df15: pd.DataFrame, sym: str, p: SwingParams, initial: float = 10_000.0) -> list[ITrade]:
+def backtest_symbol(df15: pd.DataFrame, sym: str, p: SwingParams, initial: float = 10_000.0, entry_filter=None) -> list[ITrade]:
+    """`entry_filter(bar_time) -> bool` permite vetar una senal (investigacion de filtros de confirmacion)."""
     spec = SPECS[sym]
     d = indicators(resample(df15, p.timeframe), p)
     o, h, l, c = d["open"].to_numpy(), d["high"].to_numpy(), d["low"].to_numpy(), d["close"].to_numpy()
@@ -128,7 +129,7 @@ def backtest_symbol(df15: pd.DataFrame, sym: str, p: SwingParams, initial: float
     i = max(200, p.bb_period, p.breakout_bars) + 1
     while i < n - 1:
         side = signal(d, i, p)
-        if side == 0:
+        if side == 0 or (entry_filter is not None and not entry_filter(idx[i])):
             i += 1
             continue
         atr = float(d["atr"].iloc[i])

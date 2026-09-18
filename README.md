@@ -264,6 +264,29 @@ un factor de beneficio de 1,34 en esos mismos tramos, pero fue elegida mirando t
 cuenta como prueba independiente. Lectura honesta: el borde es débil y sensible a los parámetros; la
 demo de 8 semanas es la prueba que falta.
 
+### Investigación: Kronos como filtro de confirmación
+
+`scripts/kronos_filter.py` prueba el modelo fundacional de velas
+[Kronos](https://github.com/shiyu-coder/Kronos) (Kronos-small, 24,7M de parámetros, en CPU) como
+filtro de las señales del swing: en cada señal de compra pide la predicción de las siguientes barras
+de 4 h con 400 barras de contexto y solo entra si la subida prevista supera un umbral. Las
+predicciones se guardan en `data/research/kronos_predictions.json` y los informes en
+`docs/kronos_report.json` (6 barras) y `docs/kronos_report_h3.json` (3 barras). Resultados sobre los
+12 meses y 126 señales con predicción:
+
+- El signo de la predicción no sirve: Kronos prevé subida en el 100 % de las señales, porque en la
+  banda inferior el precio está por debajo de la media de su ventana y el modelo regresa a ella.
+- A 6 barras, la magnitud prevista sí correlaciona con el rebote real (IC de Spearman 0,19). Entrar
+  solo en el tercil superior de subida prevista deja 27 operaciones con factor de beneficio 2,12 y
+  drawdown del 2,7 %, frente a 1,20 de media (p90 1,66) de un filtro aleatorio con la misma tasa de
+  paso, y es positivo en los seis símbolos. Pero en la segunda mitad del año, donde la estrategia
+  pierde, el filtro solo la deja en tablas.
+- A 3 barras el efecto desaparece: IC 0,08, ningún umbral supera al azar y el tercil inferior rinde
+  igual que el superior.
+
+Lectura honesta: sugerente pero no robusto con 126 señales de un solo año; no se despliega. Merece
+repetirse con más historia y con Kronos-base cuando la demo lleve unos meses.
+
 ### Freno global
 
 Los tres bots comparten un freno (`autotrader/guard.py`): la variable `BOT_HALT` (`off`, `freeze` para

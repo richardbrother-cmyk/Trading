@@ -33,6 +33,7 @@ ALPACA_CACHE = "docs/alpaca_state.json"
 CTRADER_STATE = "docs/ctrader_state.json"
 SWING_STATE = "docs/swing_state.json"
 SWING_WALKFORWARD = "docs/swing_walkforward.json"
+KRONOS_REPORT = "docs/kronos_report.json"
 
 
 def collect(no_live: bool) -> dict:
@@ -127,6 +128,16 @@ def collect(no_live: bool) -> dict:
     if os.path.exists(SWING_WALKFORWARD):
         with open(SWING_WALKFORWARD, encoding="utf-8") as fh:
             swing["walkforward"] = json.load(fh)
+    if os.path.exists(KRONOS_REPORT):
+        with open(KRONOS_REPORT, encoding="utf-8") as fh:
+            swing["kronos"] = json.load(fh)
+        alt = KRONOS_REPORT.replace(".json", "_h3.json")
+        if os.path.exists(alt):
+            with open(alt, encoding="utf-8") as fh:
+                h3 = json.load(fh)
+            top = (h3.get("variants") or {}).get("kronos_tercil_superior", {})
+            swing["kronos"]["horizon3"] = {"ic_spearman": (h3.get("information") or {}).get("ic_spearman"), "top_tercile_pf": top.get("profit_factor"),
+                                          "top_tercile_return": top.get("return"), "verdict": h3.get("verdict")}
     last_run = None
     cycles = []
     log = os.path.join(s.state_dir, "run_log.jsonl")

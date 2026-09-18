@@ -1,0 +1,165 @@
+{
+ "generated_at": "2026-09-18 01:14 UTC",
+ "model": "NeoQuasar/Kronos-small (24.7M) + Kronos-Tokenizer-base, CPU",
+ "horizon_bars": 3,
+ "samples": 10,
+ "lookback_bars": 400,
+ "deployed": "bandas H4 20/2, RSI<30, stop 2 ATR, 3 dias, solo largos",
+ "equity": 10000,
+ "risk_pct": 0.01,
+ "symbols": [
+  "EURUSD",
+  "GBPUSD",
+  "NAS100",
+  "US500",
+  "XAUUSD",
+  "XTIUSD"
+ ],
+ "information": {
+  "signals": 126,
+  "pred_up_rate": 0.992,
+  "real_up_rate": 0.548,
+  "directional_accuracy": 0.54,
+  "ic_spearman": 0.078,
+  "mean_real_ret_when_pred_up": 0.00275,
+  "mean_real_ret_when_pred_down": 0.01623,
+  "by_symbol": {
+   "EURUSD": {
+    "signals": 27,
+    "directional_accuracy": 0.407,
+    "ic_spearman": -0.376
+   },
+   "GBPUSD": {
+    "signals": 24,
+    "directional_accuracy": 0.583,
+    "ic_spearman": -0.043
+   },
+   "NAS100": {
+    "signals": 17,
+    "directional_accuracy": 0.647,
+    "ic_spearman": 0.243
+   },
+   "US500": {
+    "signals": 18,
+    "directional_accuracy": 0.722,
+    "ic_spearman": 0.152
+   },
+   "XAUUSD": {
+    "signals": 29,
+    "directional_accuracy": 0.483,
+    "ic_spearman": -0.119
+   },
+   "XTIUSD": {
+    "signals": 11,
+    "directional_accuracy": 0.455,
+    "ic_spearman": -0.045
+   }
+  },
+  "magnitude_terciles_atr": [
+   0.717,
+   1.236
+  ],
+  "real_atr_by_pred_tercile": [
+   0.43,
+   -0.015,
+   0.084
+  ]
+ },
+ "variants": {
+  "todas_las_senales_con_prediccion": {
+   "trades": 66,
+   "win_rate": 0.485,
+   "profit_factor": 1.43,
+   "avg_r": 0.142,
+   "return": 0.1246,
+   "max_drawdown": -0.0753,
+   "avg_hold_days": 2.03,
+   "trades_per_month": 5.4,
+   "costs": 219.65
+  },
+  "kronos_sube_mas_de_0.25_atr": {
+   "trades": 64,
+   "win_rate": 0.469,
+   "profit_factor": 1.35,
+   "avg_r": 0.107,
+   "return": 0.1018,
+   "max_drawdown": -0.0953,
+   "avg_hold_days": 2.07,
+   "trades_per_month": 5.3,
+   "costs": 213.88
+  },
+  "kronos_sube_mas_de_0.5_atr": {
+   "trades": 57,
+   "win_rate": 0.404,
+   "profit_factor": 1.08,
+   "avg_r": 0.011,
+   "return": 0.0215,
+   "max_drawdown": -0.0934,
+   "avg_hold_days": 2.08,
+   "trades_per_month": 4.7,
+   "costs": 196.08,
+   "random_same_pass_rate": {
+    "pass_rate": 0.77,
+    "runs": 30,
+    "profit_factor_mean": 1.35,
+    "profit_factor_p10_p90": [
+     1.21,
+     1.52
+    ],
+    "return_mean": 0.0885,
+    "return_p10_p90": [
+     0.0586,
+     0.1347
+    ]
+   }
+  },
+  "kronos_sube_mas_de_1_atr": {
+   "trades": 40,
+   "win_rate": 0.475,
+   "profit_factor": 1.32,
+   "avg_r": 0.174,
+   "return": 0.0604,
+   "max_drawdown": -0.0579,
+   "avg_hold_days": 2.09,
+   "trades_per_month": 3.3,
+   "costs": 127.65
+  },
+  "kronos_tercil_superior": {
+   "trades": 29,
+   "win_rate": 0.517,
+   "profit_factor": 1.61,
+   "avg_r": 0.261,
+   "return": 0.0747,
+   "max_drawdown": -0.0374,
+   "avg_hold_days": 2.16,
+   "trades_per_month": 2.4,
+   "costs": 90.93,
+   "random_same_pass_rate": {
+    "pass_rate": 0.325,
+    "runs": 30,
+    "profit_factor_mean": 1.2,
+    "profit_factor_p10_p90": [
+     0.84,
+     1.66
+    ],
+    "return_mean": 0.0265,
+    "return_p10_p90": [
+     -0.0251,
+     0.0967
+    ]
+   }
+  },
+  "kronos_tercil_inferior": {
+   "trades": 33,
+   "win_rate": 0.576,
+   "profit_factor": 1.67,
+   "avg_r": 0.232,
+   "return": 0.0828,
+   "max_drawdown": -0.0291,
+   "avg_hold_days": 2.1,
+   "trades_per_month": 2.7,
+   "costs": 127.66
+  }
+ },
+ "verdict": "Kronos preve subida en casi todas las senales (el precio esta bajo la media de su ventana), asi que el signo no filtra nada; la magnitud prevista apenas correlaciona con el rebote real (IC 0.078); ningun umbral de magnitud supera de forma clara a un filtro aleatorio con la misma tasa de paso"
+}
