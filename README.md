@@ -262,7 +262,7 @@ los 7 días, máximo 3 posiciones abiertas, etiqueta `autotrader-aggr`. El riesg
 con la variable `AGGR_RISK_PER_TRADE` (3 % por defecto) y el freno por drawdown con
 `AGGR_MAX_DRAWDOWN_PCT` (30 %). Estado en `docs/aggr_state.json` y pestaña propia en el panel.
 
-**Stop a break even** (`SWING_BREAKEVEN_R`, variable `AGGR_BREAKEVEN_R`, 1 R por defecto; `SWING_BREAKEVEN_LOCK_R`,
+**Stop a break even** (`SWING_BREAKEVEN_R`, variable `AGGR_BREAKEVEN_R`, 2 R por defecto; `SWING_BREAKEVEN_LOCK_R`,
 variable `AGGR_BREAKEVEN_LOCK_R`, 0,1 R): en cada ciclo el bot pide el último precio de 1 minuto de cada posición
 propia y, si ya lleva ganados N R (R = distancia entre la entrada y el stop original), sube el stop a la entrada más
 0,1 R para cubrir spread y comisión, reenviando el take profit (la API de cTrader borra el objetivo si no se reenvía
@@ -275,15 +275,15 @@ Coste de la regla en el histórico (`docs/aggr_breakeven.json`, 12 meses, seis s
 |---|---|---|---|---|---|---|---|---|
 | Sin break even | 170 | 19 % | 0 % | 0,47 | 79 | 1,58 | 16 | −71 % |
 | BE tras 0,5 R | 212 | 9 % | 51 % | 0,22 | 47 | 1,56 | 7 | −55 % |
-| **BE tras 1 R (activa)** | 193 | 11 % | 37 % | 0,29 | 55 | 1,57 | 7 | −60 % |
+| BE tras 1 R | 193 | 11 % | 37 % | 0,29 | 55 | 1,57 | 7 | −60 % |
 | BE tras 1,5 R | 184 | 12 % | 31 % | 0,26 | 48 | 1,46 | 9 | −68 % |
-| BE tras 2 R | 177 | 15 % | 21 % | 0,34 | 60 | 1,53 | 9 | −73 % |
+| **BE tras 2 R (activa)** | 177 | 15 % | 21 % | 0,34 | 60 | 1,53 | 9 | −73 % |
 | BE tras 3 R | 173 | 16 % | 13 % | 0,36 | 62 | 1,50 | 18 | −74 % |
 
 Con un objetivo de 6R el precio vuelve a la entrada muy a menudo antes de llegar: la regla recorta la ganancia media
-por operación (de 0,47 R a 0,29 R con 1 R) porque parte de las operaciones que habrían llegado al objetivo salen en
-cero, pero acorta las rachas de pérdidas (de 16 a 7) y la caída máxima. Es una decisión de preferencia, no de borde:
-protege capital a cambio de menos beneficio esperado.
+por operación (de 0,47 R a 0,29 R con 1 R, a 0,34 R con 2 R) porque parte de las operaciones que habrían llegado al
+objetivo salen en cero, pero acorta las rachas de pérdidas (de 16 a 7 o 9). Es una decisión de preferencia, no de
+borde: protege capital a cambio de menos beneficio esperado. Se eligió 2 R como punto intermedio.
 
 Por qué 3 % y no 10 %: con la única combinación que mostró borde en 12 meses (factor de beneficio 1,73,
 148 operaciones, solo el 20 % llega al objetivo, rachas de 14 pérdidas), una simulación de una cuenta
