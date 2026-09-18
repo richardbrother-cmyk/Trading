@@ -39,6 +39,7 @@ class SwingParams:
     bb_period: int = 20
     bb_std: float = 2.0
     bands_rsi: float = 30.0  # bands: RSI por debajo (largo) / por encima de 100-nivel (corto)
+    pure_rr: bool = False  # True: salida solo por stop, objetivo (tp_atr) o tiempo; sin salida por EMA20 ni por la media de bandas
     allow_short: bool = True
     risk_pct: float = 0.01
     max_risk_pct: float = 0.03
@@ -135,7 +136,7 @@ def backtest_symbol(df15: pd.DataFrame, sym: str, p: SwingParams, initial: float
         atr = float(d["atr"].iloc[i])
         entry = o[i + 1] + side * spec.spread / 2
         stop = entry - side * p.stop_atr * atr
-        tp = entry + side * p.tp_atr * atr if p.strategy != "bands" else float(d["bb_mid"].iloc[i])
+        tp = entry + side * p.tp_atr * atr if (p.strategy != "bands" or p.pure_rr) else float(d["bb_mid"].iloc[i])
         units = _size(equity, entry, stop, spec, p)
         if units <= 0:
             i += 1
@@ -154,7 +155,7 @@ def backtest_symbol(df15: pd.DataFrame, sym: str, p: SwingParams, initial: float
                     exit_price, reason, j_exit = tp, "objetivo", j; break
                 if side == -1 and l[j] <= tp:
                     exit_price, reason, j_exit = tp, "objetivo", j; break
-            if p.strategy == "breakout" and j > i + 1:
+            if p.strategy == "breakout" and not p.pure_rr and j > i + 1:
                 if (side == 1 and c[j] < d["ema20"].iloc[j]) or (side == -1 and c[j] > d["ema20"].iloc[j]):
                     exit_price, reason, j_exit = c[j], "salida ema20", j; break
         if exit_price is None:
@@ -165,6 +166,8 @@ def backtest_symbol(df15: pd.DataFrame, sym: str, p: SwingParams, initial: float
         t.costs += t.exit * units * p.commission_side + entry * units * p.swap_daily * days_held
         trades.append(t)
         equity += t.pnl
+        if equity <= 0:  # cuenta quebrada: la simulacion se detiene
+            break
         i = j_exit + 1
     return trades
 

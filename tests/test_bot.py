@@ -6,7 +6,7 @@ from autotrader.data import DataProvider
 
 def test_run_cycle_sim_synthetic(tmp_path):
     s = Settings(broker="sim", data_provider="synthetic", symbols=["AAA", "BBB", "CCC", "DDD"],
-                 fast_sma=10, slow_sma=30, state_dir=str(tmp_path))
+                 fast_sma=10, slow_sma=30, state_dir=str(tmp_path), event_mode="off")
     broker = SimulatedBroker(initial_cash=s.initial_cash, state_dir=s.state_dir)
     summary = run_cycle(s, broker, DataProvider("synthetic", days=300), force=True)
     assert len(summary["decisions"]) == 4
@@ -40,7 +40,7 @@ def test_run_cycle_skips_symbols_with_pending_buy(tmp_path):
             return {"id": "x", "status": "accepted"}
 
     s = Settings(broker="sim", data_provider="synthetic", symbols=["AAA", "BBB", "CCC", "DDD"],
-                 fast_sma=10, slow_sma=30, state_dir=str(tmp_path))
+                 fast_sma=10, slow_sma=30, state_dir=str(tmp_path), event_mode="off")
     broker = FakeBroker()
     summary = run_cycle(s, broker, DataProvider("synthetic", days=300))
     assert broker.orders == []
@@ -80,7 +80,7 @@ def test_gap_filter_uses_last_completed_close(tmp_path):
             return {"id": "x", "status": "accepted"}
 
     s = Settings(broker="sim", data_provider="yahoo", symbols=["AAA"], fast_sma=10, slow_sma=30,
-                 rsi_max_entry=101.0, state_dir=str(tmp_path))
+                 rsi_max_entry=101.0, state_dir=str(tmp_path), event_mode="off")
     broker = FakeBroker()
     summary = run_cycle(s, broker, Prov())
     assert broker.orders == []
@@ -112,7 +112,7 @@ def test_exposure_leverage_allows_several_cfd_positions(tmp_path):
 
     syms = ["A", "B", "C", "D", "E", "F"]
     s = Settings(broker="sim", data_provider="synthetic", symbols=syms, fast_sma=10, slow_sma=30, rsi_max_entry=101.0,
-                 max_positions=8, max_position_pct=0.12, exposure_leverage=5.0, stop_loss_pct=0.03, state_dir=str(tmp_path))
+                 max_positions=8, max_position_pct=0.12, exposure_leverage=5.0, stop_loss_pct=0.03, state_dir=str(tmp_path), event_mode="off")
     broker = FakeBroker()
 
     class Prov:
