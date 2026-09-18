@@ -45,6 +45,8 @@ def _history_peak(path: str) -> float:
     except (OSError, ValueError):
         return 0.0
     values = [float(v) for _t, v in raw.get("history", []) if v is not None]
+    if raw.get("initial"):  # capital inicial de la cuenta, por si el historial empieza tras las primeras perdidas
+        values.append(float(raw["initial"]))
     return max(values) if values else 0.0
 
 

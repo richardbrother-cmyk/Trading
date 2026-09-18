@@ -5,8 +5,10 @@ from autotrader.guard import evaluate, peak_equity
 
 def test_peak_uses_history_state_and_now(tmp_path):
     hist = tmp_path / "state.json"
-    hist.write_text(json.dumps({"history": [["2026-09-01", 210.0], ["2026-09-02", 205.0]]}))
+    hist.write_text(json.dumps({"initial": 200.0, "history": [["2026-09-01", 210.0], ["2026-09-02", 205.0]]}))
     assert peak_equity(198.0, str(hist), str(tmp_path)) == 210.0
+    hist.write_text(json.dumps({"initial": 220.0, "history": [["2026-09-01", 210.0]]}))
+    assert peak_equity(198.0, str(hist), str(tmp_path)) == 220.0
     # el maximo persiste aunque el historial desaparezca
     hist.unlink()
     assert peak_equity(199.0, str(hist), str(tmp_path)) == 210.0
