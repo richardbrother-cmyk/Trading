@@ -1,0 +1,274 @@
+{
+ "available": true,
+ "broker": "Fusion Markets · cTrader demo · swing",
+ "account": 10138759,
+ "at": "2026-09-18T18:35Z",
+ "balance": 492.84,
+ "equity": 492.84,
+ "unrealized_pnl": 0,
+ "leverage": 500.0,
+ "positions": [],
+ "symbols": [
+  "US500",
+  "NAS100",
+  "EURUSD",
+  "GBPUSD",
+  "XAUUSD",
+  "XTIUSD"
+ ],
+ "trades": [
+  {
+   "symbol": "EURUSD",
+   "at": "2026-09-18T18:01Z",
+   "units": 100000.0,
+   "entry": 1.14819,
+   "exit": 1.14817,
+   "gross": -2.0,
+   "swap": 0.0,
+   "commission": -5.16,
+   "net": -7.16,
+   "balance_after": 492.84,
+   "label": "",
+   "opened_at": "2026-09-18T17:11Z",
+   "origin": "manual"
+  }
+ ],
+ "settings": {
+  "risk_per_trade": 0.06,
+  "max_risk_pct": 0.09,
+  "max_signal_age_hours": 2.0,
+  "stop_atr": 0.75,
+  "tp_atr": 4.5,
+  "strategy": "breakout",
+  "description": "cierre sobre el maximo de 20 barras y sobre la EMA200; stop 0.75 ATR, objetivo 4.5 ATR, salida a los 7 dias",
+  "max_hold_days": 7.0,
+  "max_positions": 3,
+  "label": "autotrader-aggr",
+  "max_drawdown_pct": 0.3,
+  "halt_mode": "off"
+ },
+ "event_window": [
+  "Vencimiento trimestral de opciones y futuros (triple witching) + rebalanceo S&P"
+ ],
+ "initial": 500.0,
+ "bot_metrics": {
+  "initial": 500.0,
+  "realized": {
+   "bot": 0.0,
+   "manual": -7.16,
+   "excluded": 0.0
+  },
+  "open": {
+   "bot": 0.0,
+   "manual": 0.0,
+   "excluded": 0.0
+  },
+  "counts": {
+   "bot": 0,
+   "manual": 1,
+   "excluded": 0
+  },
+  "adjusted_equity": 500.0,
+  "adjusted_return": 0.0
+ },
+ "exclusions": {
+  "reason": "Entradas del 14 de septiembre de 2026: el filtro de huecos comparaba el precio en vivo con la barra diaria parcial y dejo pasar compras que no debia. Se excluyen de las metricas del bot para medir la operativa corregida.",
+  "entries_before": "2026-09-15T00:00Z"
+ },
+ "last_run": {
+  "at": "2026-09-18 18:35",
+  "equity": 492.84,
+  "positions": 0,
+  "buys": 0,
+  "sells": 0,
+  "errors": 0,
+  "note": "sin cambios",
+  "decisions": [
+   {
+    "symbol": "US500",
+    "action": "HOLD",
+    "rsi": 49.3,
+    "close": 7623.59,
+    "bb_lo": 7564.74,
+    "bb_mid": 7616.48,
+    "bar": "2026-09-18 13:00",
+    "bar_age_h": 1.59,
+    "reason": null
+   },
+   {
+    "symbol": "NAS100",
+    "action": "HOLD",
+    "rsi": 56.5,
+    "close": 29439.03,
+    "bb_lo": 28812.62,
+    "bb_mid": 29236.19,
+    "bar": "2026-09-18 13:00",
+    "bar_age_h": 1.59,
+    "reason": null
+   },
+   {
+    "symbol": "EURUSD",
+    "action": "HOLD",
+    "rsi": 35.1,
+    "close": 1.14737,
+    "bb_lo": 1.14332,
+    "bb_mid": 1.15008,
+    "bar": "2026-09-18 13:00",
+    "bar_age_h": 1.59,
+    "reason": null
+   },
+   {
+    "symbol": "GBPUSD",
+    "action": "HOLD",
+    "rsi": 40.2,
+    "close": 1.33823,
+    "bb_lo": 1.33071,
+    "bb_mid": 1.34111,
+    "bar": "2026-09-18 13:00",
+    "bar_age_h": 1.59,
+    "reason": null
+   },
+   {
+    "symbol": "XAUUSD",
+    "action": "HOLD",
+    "rsi": 57.3,
+    "close": 4382.83,
+    "bb_lo": 4251.97,
+    "bb_mid": 4330.13,
+    "bar": "2026-09-18 13:00",
+    "bar_age_h": 1.59,
+    "reason": null
+   },
+   {
+    "symbol": "XTIUSD",
+    "action": "HOLD",
+    "rsi": 46.4,
+    "close": 100.691,
+    "bb_lo": 98.773,
+    "bb_mid": 102.575,
+    "bar": "2026-09-18 13:00",
+    "bar_age_h": 1.59,
+    "reason": null
+   }
+  ],
+  "orders": [],
+  "closed": [],
+  "event_window": [
+   "Vencimiento trimestral de opciones y futuros (triple witching) + rebalanceo S&P"
+  ],
+  "guard": {
+   "mode": "off",
+   "reason": "",
+   "peak": 492.84,
+   "drawdown": 0.0
+  }
+ },
+ "slippage": {
+  "items": [],
+  "total_usd": 0,
+  "avg_bps": 0.0,
+  "count": 0
+ },
+ "guard": {
+  "mode": "off",
+  "reason": "",
+  "peak": 492.84,
+  "drawdown": 0.0
+ },
+ "history": [
+  [
+   "2026-09-18T18:35Z",
+   492.84
+  ]
+ ],
+ "cycles": [
+  {
+   "at": "2026-09-18 18:35",
+   "equity": 492.84,
+   "positions": 0,
+   "buys": 0,
+   "sells": 0,
+   "errors": 0,
+   "note": "sin cambios",
+   "decisions": [
+    {
+     "symbol": "US500",
+     "action": "HOLD",
+     "rsi": 49.3,
+     "close": 7623.59,
+     "bb_lo": 7564.74,
+     "bb_mid": 7616.48,
+     "bar": "2026-09-18 13:00",
+     "bar_age_h": 1.59,
+     "reason": null
+    },
+    {
+     "symbol": "NAS100",
+     "action": "HOLD",
+     "rsi": 56.5,
+     "close": 29439.03,
+     "bb_lo": 28812.62,
+     "bb_mid": 29236.19,
+     "bar": "2026-09-18 13:00",
+     "bar_age_h": 1.59,
+     "reason": null
+    },
+    {
+     "symbol": "EURUSD",
+     "action": "HOLD",
+     "rsi": 35.1,
+     "close": 1.14737,
+     "bb_lo": 1.14332,
+     "bb_mid": 1.15008,
+     "bar": "2026-09-18 13:00",
+     "bar_age_h": 1.59,
+     "reason": null
+    },
+    {
+     "symbol": "GBPUSD",
+     "action": "HOLD",
+     "rsi": 40.2,
+     "close": 1.33823,
+     "bb_lo": 1.33071,
+     "bb_mid": 1.34111,
+     "bar": "2026-09-18 13:00",
+     "bar_age_h": 1.59,
+     "reason": null
+    },
+    {
+     "symbol": "XAUUSD",
+     "action": "HOLD",
+     "rsi": 57.3,
+     "close": 4382.83,
+     "bb_lo": 4251.97,
+     "bb_mid": 4330.13,
+     "bar": "2026-09-18 13:00",
+     "bar_age_h": 1.59,
+     "reason": null
+    },
+    {
+     "symbol": "XTIUSD",
+     "action": "HOLD",
+     "rsi": 46.4,
+     "close": 100.691,
+     "bb_lo": 98.773,
+     "bb_mid": 102.575,
+     "bar": "2026-09-18 13:00",
+     "bar_age_h": 1.59,
+     "reason": null
+    }
+   ],
+   "orders": [],
+   "closed": [],
+   "event_window": [
+    "Vencimiento trimestral de opciones y futuros (triple witching) + rebalanceo S&P"
+   ],
+   "guard": {
+    "mode": "off",
+    "reason": "",
+    "peak": 492.84,
+    "drawdown": 0.0
+   }
+  }
+ ]
+}
