@@ -260,6 +260,28 @@ tendencial ni con operaciones manuales. Cada ciclo publica `docs/swing_state.jso
 muestra la cuenta en la pestaña "Fusion · swing 200 USD". Oro y petróleo se descartan solos porque su lote mínimo
 arriesga más del tope mientras la cuenta sea pequeña.
 
+### Simulación de la cuenta agresiva a 3 años
+
+`scripts/aggr_simulation.py` (resultado en `docs/aggr_simulation.json`, gráfica en la pestaña agresiva) recorre
+los 3 años de barras M15 de `data/intraday/` (septiembre 2023 a septiembre 2026, descargados con el workflow
+`intraday-research` y `days=1100`) con los parámetros que operan hoy: ruptura H4 de 20 barras, stop 0,75 ATR,
+objetivo 6R, break even tras 2 R, 7 días, 6 % de riesgo, lote mínimo, máximo 3 posiciones y freno al 30 %.
+Primero genera las 693 señales de la estrategia (acierto 29 %, 0,21 R de media, PF 1,31; 2025 fue un año plano
+con −1 R en 267 señales) y después simula una cuenta de 500 USD que las recorre en orden, más 2.000 recorridos
+Monte Carlo que conservan fechas y distancias al stop pero barajan los resultados.
+
+| Escenario | Histórico (3 años) | Monte Carlo p10 / mediana / p90 | P(freno) | Caída máx. mediana |
+|---|---|---|---|---|
+| Con freno 30 %, riesgo 6 % (config. actual) | 462 USD (−8 %), freno a los 2 meses | 335 / 457 / 1.192 | 100 % | −33 % |
+| Sin freno, riesgo 6 % | 178 USD (−64 %), caída −99 % | 78 / 5.967 / 367.845 | — | −92 % |
+| Con freno, riesgo 2 % | 650 USD (+30 %) | 367 / 658 / — | 99 % | −31 % |
+| Sin freno, riesgo 2 % | 1.522 USD (+204 %), caída −65 % | 726 / 3.217 / — | — | −49 % |
+
+Lectura: con 6 % de riesgo y un acierto de un tercio, cinco o seis pérdidas seguidas (habituales) ya son un 30 %
+de caída, así que el freno detiene la cuenta en todos los recorridos, de mediana en el segundo mes, y desde ahí
+no opera hasta que se rearme. Sin freno la mediana es alta pero la dispersión es enorme y el recorrido histórico
+real termina en pérdida tras una caída del 99 %. Con 2 % de riesgo la misma estrategia sobrevive al año plano.
+
 ### Variantes probadas de "151 Trading Strategies" (Alpaca)
 
 `scripts/alpaca_variants.py` (resultados en `docs/alpaca_variants.json`, datos de 2 años cacheados en

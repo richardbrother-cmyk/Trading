@@ -277,6 +277,16 @@ footer { color: var(--muted); font-size: 12.5px; }
       <div class="tbl-wrap"><table id="sw-kronos"></table></div>
       <p class="note" id="sw-kr-note" style="margin:10px 0 0"></p>
     </section>
+    <section id="sw-sim-section" style="display:none">
+      <div class="sec-head"><div><h2>Simulación: qué puede pasar con los parámetros actuales</h2><p class="lede" id="sw-sim-lede"></p></div></div>
+      <div class="kpis" id="sw-sim-kpis" style="margin-bottom:12px"></div>
+      <h3 style="margin:6px 0 4px;font-size:14px">Con el freno del 30 % tal como está configurado</h3>
+      <div class="chart-wrap"><svg class="chart" id="sw-sim-brake" viewBox="0 0 1100 300" role="img" aria-label="Abanico de trayectorias con freno"></svg></div>
+      <h3 style="margin:14px 0 4px;font-size:14px">Sin freno (lo que hace la estrategia si nadie la detiene)</h3>
+      <div class="chart-wrap"><svg class="chart" id="sw-sim-nobrake" viewBox="0 0 1100 300" role="img" aria-label="Abanico de trayectorias sin freno"></svg></div>
+      <div class="tbl-wrap" style="margin-top:12px"><table id="sw-sim-table"></table></div>
+      <p class="note" id="sw-sim-note" style="margin:10px 0 0"></p>
+    </section>
     <section id="sw-be-section" style="display:none">
       <div class="sec-head"><div><h2>Investigación: stop a break even</h2><p class="lede" id="sw-be-lede"></p></div></div>
       <div class="tbl-wrap"><table id="sw-breakeven"></table></div>
@@ -356,6 +366,35 @@ function drawEquity(svgId, tipId, wrapId, emptyId, pts, initial, emptyText){
     tip.style.display="block"; const left=(ev.clientX-r.left)+14, maxLeft = wrap.clientWidth - tip.offsetWidth - 8; tip.style.left=Math.min(left,maxLeft)+"px"; tip.style.top=Math.max(0,(ev.clientY-r.top)-tip.offsetHeight-12)+"px";
   });
   svg.querySelector(".hit").addEventListener("mouseleave", ()=>{ tip.style.display="none"; cross.style.display="none"; });
+}
+
+function drawFan(svg, dates, sc, initial){
+  if (!svg) return;
+  const W=1100, H=300, P={t:14, r:150, b:30, l:70};
+  const f = sc.fan, hist = sc.historical.curve, samples = sc.samples || [];
+  const n = dates.length;
+  const all = [].concat(f.p5, f.p95, hist, ...samples, [initial]).filter(v => v > 0);
+  const lo = Math.max(1, Math.min(...all) * 0.9), hi = Math.max(...all) * 1.1;
+  const L = Math.log10;
+  const X = i => P.l + (n===1 ? 0 : i/(n-1))*(W-P.l-P.r), Y = v => P.t + (L(hi)-L(Math.max(v, lo)))/(L(hi)-L(lo))*(H-P.t-P.b);
+  let g = "";
+  const ticks = []; for (let e = Math.floor(L(lo)); e <= Math.ceil(L(hi)); e++) for (const m of [1,2,5]) { const v = m*Math.pow(10,e); if (v>=lo && v<=hi) ticks.push(v); }
+  for (const v of ticks) g += `<line x1="${P.l}" x2="${W-P.r}" y1="${Y(v).toFixed(1)}" y2="${Y(v).toFixed(1)}" stroke="var(--grid)"/><text x="${P.l-8}" y="${(Y(v)+4).toFixed(1)}" text-anchor="end">${fmtUSD(v)}</text>`;
+  const path = arr => arr.map((v,i)=>(i?"L":"M")+X(i).toFixed(1)+" "+Y(v).toFixed(1)).join("");
+  const band = (up, dn) => path(up) + dn.map((v,i)=>"L"+X(dn.length-1-i).toFixed(1)+" "+Y(dn[dn.length-1-i]).toFixed(1)).join("") + "Z";
+  g += `<path d="${band(f.p95, f.p5)}" fill="var(--accent)" opacity=".10"/>`;
+  g += `<path d="${band(f.p75, f.p25)}" fill="var(--accent)" opacity=".18"/>`;
+  for (const sp of samples) g += `<path d="${path(sp)}" fill="none" stroke="var(--ink-2)" stroke-width=".8" opacity=".25"/>`;
+  g += `<line x1="${P.l}" x2="${W-P.r}" y1="${Y(initial).toFixed(1)}" y2="${Y(initial).toFixed(1)}" stroke="var(--axis)"/>`;
+  g += `<line x1="${P.l}" x2="${W-P.r}" y1="${Y(initial*(1-0.30)).toFixed(1)}" y2="${Y(initial*(1-0.30)).toFixed(1)}" stroke="var(--neg)" stroke-dasharray="2 4" opacity=".7"/><text x="${W-P.r+12}" y="${(Y(initial*0.7)+4).toFixed(1)}" fill="var(--neg)">−30 % del inicio</text>`;
+  g += `<path d="${path(f.p50)}" fill="none" stroke="var(--accent)" stroke-width="1.6" stroke-dasharray="4 4"/>`;
+  g += `<path d="${path(hist)}" fill="none" stroke="var(--ink)" stroke-width="2.4" stroke-linejoin="round"/>`;
+  const lab = (v, txt, color) => `<text class="endlab" x="${W-P.r+12}" y="${(Y(v)+4).toFixed(1)}" fill="${color}">${txt}</text>`;
+  g += lab(f.p95[n-1], `p95 ${fmtUSD(f.p95[n-1])}`, "var(--ink-2)") + lab(f.p5[n-1], `p5 ${fmtUSD(f.p5[n-1])}`, "var(--ink-2)");
+  g += `<circle cx="${X(n-1).toFixed(1)}" cy="${Y(hist[n-1]).toFixed(1)}" r="4.5" fill="var(--ink)" stroke="var(--surface)" stroke-width="2"/>`;
+  const every = Math.max(1, Math.round(n/8));
+  dates.forEach((d,i)=>{ if (i%every===0 || i===n-1) g += `<text x="${X(i).toFixed(1)}" y="${H-P.b+18}" text-anchor="middle">${new Date(d).toLocaleString("es-ES",{month:"short",year:"2-digit",timeZone:"UTC"})}</text>`; });
+  svg.innerHTML = g;
 }
 
 const st = s => ({filled:"ejecutada", canceled:"cancelada", accepted:"en cola", new:"en cola", held:"stop en espera", rejected:"rechazada", expired:"expirada", partially_filled:"parcial", pending_new:"en cola"}[s]||s);
@@ -627,6 +666,32 @@ function renderSwingTab(prefix, SW, badgeId, base0, research){
   } else if (research) {
     $("sw-kr-lede").textContent = "Sin resultados todavía.";
     $("sw-kronos").innerHTML = "";
+  }
+  const SIM = SW.simulation;
+  if (SIM && SIM.scenarios) {
+    $("sw-sim-section").style.display = "";
+    const sg = SIM.signals, a = SIM.account, ini = a.initial;
+    $("sw-sim-lede").textContent = `${SIM.years.toFixed(1)} años de histórico de 4 h (${SIM.period[0]} a ${SIM.period[1]}) de ${SIM.symbols.join(", ")}: ${sg.count} señales de la estrategia (acierto ${(sg.win*100).toFixed(0)} %, ${sg.avg_r.toFixed(2)} R de media, PF ${sg.profit_factor}). Una cuenta de ${fmtUSD(ini)} las recorre en orden con ${(a.risk_pct*100).toFixed(0)} % de riesgo por operación, lote mínimo del símbolo, máximo ${a.max_positions} posiciones y freno al ${(a.max_drawdown_pct*100).toFixed(0)} % de caída. El abanico son ${SIM.paths} recorridos con los mismos días y distancias al stop pero barajando los resultados: banda clara 5–95 %, banda oscura 25–75 %, línea gruesa el recorrido histórico real, línea de puntos la mediana. Escala logarítmica. Generado el ${SIM.generated_at}.`;
+    const fb = SIM.scenarios.freno.stats, fn = SIM.scenarios.sin_freno.stats;
+    $("sw-sim-kpis").innerHTML = [
+      {label:"Freno salta en", value:`${(fb.p_brake*100).toFixed(0)} %`, sub:`de los recorridos${fb.brake_month_p50!=null?`, mediana al mes ${fb.brake_month_p50.toFixed(0)}`:""}`, cls:fb.p_brake>0.5?"neg":""},
+      {label:"Final mediano con freno", value:fmtUSD(fb.final_p50), sub:`p10 ${fmtUSD(fb.final_p10)} · p90 ${fmtUSD(fb.final_p90)}`},
+      {label:"Final mediano sin freno", value:fmtUSD(fn.final_p50), sub:`p10 ${fmtUSD(fn.final_p10)} · p90 ${fmtUSD(fn.final_p90)}`},
+      {label:"Caída máx. mediana sin freno", value:pct(fn.max_dd_p50), sub:`peor decil ${pct(fn.max_dd_p90)}`, cls:"neg"},
+      {label:"Acaba por debajo de la mitad", value:`${(fn.p_half*100).toFixed(0)} %`, sub:"sin freno · con freno " + (fb.p_half*100).toFixed(0) + " %"},
+      {label:"Multiplica por 5 o más", value:`${(fn.p_x5*100).toFixed(0)} %`, sub:"sin freno · con freno " + (fb.p_x5*100).toFixed(0) + " %", cls:"pos"},
+    ].map(k => `<div class="tile"><div class="label">${esc(k.label)}</div><div class="value">${esc(k.value)}</div><div class="sub ${k.cls||""}">${k.sub}</div></div>`).join("");
+    drawFan($("sw-sim-brake"), SIM.dates, SIM.scenarios.freno, ini);
+    drawFan($("sw-sim-nobrake"), SIM.dates, SIM.scenarios.sin_freno, ini);
+    const row = (name, sc) => { const h = sc.historical, s2 = sc.stats; return `<tr><td>${name}</td><td class="num ${h.return>=0?"pos":"neg"}">${fmtUSD(h.final)} (${pct(h.return)})</td><td class="num neg">${pct(h.max_dd)}</td><td class="num">${h.taken}${h.skipped_full?` (+${h.skipped_full} sin hueco)`:""}</td><td class="num">${h.brake_at||"—"}</td><td class="num">${fmtUSD(s2.final_p10)} / ${fmtUSD(s2.final_p50)} / ${fmtUSD(s2.final_p90)}</td><td class="num">${(s2.p_loss*100).toFixed(0)} %</td><td class="num">${(s2.p_double*100).toFixed(0)} %</td></tr>`; };
+    $("sw-sim-table").innerHTML = `<thead><tr><th>Escenario</th><th class="num">Histórico: final</th><th class="num">Caída máx.</th><th class="num">Ops. tomadas</th><th class="num">Freno saltó</th><th class="num">Monte Carlo: p10 / mediana / p90</th><th class="num">P(acabar en pérdida)</th><th class="num">P(duplicar)</th></tr></thead><tbody>${row("Con freno 30 %", SIM.scenarios.freno)}${row("Sin freno", SIM.scenarios.sin_freno)}</tbody>`;
+    const sw = SIM.risk_sweep || [];
+    if (sw.length) {
+      const rows = sw.map(r=>`<tr${Math.abs(r.risk_pct-a.risk_pct)<1e-9?' class="active"':""}><td>${(r.risk_pct*100).toFixed(0)} % ${r.brake?"con freno":"sin freno"}</td><td class="num ${r.hist_final>=ini?"pos":"neg"}">${fmtUSD(r.hist_final)}</td><td class="num neg">${pct(r.hist_max_dd)}</td><td class="num">${fmtUSD(r.final_p10)} / ${fmtUSD(r.final_p50)} / ${fmtUSD(r.final_p90)}</td><td class="num">${(r.p_loss*100).toFixed(0)} %</td><td class="num">${(r.p_half*100).toFixed(0)} %</td><td class="num">${(r.p_brake*100).toFixed(0)} %</td><td class="num neg">${pct(r.max_dd_p50)}</td></tr>`).join("");
+      $("sw-sim-table").innerHTML += `<thead><tr><th>Riesgo por operación</th><th class="num">Histórico: final</th><th class="num">Caída máx. hist.</th><th class="num">Monte Carlo: p10 / mediana / p90</th><th class="num">P(pérdida)</th><th class="num">P(mitad)</th><th class="num">P(freno)</th><th class="num">Caída máx. mediana</th></tr></thead><tbody>${rows}</tbody>`;
+    }
+    const by = Object.entries(sg.by_year||{}).map(([y,v])=>`${y}: ${v.trades} señales, ${v.sum_r>=0?"+":""}${v.sum_r} R`).join(" · ");
+    $("sw-sim-note").textContent = `Señales por año: ${by}. Lectura: con 6 % de riesgo y un acierto de un tercio, una racha de cinco o seis pérdidas seguidas (normal en esta estrategia) ya supone una caída del 30 %, así que el freno detiene la cuenta casi siempre y en los primeros meses; a partir de ahí no opera hasta que se rearme. Sin freno, la estrategia gana en mediana pero pasa por caídas que se comen casi todo el capital por el camino, y el recorrido histórico real de los tres años acaba en pérdida. La segunda tabla muestra cómo cambia todo con menos riesgo por operación. Las trayectorias no incluyen huecos de fin de semana ni fallos de ejecución, y el orden histórico de los resultados es solo uno de los posibles.`;
   }
   const bg = SW.breakeven_grid;
   if (bg && bg.length) {

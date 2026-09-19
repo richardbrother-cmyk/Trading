@@ -34,6 +34,7 @@ CTRADER_STATE = "docs/ctrader_state.json"
 SWING_STATE = "docs/swing_state.json"
 AGGR_STATE = "docs/aggr_state.json"
 AGGR_BREAKEVEN = "docs/aggr_breakeven.json"
+AGGR_SIMULATION = "docs/aggr_simulation.json"
 SWING_WALKFORWARD = "docs/swing_walkforward.json"
 KRONOS_REPORT = "docs/kronos_report.json"
 ALPACA_VARIANTS = "docs/alpaca_variants.json"
@@ -138,6 +139,9 @@ def collect(no_live: bool) -> dict:
     if os.path.exists(AGGR_BREAKEVEN):
         with open(AGGR_BREAKEVEN, encoding="utf-8") as fh:
             aggr["breakeven_grid"] = json.load(fh)
+    if os.path.exists(AGGR_SIMULATION):
+        with open(AGGR_SIMULATION, encoding="utf-8") as fh:
+            aggr["simulation"] = json.load(fh)
     if os.path.exists(KRONOS_REPORT):
         with open(KRONOS_REPORT, encoding="utf-8") as fh:
             swing["kronos"] = json.load(fh)
