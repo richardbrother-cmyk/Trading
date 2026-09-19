@@ -24,21 +24,45 @@ import numpy as np
 import pandas as pd
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from autotrader.intraday import SPECS  # noqa: E402
+from autotrader.intraday import SPECS, SymbolSpec  # noqa: E402
 from autotrader.swing import SwingParams, backtest_symbol  # noqa: E402
+
+# Spread tipico estimado (en unidades de precio) para simbolos sin especificacion fija; el lote minimo, el paso y los
+# decimales se leen de data/intraday/symbols.json (volcado del broker por scripts/fetch_intraday.py).
+SPREAD_ESTIMATES = {"CORN": 1.0, "WHEAT": 1.0, "COFARA": 0.4, "USCOCOA": 15.0, "COTTON": 0.10, "SUGAR": 0.03,
+                    "XAGUSD": 0.03, "XPTUSD": 2.0, "XBRUSD": 0.03, "XNGUSD": 0.006}
+
+
+def ensure_specs(symbols: list[str], data_dir: str, spread_mult: float = 1.0) -> None:
+    """Registra en SPECS los simbolos que falten usando symbols.json del broker y el spread estimado."""
+    path = os.path.join(data_dir, "symbols.json")
+    broker = json.load(open(path, encoding="utf-8")) if os.path.exists(path) else {}
+    for sym in symbols:
+        if sym in SPECS and spread_mult == 1.0:
+            continue
+        base = SPECS.get(sym)
+        info = broker.get(sym)
+        if base is None and info is None:
+            raise SystemExit(f"{sym}: sin especificacion (ni en SPECS ni en {path})")
+        spread = (base.spread if base else SPREAD_ESTIMATES.get(sym, 0.0)) * spread_mult
+        SPECS[sym] = SymbolSpec(sym, "00:00", "24:00", spread, info["step_units"] if info else base.step,
+                                info["min_units"] if info else base.min_units, info["digits"] if info else base.digits)
 
 PARAMS = dict(strategy="breakout", timeframe="H4", stop_atr=0.75, tp_atr=4.5, pure_rr=True, allow_short=False, max_hold_days=7.0,
               breakout_bars=20, breakeven_r=2.0, breakeven_lock_r=0.1)
 ACCOUNT = dict(initial=500.0, risk_pct=0.06, max_risk_pct=0.09, max_positions=3, max_drawdown_pct=0.30)
 
 
-def load(data_dir: str) -> dict[str, pd.DataFrame]:
+def load(data_dir: str, symbols: list[str] | None = None) -> dict[str, pd.DataFrame]:
     out = {}
     for path in sorted(glob.glob(os.path.join(data_dir, "*_M15.csv"))):
+        sym = os.path.basename(path).split("_")[0]
+        if symbols and sym not in symbols:
+            continue
         df = pd.read_csv(path, parse_dates=["time"]).set_index("time")
         if df.index.tz is None:
             df.index = df.index.tz_localize("UTC")
-        out[os.path.basename(path).split("_")[0]] = df
+        out[sym] = df
     return out
 
 
@@ -116,10 +140,17 @@ def main() -> int:
     ap.add_argument("--seed", type=int, default=7)
     ap.add_argument("--tp-r", type=float, default=6.0, help="objetivo en multiplos del stop (6 = configuracion actual)")
     ap.add_argument("--breakeven-r", type=float, default=2.0)
+    ap.add_argument("--symbols", default="US500,NAS100,XAUUSD,XTIUSD,EURUSD,GBPUSD", help="universo (coma)")
+    ap.add_argument("--spread-mult", type=float, default=1.0, help="multiplicador del spread (sensibilidad a costes)")
     args = ap.parse_args()
     PARAMS["tp_atr"] = round(PARAMS["stop_atr"] * args.tp_r, 4)
     PARAMS["breakeven_r"] = args.breakeven_r
-    data = load(args.data)
+    symbols = [x.strip().upper() for x in args.symbols.split(",") if x.strip()]
+    ensure_specs(symbols, args.data, args.spread_mult)
+    data = load(args.data, symbols)
+    missing = [x for x in symbols if x not in data]
+    if missing:
+        print("sin datos para", missing)
     trades = historical_trades(data)
     if not trades:
         print("sin operaciones"); return 1
@@ -179,6 +210,7 @@ def main() -> int:
                           "max_dd_p50": round(float(np.median(dds)), 3)})
     out = {"generated_at": datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC"), "period": [str(start.date()), str(end.date())],
            "years": round((end - start).days / 365.25, 2), "symbols": list(data), "params": PARAMS, "tp_r": args.tp_r, "account": ACCOUNT, "paths": args.paths,
+           "spreads": {k: SPECS[k].spread for k in data}, "spread_mult": args.spread_mult,
            "dates": months,
            "signals": {"count": len(trades), "win": round(float((R > 0).mean()), 3), "avg_r": round(float(R.mean()), 3), "sum_r": round(float(R.sum()), 1),
                        "profit_factor": round(float(R[R > 0].sum() / -R[R <= 0].sum()), 2) if (R <= 0).any() else None,
