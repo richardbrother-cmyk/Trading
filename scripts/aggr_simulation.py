@@ -160,7 +160,13 @@ def main() -> int:
     ap.add_argument("--breakeven-r", type=float, default=2.0)
     ap.add_argument("--symbols", default="US500,NAS100,XAUUSD,XTIUSD,EURUSD,GBPUSD", help="universo (coma)")
     ap.add_argument("--spread-mult", type=float, default=1.0, help="multiplicador del spread (sensibilidad a costes)")
+    ap.add_argument("--risk", type=float, default=None, help="riesgo por operacion (p.ej. 0.06); por defecto el de ACCOUNT")
+    ap.add_argument("--brake", type=float, default=None, help="freno por drawdown (p.ej. 0.30); por defecto el de ACCOUNT")
     args = ap.parse_args()
+    if args.risk is not None:
+        ACCOUNT["risk_pct"], ACCOUNT["max_risk_pct"] = args.risk, max(0.03, 1.5 * args.risk)
+    if args.brake is not None:
+        ACCOUNT["max_drawdown_pct"] = args.brake
     PARAMS["tp_atr"] = round(PARAMS["stop_atr"] * args.tp_r, 4)
     PARAMS["breakeven_r"] = args.breakeven_r
     symbols = [x.strip().upper() for x in args.symbols.split(",") if x.strip()]
