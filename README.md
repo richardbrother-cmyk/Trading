@@ -321,6 +321,22 @@ caída; la salida por caída diaria solo mejora si se recompra al día siguiente
 reproduce (vendería y recompraría en la hora siguiente), y con una espera realista de 5 a 10 días baja la caída
 máxima a cambio de menos retorno. Ninguna variante se activó.
 
+### Investigación: "un tiro por semana"
+
+`scripts/one_shot_week.py` (resultado en `docs/one_shot_week.json`) simula una sola operación intradía por semana con
+riesgo fijo de 100 USD y objetivo 3 a 1 sobre los 3 años de barras M15: cada semana se toma la primera ruptura del
+rango de apertura (motor `autotrader.intraday`, ORB de 2 barras, stop en el rango con tope del 0,4 %) que aparezca
+en el universo y no se opera más esa semana. Variantes: objetivo 2R/3R/4R, break even, solo largos, rango de 1 h,
+universos (índices, índices y oro, divisas), solo martes a jueves, elegir el símbolo con mayor rango, y dos variantes
+por evento: viernes de empleo (ORB en la apertura) y días de FOMC (ruptura de la primera media hora tras el
+comunicado de las 14:00 de Nueva York, hora ajustada al horario de verano).
+
+Resultado: la versión mecánica semanal no tiene borde (158 operaciones, R medio +0,07, PF 1,12, dos de cuatro años
+negativos; con solo largos o eligiendo el mayor rango, negativa). Las variantes por evento salen mejor pero con
+muestras pequeñas: viernes de empleo 34 operaciones, R medio +0,20, PF 1,39, racha máxima de 4 pérdidas; FOMC 25
+operaciones, R medio +0,23, PF 1,46. Ninguna reproduce un 3R "limpio": solo el 12 % de las operaciones llega al
+objetivo; el resto son stops o cierres parciales al final de la sesión.
+
 ### Cuenta agresiva (500 USD)
 
 Tercera cuenta demo, workflow `ctrader-aggr.yml`, mismo motor que el bot swing con otro perfil
