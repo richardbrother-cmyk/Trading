@@ -278,9 +278,10 @@ Monte Carlo que conservan fechas y distancias al stop pero barajan los resultado
 | Sin freno, riesgo 2 % | 1.522 USD (+204 %), caída −65 % | 726 / 3.217 / — | — | −49 % |
 
 **Regla de retiros en vivo**: el workflow lleva `WITHDRAW_TRIGGER_PCT` (0,80) y `WITHDRAW_PCT` (0,30). En cada
-ciclo, `scripts/ctrader_state.py` lee el historial de caja de cTrader (`CTraderSession.cash_flows`), toma como base
-el saldo tras el último retiro (o los 500 iniciales) y publica en `docs/aggr_state.json` el bloque `withdrawal`
-(base, objetivo, progreso, importe sugerido). Si el capital alcanza la base más 80 %, el workflow abre un issue en
+ciclo, `scripts/ctrader_state.py` detecta retiros y depósitos por conciliación (`guard.detect_cash_flow`: lo que
+cambia el saldo entre dos lecturas y no explican las operaciones cerradas; la consulta directa del historial de caja
+no responde en este broker), toma como base el saldo tras el último retiro (o los 500 iniciales, más los depósitos)
+y publica en `docs/aggr_state.json` el bloque `withdrawal` (base, objetivo, progreso, importe sugerido). Si el capital alcanza la base más 80 %, el workflow abre un issue en
 GitHub con la etiqueta `retiro` (llega por correo) indicando cuánto retirar; el bot nunca retira por su cuenta. Al
 detectar el retiro, el freno por drawdown (`autotrader/guard.py`) ignora el historial anterior y usa la base nueva
 como máximo, así que sacar dinero no cuenta como caída, y el issue se cierra solo.

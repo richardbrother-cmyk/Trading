@@ -16,7 +16,7 @@ from datetime import datetime, timezone
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from autotrader.config import Settings  # noqa: E402
-from autotrader.guard import withdrawal_status  # noqa: E402
+from autotrader.guard import detect_cash_flow, withdrawal_status  # noqa: E402
 from autotrader.ctrader import CTraderSession  # noqa: E402
 from autotrader.ctrader_auth import load_access_token  # noqa: E402
 from autotrader.events import active_events, load_events  # noqa: E402
@@ -190,20 +190,26 @@ def collect(s: Settings, swing: bool = False, initial: float | None = None, labe
         trigger = float(os.getenv("WITHDRAW_TRIGGER_PCT", "0") or 0)
         if trigger > 0:
             withdraw_pct = float(os.getenv("WITHDRAW_PCT", "0.30") or 0.30)
-            # El ultimo retiro conocido se conserva en el estado publicado; cada ciclo solo se revisa la ultima semana
-            prev_wd = (prev or {}).get("withdrawal") or {}
+            # Retiros y depositos por conciliacion: entre dos lecturas, lo que el saldo cambia y no explican las operaciones
+            # cerradas es un movimiento de caja (la consulta directa del historial de caja no responde en este broker).
+            # El ultimo retiro conocido y la base se conservan en el estado publicado.
+            prev = prev or {}
+            prev_wd = prev.get("withdrawal") or {}
             base, last_at = float(initial or 0), ""
-            if prev_wd.get("last_at") and prev_wd.get("base"):
-                base, last_at = float(prev_wd["base"]), str(prev_wd["last_at"])
-            try:
-                flows = session.cash_flows(days=8)
-                outs = [f for f in flows if f["type"] == "withdraw" and f["at"].strftime("%Y-%m-%dT%H:%MZ") > last_at]
-                if outs:
-                    base, last_at = outs[-1]["balance_after"], outs[-1]["at"].strftime("%Y-%m-%dT%H:%MZ")
-                snapshot["cash_flows"] = [{"at": f["at"].strftime("%Y-%m-%dT%H:%MZ"), "type": f["type"], "delta": f["delta"],
-                                           "balance_after": f["balance_after"]} for f in flows[-20:]]
-            except Exception as exc:  # noqa: BLE001
-                snapshot["cash_flows_error"] = repr(exc)
+            if prev_wd.get("base"):
+                base, last_at = float(prev_wd["base"]), str(prev_wd.get("last_at") or "")
+            flows = list(prev.get("cash_flows") or [])
+            prev_at = str(prev.get("at") or "")
+            if prev.get("balance") is not None and prev_at and not any("error" in t for t in trades):
+                net_since = sum(float(t["net"]) for t in trades if str(t["at"]) > prev_at)
+                flow = detect_cash_flow(float(prev["balance"]), balance, net_since)
+                if flow < 0:
+                    base, last_at = round(balance, 2), snapshot["at"]
+                    flows.append({"at": snapshot["at"], "type": "withdraw", "delta": flow, "balance_after": round(balance, 2)})
+                elif flow > 0:
+                    base = round(base + flow, 2)  # un deposito sube la base en la misma cantidad
+                    flows.append({"at": snapshot["at"], "type": "deposit", "delta": flow, "balance_after": round(balance, 2)})
+            snapshot["cash_flows"] = flows[-20:]
             snapshot["withdrawal"] = withdrawal_status(snapshot["equity"], base, trigger, withdraw_pct, last_at)
         rec = last_cycle(s.state_dir, swing=True, label=label)
         cycle = swing_cycle(rec) if rec else None

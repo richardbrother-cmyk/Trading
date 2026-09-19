@@ -85,6 +85,15 @@ def peak_equity(equity_now: float, history_path: str, state_dir: str) -> float:
     return peak
 
 
+def detect_cash_flow(prev_balance: float | None, balance: float, deals_net_since: float, tolerance: float = 1.0) -> float:
+    """Movimiento de caja entre dos lecturas del saldo: lo que no explican las operaciones cerradas entre medias.
+    Negativo = retiro, positivo = deposito; 0 si la diferencia cabe en la tolerancia (comisiones sueltas, redondeos)."""
+    if prev_balance is None:
+        return 0.0
+    flow = balance - prev_balance - deals_net_since
+    return round(flow, 2) if abs(flow) > tolerance else 0.0
+
+
 def withdrawal_status(equity: float, base: float, trigger_pct: float, withdraw_pct: float, last_at: str = "") -> dict:
     """Regla de retiros: al ganar `trigger_pct` sobre la base (saldo tras el ultimo retiro, o el inicial) toca retirar
     `withdraw_pct` del saldo. Devuelve base, objetivo, progreso y, si toca, el importe sugerido."""

@@ -47,3 +47,12 @@ def test_peak_resets_after_withdrawal(tmp_path):
     assert w["alert"] and w["target"] == 720.0 and w["suggested_amount"] == 216.0 and w["equity_after"] == 504.0
     w2 = withdrawal_status(600.0, 500.0, 0.80, 0.30, "2026-01-15T00:00Z")
     assert not w2["alert"] and w2["target"] == 900.0 and abs(w2["progress"] - 0.25) < 1e-9 and w2["last_at"] == "2026-01-15T00:00Z"
+
+
+def test_detect_cash_flow_from_balance_reconciliation():
+    from autotrader.guard import detect_cash_flow
+    assert detect_cash_flow(None, 500.0, 0.0) == 0.0
+    assert detect_cash_flow(500.0, 500.4, 0.0) == 0.0  # redondeos y comisiones sueltas no cuentan
+    assert detect_cash_flow(900.0, 630.0, 0.0) == -270.0  # retiro
+    assert detect_cash_flow(900.0, 660.0, 30.0) == -270.0  # retiro con una operacion ganadora entre medias
+    assert detect_cash_flow(500.0, 700.0, 0.0) == 200.0  # deposito
