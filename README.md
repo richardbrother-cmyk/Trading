@@ -311,9 +311,11 @@ Tercera cuenta demo, workflow `ctrader-aggr.yml`, mismo motor que el bot swing c
 (`SWING_STRATEGY`, `SWING_STOP_ATR`, `SWING_TP_ATR`, `SWING_PURE_RR`, `SWING_MAX_HOLD_DAYS`,
 `SWING_LABEL`, `SWING_MAX_POSITIONS`): ruptura de 4 h (cierre sobre el máximo de 20 barras y sobre la
 EMA200), solo largos, stop a 0,75 ATR y objetivo fijo a 6 veces el stop enviados con la orden, salida a
-los 7 días, máximo 3 posiciones abiertas, etiqueta `autotrader-aggr`. El riesgo por operación se fija
-con la variable `AGGR_RISK_PER_TRADE` (3 % por defecto) y el freno por drawdown con
-`AGGR_MAX_DRAWDOWN_PCT` (30 %). Estado en `docs/aggr_state.json` y pestaña propia en el panel.
+los 7 días, máximo 3 posiciones abiertas, etiqueta `autotrader-aggr`. Riesgo por operación 3 % y freno
+por drawdown al 50 % desde el máximo, fijados en el workflow tras la simulación a 3 años (con 6 % y 30 % el
+freno saltaba a los dos meses en todos los recorridos y sin freno la cuenta no sobrevivía a 2025); las variables
+`AGGR_RISK_PER_TRADE` y `AGGR_MAX_DRAWDOWN_PCT` ya no se leen. Estado en `docs/aggr_state.json` y pestaña propia
+en el panel.
 
 **Stop a break even** (`SWING_BREAKEVEN_R`, variable `AGGR_BREAKEVEN_R`, 2 R por defecto; `SWING_BREAKEVEN_LOCK_R`,
 variable `AGGR_BREAKEVEN_LOCK_R`, 0,1 R): en cada ciclo el bot pide el último precio de 1 minuto de cada posición

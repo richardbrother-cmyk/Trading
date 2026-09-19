@@ -52,12 +52,13 @@ jobs:
       CTRADER_ACCESS_TOKEN: ${{ secrets.CTRADER_ACCESS_TOKEN }}
       # Freno global: BOT_HALT (variable del repositorio: off | freeze | close) y freno por drawdown desde el maximo
       BOT_HALT: ${{ vars.AGGR_BOT_HALT || vars.BOT_HALT || 'off' }}
-      MAX_DRAWDOWN_PCT: ${{ vars.AGGR_MAX_DRAWDOWN_PCT || '0.30' }}
+      # Freno al 50 % desde el maximo (decidido con la simulacion a 3 anos: con 30 % saltaba a los dos meses en todos
+      # los recorridos). Valor fijo en el workflow: las variables del repositorio ya no lo cambian.
+      MAX_DRAWDOWN_PCT: "0.50"
       # Indices y forex son operables con 200 USD; oro y petroleo se saltan solos si el lote minimo arriesga
       # mas de SWING_MAX_RISK_PCT
       SYMBOLS: "US500,NAS100,EURUSD,GBPUSD,XAUUSD,XTIUSD"
-      # Perfil: ruptura H4 con stop corto y objetivo 6R fijo. Riesgo por operacion configurable (RISK_PER_TRADE) con
-      # maximo de 3 posiciones abiertas; el freno por drawdown se fija en el 30 % desde el maximo.
+      # Perfil: ruptura H4 con stop corto y objetivo 6R fijo, maximo de 3 posiciones abiertas.
       SWING_STRATEGY: "breakout"
       SWING_BREAKOUT_BARS: "20"
       SWING_STOP_ATR: "0.75"
@@ -70,7 +71,9 @@ jobs:
       SWING_BREAKEVEN_LOCK_R: ${{ vars.AGGR_BREAKEVEN_LOCK_R || '0.1' }}
       SWING_LABEL: "autotrader-aggr"
       SWING_MAX_POSITIONS: "3"
-      RISK_PER_TRADE: ${{ vars.AGGR_RISK_PER_TRADE || '0.03' }}
+      # Riesgo por operacion 3 % (decidido con la simulacion a 3 anos: con 6 % la cuenta no sobrevivia al ano plano).
+      # Valor fijo en el workflow: la variable AGGR_RISK_PER_TRADE del repositorio ya no se lee.
+      RISK_PER_TRADE: "0.03"
       # Tope para aceptar el lote minimo: si no se fija, 1,5x el riesgo por operacion
       SWING_MAX_RISK_PCT: ${{ vars.AGGR_MAX_RISK_PCT || '0' }}
       SWING_MAX_SIGNAL_AGE_HOURS: "2"
