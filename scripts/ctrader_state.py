@@ -116,7 +116,7 @@ def swing_cycle(rec: dict) -> dict:
             "closed": rec.get("closed", []), "event_window": rec.get("event_window", []), "guard": rec.get("guard")}
 
 
-def collect(s: Settings, swing: bool = False, initial: float | None = None, label: str = SWING_LABEL) -> tuple[dict, dict | None]:
+def collect(s: Settings, swing: bool = False, initial: float | None = None, label: str = SWING_LABEL, prev: dict | None = None) -> tuple[dict, dict | None]:
     exclusions = load_exclusions()
     cutoff = cutoff_for("ctrader", exclusions)
     token = load_access_token(os.path.join(s.state_dir, "ctrader_tokens.json"), s.ctrader_client_id, s.ctrader_client_secret,
@@ -190,16 +190,20 @@ def collect(s: Settings, swing: bool = False, initial: float | None = None, labe
         trigger = float(os.getenv("WITHDRAW_TRIGGER_PCT", "0") or 0)
         if trigger > 0:
             withdraw_pct = float(os.getenv("WITHDRAW_PCT", "0.30") or 0.30)
+            # El ultimo retiro conocido se conserva en el estado publicado; cada ciclo solo se revisa la ultima semana
+            prev_wd = (prev or {}).get("withdrawal") or {}
             base, last_at = float(initial or 0), ""
+            if prev_wd.get("last_at") and prev_wd.get("base"):
+                base, last_at = float(prev_wd["base"]), str(prev_wd["last_at"])
             try:
-                flows = session.cash_flows(days=400)
-                outs = [f for f in flows if f["type"] == "withdraw"]
+                flows = session.cash_flows(days=8)
+                outs = [f for f in flows if f["type"] == "withdraw" and f["at"].strftime("%Y-%m-%dT%H:%MZ") > last_at]
                 if outs:
                     base, last_at = outs[-1]["balance_after"], outs[-1]["at"].strftime("%Y-%m-%dT%H:%MZ")
                 snapshot["cash_flows"] = [{"at": f["at"].strftime("%Y-%m-%dT%H:%MZ"), "type": f["type"], "delta": f["delta"],
                                            "balance_after": f["balance_after"]} for f in flows[-20:]]
             except Exception as exc:  # noqa: BLE001
-                snapshot["cash_flows_error"] = str(exc)
+                snapshot["cash_flows_error"] = repr(exc)
             snapshot["withdrawal"] = withdrawal_status(snapshot["equity"], base, trigger, withdraw_pct, last_at)
         rec = last_cycle(s.state_dir, swing=True, label=label)
         cycle = swing_cycle(rec) if rec else None
@@ -237,7 +241,7 @@ def main() -> int:
         with open(args.out, encoding="utf-8") as fh:
             prev = json.load(fh)
     initial = args.initial if args.initial is not None else (200.0 if args.swing else 10_000.0)
-    snapshot, cycle = collect(s, swing=args.swing, initial=initial, label=args.label)
+    snapshot, cycle = collect(s, swing=args.swing, initial=initial, label=args.label, prev=prev)
     if args.swing:
         snapshot["slippage"] = merge_slippage(prev, realized_slippage(cycle, snapshot["positions"]))
         snapshot["guard"] = (cycle or {}).get("guard")

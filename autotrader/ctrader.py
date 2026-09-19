@@ -265,14 +265,21 @@ class CTraderSession:
                 cur["opened_at"] = opened
         return meta
 
-    def cash_flows(self, days: int = 400) -> list[dict]:
-        """Depositos y retiros de la cuenta (historial de caja), del mas antiguo al mas reciente."""
+    def cash_flows(self, days: int = 8, chunk_days: int = 7) -> list[dict]:
+        """Depositos y retiros de la cuenta (historial de caja), del mas antiguo al mas reciente. La API limita cada
+        consulta a una semana, asi que el rango se pide por tramos."""
         now = datetime.now(timezone.utc)
-        res = self.call("ProtoOACashFlowHistoryListReq", timeout=40, ctidTraderAccountId=self.account_id,
-                        fromTimestamp=int((now - timedelta(days=days)).timestamp() * 1000), toTimestamp=int(now.timestamp() * 1000))
         types = self.model.ProtoOAChangeBalanceType
+        rows = []
+        start = now - timedelta(days=days)
+        while start < now:
+            end = min(start + timedelta(days=chunk_days), now)
+            res = self.call("ProtoOACashFlowHistoryListReq", timeout=40, ctidTraderAccountId=self.account_id,
+                            fromTimestamp=int(start.timestamp() * 1000), toTimestamp=int(end.timestamp() * 1000))
+            rows.extend(list(res.depositWithdraw))
+            start = end
         out = []
-        for f in res.depositWithdraw:
+        for f in rows:
             kind = types.Name(f.operationType)
             if kind not in ("BALANCE_DEPOSIT", "BALANCE_WITHDRAW"):
                 continue
