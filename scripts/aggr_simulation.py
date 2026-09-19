@@ -50,7 +50,10 @@ def ensure_specs(symbols: list[str], data_dir: str, spread_mult: float = 1.0) ->
 
 PARAMS = dict(strategy="breakout", timeframe="H4", stop_atr=0.75, tp_atr=4.5, pure_rr=True, allow_short=False, max_hold_days=7.0,
               breakout_bars=20, breakeven_r=2.0, breakeven_lock_r=0.1)
-ACCOUNT = dict(initial=500.0, risk_pct=0.03, max_risk_pct=0.045, max_positions=3, max_drawdown_pct=0.50)
+ACCOUNT = dict(initial=500.0, risk_pct=0.03, max_risk_pct=0.045, max_positions=3, max_drawdown_pct=0.50,
+               # Regla de retiros (escenario "retiros"): cuando la cuenta gana withdraw_trigger sobre su base (el saldo tras el
+               # ultimo retiro, o el inicial) se retira withdraw_pct del saldo; la base y el maximo del freno pasan a ser lo que queda.
+               withdraw_trigger=0.80, withdraw_pct=0.30)
 
 
 def load(data_dir: str, symbols: list[str] | None = None) -> dict[str, pd.DataFrame]:
@@ -77,24 +80,38 @@ def historical_trades(data: dict[str, pd.DataFrame]) -> list[dict]:
     return rows
 
 
-def simulate(trades: list[dict], r_values: np.ndarray, grid: pd.DatetimeIndex, brake: bool = True, account: dict | None = None) -> dict:
+def simulate(trades: list[dict], r_values: np.ndarray, grid: pd.DatetimeIndex, brake: bool = True, account: dict | None = None,
+             withdraw: bool = False) -> dict:
     """Recorre las operaciones en orden con una cuenta de 500 USD. `r_values[i]` es el resultado en R de la operacion i."""
     a = account or ACCOUNT
-    equity, peak = a["initial"], a["initial"]
+    equity, peak, base = a["initial"], a["initial"], a["initial"]
     open_pos: list[tuple[pd.Timestamp, float]] = []  # (salida, pnl)
-    events: list[tuple[pd.Timestamp, float]] = []  # (momento, equity tras cerrar)
+    events: list[tuple[pd.Timestamp, float, float]] = []  # (momento, equity tras cerrar, retirado acumulado)
+    withdrawals: list[dict] = []
+    withdrawn = 0.0
     taken = skipped_lot = skipped_full = 0
     brake_at = None
     max_dd = 0.0
+
+    def close(exit_time: pd.Timestamp, pnl: float) -> None:
+        nonlocal equity, peak, max_dd, base, withdrawn
+        equity += pnl
+        peak = max(peak, equity)
+        max_dd = min(max_dd, equity / peak - 1)
+        if withdraw and equity >= base * (1 + a["withdraw_trigger"]):
+            amount = round(equity * a["withdraw_pct"], 2)
+            equity -= amount
+            withdrawn += amount
+            withdrawals.append({"at": str(exit_time)[:10], "amount": amount, "equity_after": round(equity, 2)})
+            base = peak = equity  # nueva base y nuevo maximo para el freno
+        events.append((exit_time, equity, withdrawn))
+
     for i, t in enumerate(trades):
         # cierra lo que vence antes de esta entrada
         still = []
         for exit_time, pnl in sorted(open_pos):
             if exit_time <= t["entry_time"]:
-                equity += pnl
-                peak = max(peak, equity)
-                max_dd = min(max_dd, equity / peak - 1)
-                events.append((exit_time, equity))
+                close(exit_time, pnl)
             else:
                 still.append((exit_time, pnl))
         open_pos = still
@@ -120,16 +137,17 @@ def simulate(trades: list[dict], r_values: np.ndarray, grid: pd.DatetimeIndex, b
         open_pos.append((t["exit_time"], pnl))
         taken += 1
     for exit_time, pnl in sorted(open_pos):
-        equity += pnl
-        peak = max(peak, equity)
-        max_dd = min(max_dd, equity / peak - 1)
-        events.append((exit_time, equity))
-    # curva sobre la rejilla temporal (equity cerrado, sin resultado abierto)
-    ser = pd.Series({k: v for k, v in events})
-    ser = ser[~ser.index.duplicated(keep="last")].sort_index()
-    curve = ser.reindex(ser.index.union(grid)).ffill().reindex(grid).fillna(a["initial"]).to_numpy()
+        close(exit_time, pnl)
+    # curvas sobre la rejilla temporal (equity cerrado, sin resultado abierto; y total = cuenta + retirado)
+    def on_grid(values):
+        ser = pd.Series({k: v for k, v in values})
+        ser = ser[~ser.index.duplicated(keep="last")].sort_index()
+        return ser.reindex(ser.index.union(grid)).ffill().reindex(grid).fillna(a["initial"]).to_numpy()
+    curve = on_grid([(k, e) for k, e, _w in events])
+    curve_total = on_grid([(k, e + w) for k, e, w in events])
     return {"final": float(equity), "max_dd": float(max_dd), "taken": taken, "skipped_lot": skipped_lot, "skipped_full": skipped_full,
-            "brake_at": None if brake_at is None else str(brake_at)[:10], "curve": curve}
+            "brake_at": None if brake_at is None else str(brake_at)[:10], "curve": curve, "curve_total": curve_total,
+            "withdrawn": float(withdrawn), "withdrawals": withdrawals}
 
 
 def main() -> int:
@@ -167,31 +185,46 @@ def main() -> int:
     by_year = {y: {"trades": len(v), "sum_r": round(float(np.sum(v)), 1), "win": round(float(np.mean(np.array(v) > 0)), 2)} for y, v in years.items()}
     months = [d.strftime("%Y-%m-%d") for d in grid]
     scenarios = {}
-    for key, brake in (("freno", True), ("sin_freno", False)):
-        hist = simulate(trades, R, grid, brake=brake)
+    for key, brake, wd in (("freno", True, False), ("sin_freno", False, False), ("retiros", True, True)):
+        hist = simulate(trades, R, grid, brake=brake, withdraw=wd)
         rng = np.random.default_rng(args.seed)
-        curves, finals, dds, brakes, brake_months = [], [], [], 0, []
+        curves, totals, finals, dds, brakes, brake_months, withdrawn, n_wd, first_wd = [], [], [], [], 0, [], [], [], []
         for _ in range(args.paths):
-            res = simulate(trades, rng.choice(R, size=len(R), replace=True), grid, brake=brake)
-            curves.append(res["curve"]); finals.append(res["final"]); dds.append(res["max_dd"])
+            res = simulate(trades, rng.choice(R, size=len(R), replace=True), grid, brake=brake, withdraw=wd)
+            curves.append(res["curve"]); totals.append(res["curve_total"]); finals.append(res["final"]); dds.append(res["max_dd"])
+            withdrawn.append(res["withdrawn"]); n_wd.append(len(res["withdrawals"]))
+            if res["withdrawals"]:
+                first_wd.append((pd.Timestamp(res["withdrawals"][0]["at"], tz="UTC") - start).days / 30.44)
             if res["brake_at"] is not None:
                 brakes += 1; brake_months.append((pd.Timestamp(res["brake_at"], tz="UTC") - start).days / 30.44)
-        C = np.array(curves); finals = np.array(finals)
-        pct = lambda q: np.percentile(C, q, axis=0)  # noqa: E731
+        C = np.array(curves); Ctot = np.array(totals); finals = np.array(finals); withdrawn = np.array(withdrawn)
+        total_final = finals + withdrawn
+        pct = lambda q, M=C: np.percentile(M, q, axis=0)  # noqa: E731
         scenarios[key] = {
-            "brake": brake,
+            "brake": brake, "withdraw": wd,
             "historical": {"final": round(hist["final"], 2), "return": round(hist["final"] / ACCOUNT["initial"] - 1, 4), "max_dd": round(hist["max_dd"], 4),
                            "taken": hist["taken"], "skipped_lot": hist["skipped_lot"], "skipped_full": hist["skipped_full"], "brake_at": hist["brake_at"],
-                           "curve": [round(float(x), 2) for x in hist["curve"]]},
+                           "curve": [round(float(x), 2) for x in hist["curve"]],
+                           "curve_total": [round(float(x), 2) for x in hist["curve_total"]],
+                           "withdrawn": round(hist["withdrawn"], 2), "withdrawals": hist["withdrawals"],
+                           "total": round(hist["final"] + hist["withdrawn"], 2)},
             "fan": {"p5": pct(5).round(2).tolist(), "p25": pct(25).round(2).tolist(), "p50": pct(50).round(2).tolist(),
                     "p75": pct(75).round(2).tolist(), "p95": pct(95).round(2).tolist()},
+            "fan_total": {"p50": pct(50, Ctot).round(2).tolist()} if wd else None,
             "samples": [C[i].round(2).tolist() for i in rng.choice(len(C), size=12, replace=False)],
             "stats": {"final_p10": round(float(np.percentile(finals, 10)), 0), "final_p50": round(float(np.median(finals)), 0),
                       "final_p90": round(float(np.percentile(finals, 90)), 0), "p_loss": round(float((finals < ACCOUNT["initial"]).mean()), 3),
                       "p_half": round(float((finals < ACCOUNT["initial"] / 2).mean()), 3), "p_brake": round(brakes / args.paths, 3),
                       "brake_month_p50": round(float(np.median(brake_months)), 1) if brake_months else None,
                       "p_double": round(float((finals >= 2 * ACCOUNT["initial"]).mean()), 3), "p_x5": round(float((finals >= 5 * ACCOUNT["initial"]).mean()), 3),
-                      "max_dd_p50": round(float(np.median(dds)), 4), "max_dd_p90": round(float(np.percentile(dds, 10)), 4)}}
+                      "max_dd_p50": round(float(np.median(dds)), 4), "max_dd_p90": round(float(np.percentile(dds, 10)), 4),
+                      "withdrawn_p10": round(float(np.percentile(withdrawn, 10)), 0), "withdrawn_p50": round(float(np.median(withdrawn)), 0),
+                      "withdrawn_p90": round(float(np.percentile(withdrawn, 90)), 0),
+                      "total_p10": round(float(np.percentile(total_final, 10)), 0), "total_p50": round(float(np.median(total_final)), 0),
+                      "total_p90": round(float(np.percentile(total_final, 90)), 0),
+                      "p_total_loss": round(float((total_final < ACCOUNT["initial"]).mean()), 3),
+                      "p_any_withdrawal": round(float((np.array(n_wd) > 0).mean()), 3), "n_withdrawals_p50": float(np.median(n_wd)),
+                      "first_withdrawal_month_p50": round(float(np.median(first_wd)), 1) if first_wd else None}}
     # Sensibilidad al riesgo por operacion (mismas senales, mismo freno): que cambia si se arriesga menos
     sweep = []
     for risk in (0.02, 0.03, 0.04, 0.06):  # barrido de riesgo (el freno es el de ACCOUNT)
@@ -222,7 +255,11 @@ def main() -> int:
     print(f"periodo {out['period']} ({out['years']} anos), {s['count']} senales, acierto {s['win']:.0%}, R medio {s['avg_r']}, PF {s['profit_factor']}, por ano {by_year}")
     for key, sc in scenarios.items():
         h, st = sc["historical"], sc["stats"]
-        print(f"[{key}] historico: final {h['final']} ({h['return']:+.0%}), DD {h['max_dd']:.0%}, tomadas {h['taken']}, sin lote {h['skipped_lot']}, llenas {h['skipped_full']}, freno {h['brake_at']}")
+        print(f"[{key}] historico: final {h['final']} ({h['return']:+.0%}), DD {h['max_dd']:.0%}, tomadas {h['taken']}, sin lote {h['skipped_lot']}, llenas {h['skipped_full']}, freno {h['brake_at']}"
+              + (f", retirado {h['withdrawn']} en {len(h['withdrawals'])} retiros {h['withdrawals']}, total {h['total']}" if sc["withdraw"] else ""))
+        if sc["withdraw"]:
+            print(f"[{key}] montecarlo retiros: retirado p10/p50/p90 {st['withdrawn_p10']}/{st['withdrawn_p50']}/{st['withdrawn_p90']}, total {st['total_p10']}/{st['total_p50']}/{st['total_p90']}, "
+                  f"P(algun retiro) {st['p_any_withdrawal']:.0%}, retiros mediana {st['n_withdrawals_p50']}, primer retiro mes {st['first_withdrawal_month_p50']}, P(total < inicial) {st['p_total_loss']:.0%}")
         print(f"[{key}] montecarlo: mediana {st['final_p50']}, p10 {st['final_p10']}, p90 {st['final_p90']}, P(perder) {st['p_loss']:.0%}, P(mitad) {st['p_half']:.0%}, "
               f"P(freno) {st['p_brake']:.0%} (mes mediano {st['brake_month_p50']}), P(x2) {st['p_double']:.0%}, P(x5) {st['p_x5']:.0%}, DD mediana {st['max_dd_p50']:.0%}")
     for r in sweep:

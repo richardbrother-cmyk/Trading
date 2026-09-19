@@ -277,6 +277,13 @@ Monte Carlo que conservan fechas y distancias al stop pero barajan los resultado
 | Con freno, riesgo 2 % | 650 USD (+30 %) | 367 / 658 / — | 99 % | −31 % |
 | Sin freno, riesgo 2 % | 1.522 USD (+204 %), caída −65 % | 726 / 3.217 / — | — | −49 % |
 
+**Regla de retiros** (escenario "retiros" del mismo script, con el freno vigente): cada vez que la cuenta gana un
+80 % sobre su base (el saldo tras el último retiro, o el inicial) se retira el 30 % del saldo y la base y el máximo
+del freno se reinician en lo que queda; después se sigue con los mismos porcentajes. Con riesgo 3 % y freno 50 %, en
+3 años el 72 % de los recorridos hace al menos un retiro (el primero, de mediana, al quinto mes; dos retiros de
+mediana), la mediana retirada es de 628 USD y la mediana de cuenta más retirado 1.079 USD frente a 883 USD sin la
+regla. El recorrido histórico real hizo un retiro de 303 USD en diciembre de 2023 y terminó con 355 USD en cuenta.
+
 Lectura: con 6 % de riesgo y un acierto de un tercio, cinco o seis pérdidas seguidas (habituales) ya son un 30 %
 de caída, así que el freno detiene la cuenta en todos los recorridos, de mediana en el segundo mes, y desde ahí
 no opera hasta que se rearme. Sin freno la mediana es alta pero la dispersión es enorme y el recorrido histórico
