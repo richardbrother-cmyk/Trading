@@ -20,6 +20,13 @@
   "step_units": 10.0,
   "symbol_id": 161
  },
+ "USCOCOA": {
+  "digits": 2,
+  "lot_size": 1.0,
+  "min_units": 1.0,
+  "step_units": 1.0,
+  "symbol_id": 157
+ },
  "WHEAT": {
   "digits": 2,
   "lot_size": 1.0,
