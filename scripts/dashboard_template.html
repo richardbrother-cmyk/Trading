@@ -642,6 +642,10 @@ function renderSwingTab(prefix, SW, badgeId, base0, research){
   ];
   const s = SW.settings || {}, g = SW.guard || {}, sl = SW.slippage || {};
   if (g.mode) tiles.push({label:"Freno", value: g.mode==="off" ? "libre" : g.mode==="freeze" ? "congelado" : "cerrando", sub: g.mode==="off" ? `drawdown ${pct(g.drawdown||0, 1)} desde el máximo de ${fmtUSD2(g.peak||base)} · límite ${((s.max_drawdown_pct||0)*100).toFixed(0)} %` : esc(g.reason||""), cls: g.mode==="off"?"":"bad"});
+  const wd = SW.withdrawal;
+  if (wd && wd.target) tiles.push(wd.alert
+    ? {label:"Regla de retiros", value:"¡Toca retirar!", sub:`retira ${fmtUSD2(wd.suggested_amount)} (${(wd.withdraw_pct*100).toFixed(0)} % del saldo) y quedan ~${fmtUSD2(wd.equity_after)} · base ${fmtUSD2(wd.base)}`, cls:"good"}
+    : {label:"Regla de retiros", value:`${Math.max(0, Math.round(wd.progress*100))} % del camino`, sub:`base ${fmtUSD2(wd.base)}${wd.last_at?` (tras el retiro del ${esc(wd.last_at.slice(0,10))})`:""} · objetivo ${fmtUSD2(wd.target)} (+${(wd.trigger_pct*100).toFixed(0)} %) · entonces retirar el ${(wd.withdraw_pct*100).toFixed(0)} %`});
   const swAdj = adjustedTile(SW.bot_metrics, base); if (swAdj) tiles.push(swAdj);
   if (sl.count) tiles.push({label:"Slippage acumulado", value: fmtUSD2(sl.total_usd), sub: `${sl.count} entrada(s) · media ${Number(sl.avg_bps).toFixed(1)} pb`, cls: sl.total_usd<=0?"good":"bad"});
   kp.innerHTML = tiles.map(k => `<div class="tile"><div class="label">${esc(k.label)}</div><div class="value">${esc(k.value)}</div><div class="sub ${k.cls||""}">${k.sub}</div></div>`).join("");
@@ -740,6 +744,7 @@ function renderSwingTab(prefix, SW, badgeId, base0, research){
     <tr><td>Stop a break even</td><td>${s.breakeven_r>0?`cuando la posición lleva ganado ${Number(s.breakeven_r).toFixed(1)} R (R = distancia al stop inicial) el stop sube a la entrada${s.breakeven_lock_r>0?` más ${Number(s.breakeven_lock_r).toFixed(2)} R`:""}; se revisa cada ciclo con el último precio de 1 min`:"no (stop y objetivo fijos hasta el cierre)"}</td></tr>
     <tr><td>Freno</td><td>interruptor manual BOT_HALT (${esc(s.halt_mode||"off")}) y freno automático si el equity cae ${((s.max_drawdown_pct||0)*100).toFixed(0)} % desde su máximo</td></tr>
     <tr><td>Ciclos</td><td>cada hora, de domingo noche a viernes, desde GitHub Actions</td></tr>
+    ${wd && wd.target ? `<tr><td>Regla de retiros</td><td>al ganar ${(wd.trigger_pct*100).toFixed(0)} % sobre la base se avisa con un issue en GitHub para retirar el ${(wd.withdraw_pct*100).toFixed(0)} % del saldo; al detectar el retiro en el historial de caja, la base y el máximo del freno se reinician</td></tr>` : ""}
   </tbody>`;
 }
 renderSwingTab("sw", SW, "badge-swing", 200, true);

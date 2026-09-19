@@ -265,6 +265,24 @@ class CTraderSession:
                 cur["opened_at"] = opened
         return meta
 
+    def cash_flows(self, days: int = 400) -> list[dict]:
+        """Depositos y retiros de la cuenta (historial de caja), del mas antiguo al mas reciente."""
+        now = datetime.now(timezone.utc)
+        res = self.call("ProtoOACashFlowHistoryListReq", timeout=40, ctidTraderAccountId=self.account_id,
+                        fromTimestamp=int((now - timedelta(days=days)).timestamp() * 1000), toTimestamp=int(now.timestamp() * 1000))
+        types = self.model.ProtoOAChangeBalanceType
+        out = []
+        for f in res.depositWithdraw:
+            kind = types.Name(f.operationType)
+            if kind not in ("BALANCE_DEPOSIT", "BALANCE_WITHDRAW"):
+                continue
+            digits = int(f.moneyDigits) if f.HasField("moneyDigits") else 2
+            out.append({"at": datetime.fromtimestamp(int(f.changeBalanceTimestamp) / 1000, tz=timezone.utc),
+                        "type": "deposit" if kind == "BALANCE_DEPOSIT" else "withdraw",
+                        "delta": money(int(f.delta), digits), "balance_after": money(int(f.balance), digits)})
+        out.sort(key=lambda x: x["at"])
+        return out
+
     def deals(self, days: int = 14) -> list[dict]:
         """Operaciones ejecutadas en los ultimos dias; las que cierran posicion llevan el resultado realizado."""
         now = datetime.now(timezone.utc)

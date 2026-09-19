@@ -23,6 +23,7 @@ concurrency:
 
 permissions:
   contents: write
+  issues: write
 
 env:
   SCHEDULE_ENABLED: "true"
@@ -77,6 +78,11 @@ jobs:
       # Tope para aceptar el lote minimo: si no se fija, 1,5x el riesgo por operacion
       SWING_MAX_RISK_PCT: ${{ vars.AGGR_MAX_RISK_PCT || '0' }}
       SWING_MAX_SIGNAL_AGE_HOURS: "2"
+      # Regla de retiros: al ganar el 80 % sobre la base (saldo tras el ultimo retiro, o los 500 iniciales) toca retirar
+      # el 30 % del saldo. El bot no retira: avisa con un issue en GitHub y, cuando detecta el retiro en el historial de
+      # caja, reinicia la base y el maximo del freno.
+      WITHDRAW_TRIGGER_PCT: "0.80"
+      WITHDRAW_PCT: "0.30"
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -94,6 +100,41 @@ jobs:
           python scripts/dashboard.py --no-live --out reports/dashboard.html
           cp reports/dashboard.html docs/index.html
           cp reports/dashboard.html docs/dashboard.html
+      - name: Aviso de retiro (issue en GitHub)
+        if: ${{ !inputs.dry_run }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          python - <<'PY' > /tmp/retiro.txt
+          import json
+          s = json.load(open("docs/aggr_state.json"))
+          w = s.get("withdrawal") or {}
+          print("alert" if w.get("alert") else "ok")
+          print(json.dumps(w))
+          print(s.get("equity"))
+          PY
+          state=$(sed -n 1p /tmp/retiro.txt); info=$(sed -n 2p /tmp/retiro.txt); equity=$(sed -n 3p /tmp/retiro.txt)
+          gh label create retiro --description "Toca retirar beneficios de la cuenta agresiva" --color 1D76DB 2>/dev/null || true
+          open=$(gh issue list --label retiro --state open --json number --jq '.[0].number')
+          if [ "$state" = "alert" ] && [ -z "$open" ]; then
+            base=$(echo "$info" | python -c 'import sys,json; w=json.load(sys.stdin); print(w["base"])')
+            amount=$(echo "$info" | python -c 'import sys,json; w=json.load(sys.stdin); print(w["suggested_amount"])')
+            after=$(echo "$info" | python -c 'import sys,json; w=json.load(sys.stdin); print(w["equity_after"])')
+            gh issue create --label retiro --title "Cuenta agresiva: toca retirar el 30 % (saldo ${equity} USD)" \
+              --body "La cuenta agresiva ha ganado un 80 % sobre su base de ${base} USD: el capital es ${equity} USD.
+
+          Según la regla acordada toca **retirar ${amount} USD** (30 % del saldo), dejando unos ${after} USD en la cuenta.
+
+          Cuando el retiro aparezca en el historial de caja de cTrader, el bot reinicia la base y el máximo del freno automáticamente y cierra este aviso.
+
+          Panel: https://richardbrother-cmyk.github.io/Trading/"
+            echo "aviso creado"
+          elif [ "$state" != "alert" ] && [ -n "$open" ]; then
+            gh issue close "$open" --comment "Retiro detectado o aviso ya no vigente: base actualizada. Capital actual ${equity} USD."
+            echo "aviso cerrado (#$open)"
+          else
+            echo "sin cambios ($state)"
+          fi
       - name: Publicar panel
         if: ${{ !inputs.dry_run }}
         run: |

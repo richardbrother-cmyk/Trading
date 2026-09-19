@@ -16,6 +16,7 @@ from datetime import datetime, timezone
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from autotrader.config import Settings  # noqa: E402
+from autotrader.guard import withdrawal_status  # noqa: E402
 from autotrader.ctrader import CTraderSession  # noqa: E402
 from autotrader.ctrader_auth import load_access_token  # noqa: E402
 from autotrader.events import active_events, load_events  # noqa: E402
@@ -186,6 +187,20 @@ def collect(s: Settings, swing: bool = False, initial: float | None = None, labe
                                 "strategy": prm.strategy, "description": describe(prm), "max_hold_days": prm.max_hold_days,
                                 "max_positions": int(os.getenv("SWING_MAX_POSITIONS", "0")), "label": label,
                                 "breakeven_r": prm.breakeven_r, "breakeven_lock_r": prm.breakeven_lock_r}
+        trigger = float(os.getenv("WITHDRAW_TRIGGER_PCT", "0") or 0)
+        if trigger > 0:
+            withdraw_pct = float(os.getenv("WITHDRAW_PCT", "0.30") or 0.30)
+            base, last_at = float(initial or 0), ""
+            try:
+                flows = session.cash_flows(days=400)
+                outs = [f for f in flows if f["type"] == "withdraw"]
+                if outs:
+                    base, last_at = outs[-1]["balance_after"], outs[-1]["at"].strftime("%Y-%m-%dT%H:%MZ")
+                snapshot["cash_flows"] = [{"at": f["at"].strftime("%Y-%m-%dT%H:%MZ"), "type": f["type"], "delta": f["delta"],
+                                           "balance_after": f["balance_after"]} for f in flows[-20:]]
+            except Exception as exc:  # noqa: BLE001
+                snapshot["cash_flows_error"] = str(exc)
+            snapshot["withdrawal"] = withdrawal_status(snapshot["equity"], base, trigger, withdraw_pct, last_at)
         rec = last_cycle(s.state_dir, swing=True, label=label)
         cycle = swing_cycle(rec) if rec else None
         if cycle:

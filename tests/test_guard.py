@@ -26,3 +26,24 @@ def test_drawdown_freezes_and_manual_modes(tmp_path):
     assert g.closes_positions and g.blocks_entries
     g = evaluate(195.0, "off", 0.0, str(hist), str(tmp_path))  # sin freno automatico
     assert g.mode == "off"
+
+
+def test_peak_resets_after_withdrawal(tmp_path):
+    import json
+    from autotrader.guard import evaluate, withdrawal_status
+    hist = tmp_path / "aggr_state.json"
+    # historial: subio a 1000, retiro (base 700) y despues 690: sin la marca de retiro seria una caida del 31 %
+    hist.write_text(json.dumps({"initial": 500, "history": [["2026-01-01T00:00Z", 1000.0], ["2026-02-01T00:00Z", 690.0]],
+                                "withdrawal": {"base": 700.0, "last_at": "2026-01-15T00:00Z"}}), encoding="utf-8")
+    g = evaluate(690.0, "off", 0.30, str(hist), str(tmp_path))
+    assert g.mode == "off" and g.peak == 700.0
+    # un maximo persistido de antes del retiro se descarta
+    (tmp_path / "peak_equity.json").write_text(json.dumps({"peak": 1000.0, "reset_at": ""}), encoding="utf-8")
+    assert evaluate(690.0, "off", 0.30, str(hist), str(tmp_path)).peak == 700.0
+    # sin retiro, el maximo historico manda
+    hist.write_text(json.dumps({"initial": 500, "history": [["2026-01-01T00:00Z", 1000.0], ["2026-02-01T00:00Z", 690.0]]}), encoding="utf-8")
+    assert evaluate(690.0, "off", 0.30, str(hist), str(tmp_path)).mode == "freeze"
+    w = withdrawal_status(720.0, 400.0, 0.80, 0.30)
+    assert w["alert"] and w["target"] == 720.0 and w["suggested_amount"] == 216.0 and w["equity_after"] == 504.0
+    w2 = withdrawal_status(600.0, 500.0, 0.80, 0.30, "2026-01-15T00:00Z")
+    assert not w2["alert"] and w2["target"] == 900.0 and abs(w2["progress"] - 0.25) < 1e-9 and w2["last_at"] == "2026-01-15T00:00Z"
