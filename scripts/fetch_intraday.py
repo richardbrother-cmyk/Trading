@@ -7,6 +7,7 @@ Acumula con lo ya descargado (dedup por marca de tiempo).
 from __future__ import annotations
 
 import argparse
+import json
 import os
 import sys
 from datetime import datetime, timedelta, timezone
@@ -16,7 +17,7 @@ import pandas as pd
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from autotrader.config import Settings  # noqa: E402
-from autotrader.ctrader import CTraderSession, decode_trendbars  # noqa: E402
+from autotrader.ctrader import VOLUME_SCALE, CTraderSession, decode_trendbars  # noqa: E402
 from autotrader.ctrader_auth import load_access_token  # noqa: E402
 
 PERIOD_M15 = 7
@@ -59,7 +60,24 @@ def main() -> int:
     session = CTraderSession(s.ctrader_client_id, s.ctrader_client_secret, token, s.ctrader_account_login or None, demo=s.ctrader_demo)
     os.makedirs(args.out, exist_ok=True)
     try:
-        session.load_symbols(symbols)
+        available = {n.upper() for n in session.all_symbol_names()}
+        missing = [x for x in symbols if x not in available]
+        if missing:
+            hints = {m: sorted(n for n in available if m[:3] in n)[:12] for m in missing}
+            print(f"AVISO: simbolos no disponibles {missing}; parecidos: {hints}")
+            symbols = [x for x in symbols if x in available]
+        infos = session.load_symbols(symbols)
+        spec_path = os.path.join(args.out, "symbols.json")
+        known = {}
+        if os.path.exists(spec_path):
+            with open(spec_path, encoding="utf-8") as fh:
+                known = json.load(fh)
+        for name, info in infos.items():
+            known[name] = {"symbol_id": info.symbol_id, "digits": info.digits, "lot_size": info.lot_size / VOLUME_SCALE,
+                           "min_units": info.min_volume / VOLUME_SCALE, "step_units": info.step_volume / VOLUME_SCALE}
+        with open(spec_path, "w", encoding="utf-8") as fh:
+            json.dump(known, fh, indent=1, sort_keys=True)
+        print("especificaciones:", {k: known[k] for k in symbols})
         for sym in symbols:
             df = fetch_m15(session, sym, args.days)
             path = os.path.join(args.out, f"{sym}_M15.csv")
