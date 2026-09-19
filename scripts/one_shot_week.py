@@ -192,6 +192,34 @@ def main() -> int:
         rows.append({"key": key, "description": desc, "universe": UNIVERSES["indices_y_oro"], "params": base, **m, "trades_list": tr})
         print(f"{key:18s} ops {m.get('trades',0):3d}  acierto {m.get('win_rate',0):.0%}  objetivo {m.get('target_rate',0):.0%}  R medio {m.get('avg_r',0):+.2f}  "
               f"total {m.get('total_usd',0):8.0f} USD  PF {m.get('profit_factor')}  DD {m.get('max_dd_usd',0):7.0f}  racha {m.get('max_losing_streak',0)}  años {m.get('by_year')}")
+    # Solo oro (XAUUSD): la regla "primera senal de la semana" casi nunca lo elige porque las divisas abren antes
+    from autotrader.intraday import SymbolSpec
+    gold = {"XAUUSD": data["XAUUSD"]}; orig = SPECS["XAUUSD"]
+    fomc_set = {pd.Timestamp(d).date() for d in FOMC_DAYS if start <= pd.Timestamp(d, tz="UTC") <= end}
+    for key, desc, sess, over, wd in [
+        ("oro_ny_rr3", "Solo oro: ORB en la apertura de Nueva York (13:30 UTC), objetivo 3R, una por semana", ("13:30", "20:00"), {}, None),
+        ("oro_ny_rr2", "Solo oro: ORB Nueva York, objetivo 2R", ("13:30", "20:00"), {"rr": 2.0}, None),
+        ("oro_ny_be1", "Solo oro: ORB Nueva York, 3R con break even tras 1R", ("13:30", "20:00"), {"breakeven_at_r": 1.0}, None),
+        ("oro_londres_rr3", "Solo oro: ORB en la apertura de Londres (07:00 UTC), objetivo 3R", ("07:00", "16:00"), {}, None),
+        ("oro_londres_or4", "Solo oro: ORB Londres con rango de 1 h, objetivo 3R", ("07:00", "16:00"), {"or_bars": 4}, None),
+        ("oro_ny_mar_jue", "Solo oro: ORB Nueva York, 3R, solo martes a jueves", ("13:30", "20:00"), {}, {1, 2, 3}),
+    ]:
+        SPECS["XAUUSD"] = SymbolSpec("XAUUSD", sess[0], sess[1], orig.spread, orig.step, orig.min_units, orig.digits)
+        tr = weekly_trades(gold, IntradayParams(**{**base, **over}), args.risk, wd)
+        m = summarize(tr, args.risk, weeks_total)
+        rows.append({"key": key, "description": desc, "universe": ["XAUUSD"], "params": {**base, **over, "session": sess}, **m, "trades_list": None})
+        print(f"{key:18s} ops {m.get('trades',0):3d}  acierto {m.get('win_rate',0):.0%}  objetivo {m.get('target_rate',0):.0%}  R medio {m.get('avg_r',0):+.2f}  "
+              f"total {m.get('total_usd',0):8.0f} USD  PF {m.get('profit_factor')}  DD {m.get('max_dd_usd',0):7.0f}  racha {m.get('max_losing_streak',0)}  años {m.get('by_year')}")
+    SPECS["XAUUSD"] = orig
+    for key, desc, tr in [
+        ("oro_nfp", "Solo oro: viernes de empleo, ORB en la apertura de Nueva York, 3R", event_trades(gold, IntradayParams(**base), args.risk, nfp_days(start, end))),
+        ("oro_fomc", "Solo oro: días de FOMC, ruptura de la media hora tras el comunicado, 3R",
+         event_trades(gold, IntradayParams(**base), args.risk, fomc_set, fomc_start_times(), hours=2.5)),
+    ]:
+        m = summarize(tr, args.risk, weeks_total)
+        rows.append({"key": key, "description": desc, "universe": ["XAUUSD"], "params": base, **m, "trades_list": tr})
+        print(f"{key:18s} ops {m.get('trades',0):3d}  acierto {m.get('win_rate',0):.0%}  objetivo {m.get('target_rate',0):.0%}  R medio {m.get('avg_r',0):+.2f}  "
+              f"total {m.get('total_usd',0):8.0f} USD  PF {m.get('profit_factor')}  DD {m.get('max_dd_usd',0):7.0f}  racha {m.get('max_losing_streak',0)}  años {m.get('by_year')}")
     out = {"generated_at": datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC"), "period": [str(start.date()), str(end.date())],
            "weeks": weeks_total, "risk_usd": args.risk, "variants": rows}
     with open(args.out, "w", encoding="utf-8") as fh:

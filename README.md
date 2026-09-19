@@ -337,6 +337,12 @@ muestras pequeñas: viernes de empleo 34 operaciones, R medio +0,20, PF 1,39, ra
 operaciones, R medio +0,23, PF 1,46. Ninguna reproduce un 3R "limpio": solo el 12 % de las operaciones llega al
 objetivo; el resto son stops o cierres parciales al final de la sesión.
 
+Solo oro (XAUUSD, que la regla semanal casi nunca elige porque las divisas abren antes): ORB en la apertura de
+Nueva York sin borde (158 operaciones, PF 1,02, 6 % llega al 3R); ORB en la apertura de Londres con rango de 1 h,
+PF 1,19; solo martes a jueves, PF 1,29 (filtro que en el universo mixto salía negativo, así que es sospechoso de
+ajuste a la muestra); viernes de empleo, negativo (PF 0,80); días de FOMC, la mejor de todas pero con 25 operaciones:
+acierto 60 %, PF 2,08, aunque solo el 8 % llega al 3R y la mayoría de ganancias son cierres al final de la sesión.
+
 ### Cuenta agresiva (500 USD)
 
 Tercera cuenta demo, workflow `ctrader-aggr.yml`, mismo motor que el bot swing con otro perfil
