@@ -114,7 +114,11 @@ def main() -> int:
     ap.add_argument("--paths", type=int, default=2000)
     ap.add_argument("--out", default="docs/aggr_simulation.json")
     ap.add_argument("--seed", type=int, default=7)
+    ap.add_argument("--tp-r", type=float, default=6.0, help="objetivo en multiplos del stop (6 = configuracion actual)")
+    ap.add_argument("--breakeven-r", type=float, default=2.0)
     args = ap.parse_args()
+    PARAMS["tp_atr"] = round(PARAMS["stop_atr"] * args.tp_r, 4)
+    PARAMS["breakeven_r"] = args.breakeven_r
     data = load(args.data)
     trades = historical_trades(data)
     if not trades:
@@ -174,7 +178,7 @@ def main() -> int:
                           "p_half": round(float((finals < ACCOUNT["initial"] / 2).mean()), 3), "p_brake": round(brakes / len(finals), 3),
                           "max_dd_p50": round(float(np.median(dds)), 3)})
     out = {"generated_at": datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC"), "period": [str(start.date()), str(end.date())],
-           "years": round((end - start).days / 365.25, 2), "symbols": list(data), "params": PARAMS, "account": ACCOUNT, "paths": args.paths,
+           "years": round((end - start).days / 365.25, 2), "symbols": list(data), "params": PARAMS, "tp_r": args.tp_r, "account": ACCOUNT, "paths": args.paths,
            "dates": months,
            "signals": {"count": len(trades), "win": round(float((R > 0).mean()), 3), "avg_r": round(float(R.mean()), 3), "sum_r": round(float(R.sum()), 1),
                        "profit_factor": round(float(R[R > 0].sum() / -R[R <= 0].sum()), 2) if (R <= 0).any() else None,
