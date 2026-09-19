@@ -53,7 +53,8 @@ def test_gap_filter_uses_last_completed_close(tmp_path):
     from autotrader.broker import Account
 
     today = pd.Timestamp.now(tz="UTC").normalize().tz_localize(None)
-    idx = pd.bdate_range(end=today, periods=120)
+    # la ultima barra es la de hoy aunque sea fin de semana (si no, en sabado la barra parcial seria la del viernes)
+    idx = pd.DatetimeIndex(list(pd.bdate_range(end=today - pd.Timedelta(days=1), periods=119)) + [today])
     close = [100.0 + i * 0.5 for i in range(120)]
     close[-1] = close[-2] * 0.97  # hoy cae un 3 % respecto a ayer
     df = pd.DataFrame({"open": close, "high": close, "low": close, "close": close, "volume": 1e6}, index=idx)

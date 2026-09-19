@@ -189,6 +189,11 @@ footer { color: var(--muted); font-size: 12.5px; }
         <details style="margin-top:14px"><summary id="trades-summary">Ver todas las operaciones</summary><div class="tbl-wrap" style="margin-top:10px"><table id="trades"></table></div></details>
       </section>
     </div>
+    <section id="av-section" style="display:none">
+      <div class="sec-head"><div><h2>Investigación: variantes de "151 Trading Strategies"</h2><p class="lede" id="av-lede"></p></div></div>
+      <div class="tbl-wrap"><table id="av-table"></table></div>
+      <p class="note" id="av-note" style="margin:10px 0 0"></p>
+    </section>
   </div>
 
   <!-- ============================ FUSION / CTRADER ============================ -->
@@ -437,6 +442,18 @@ function cyclesTable(cycles){
   const oa = document.getElementById("orders-all");
   oa.innerHTML = live.available && (live.orders_all||[]).length ? `<thead><tr><th>Cuándo (UTC)</th><th>Activo</th><th>Lado</th><th class="num">Cant.</th><th class="num">Precio</th><th>Estado</th></tr></thead><tbody>` + live.orders_all.map(o=>`<tr><td class="mono" style="font-size:12px">${esc(o.at)}</td><td class="mono">${esc(o.symbol)}</td><td>${o.side==="buy"?"Compra":"Venta"}</td><td class="num">${o.qty}</td><td class="num">${o.filled_price?fmtUSD2(o.filled_price):(o.type==="stop"&&o.stop_price?"stop "+fmtUSD2(o.stop_price):"mercado")}</td><td><span class="status ${esc(o.status)}">${st(o.status)}</span></td></tr>`).join("") + "</tbody>" : `<tbody><tr><td class="empty">Sin órdenes todavía.</td></tr></tbody>`;
   document.getElementById("cycles").innerHTML = cyclesTable(D.cycles);
+})();
+
+// --- Variantes de investigacion (Alpaca) ---
+(function(){
+  const AV = D.alpaca_variants;
+  if (!AV || !AV.variants || !AV.variants.length) return;
+  document.getElementById("av-section").style.display = "";
+  const bh = AV.benchmark_spy || {};
+  document.getElementById("av-lede").textContent = `Mismo motor y universo de 13 símbolos, ${fmtUSD(AV.equity)} del ${AV.period[0]} al ${AV.period[1]}, probando tres ideas del catálogo de Kakushadze y Serur: filtro de régimen con SPY, tamaño por volatilidad y salida por caída diaria. Comprar y mantener SPY en el mismo periodo: ${pct(bh.total_return||0)}, Sharpe ${Number(bh.sharpe||0).toFixed(2)}, caída ${pct(bh.max_drawdown||0)}. Generado el ${AV.generated_at}.`;
+  const rows = AV.variants.map(v=>`<tr${v.key==="base"?' class="active"':""}><td style="font-size:12.5px">${esc(v.description)}</td><td class="num ${v.total_return>=0?"pos":"neg"}">${pct(v.total_return)}</td><td class="num">${Number(v.sharpe).toFixed(2)}</td><td class="num neg">${pct(v.max_drawdown)}</td><td class="num">${v.trades}</td><td class="num">${Number(v.profit_factor).toFixed(2)}</td><td class="num">${pct(v.halves.primera_mitad.return)} / ${pct(v.halves.segunda_mitad.return)}</td></tr>`).join("");
+  document.getElementById("av-table").innerHTML = `<thead><tr><th>Variante</th><th class="num">Retorno</th><th class="num">Sharpe</th><th class="num">Caída máx.</th><th class="num">Ops.</th><th class="num">PF</th><th class="num">1ª / 2ª mitad</th></tr></thead><tbody>${rows}</tbody>`;
+  document.getElementById("av-note").textContent = "Lectura: el filtro de régimen con SPY empeora porque bloquea oro, plata y agrícolas justo cuando diversifican; el tamaño por volatilidad recorta a los grandes ganadores sin reducir la caída; la salida por caída diaria solo mejora si se recompra al día siguiente, algo que el bot horario no reproduce, y con una espera realista de 5 a 10 días reduce la caída máxima a cambio de menos retorno. La fila resaltada es la configuración activa, que se mantiene.";
 })();
 
 // --- Backtest chart ---

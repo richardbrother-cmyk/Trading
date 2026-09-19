@@ -1,0 +1,564 @@
+{
+ "generated_at": "2026-09-19 00:03 UTC",
+ "period": [
+  "2024-09-19",
+  "2026-09-17"
+ ],
+ "symbols": [
+  "SPY",
+  "QQQ",
+  "AAPL",
+  "MSFT",
+  "NVDA",
+  "GLD",
+  "SLV",
+  "PPLT",
+  "PALL",
+  "USO",
+  "WEAT",
+  "CORN",
+  "DBA"
+ ],
+ "equity": 100000,
+ "benchmark_spy": {
+  "total_return": 0.3356,
+  "cagr": 0.1563,
+  "sharpe": 0.97,
+  "max_drawdown": -0.19
+ },
+ "variants": [
+  {
+   "key": "base",
+   "description": "Configuración actual (cruce SMA 20/50, RSI < 70, stop 5 %, 12 % por posición)",
+   "initial_cash": 100000,
+   "final_equity": 149102.95,
+   "total_return": 0.491,
+   "cagr": 0.2219,
+   "sharpe": 1.43,
+   "max_drawdown": -0.1199,
+   "trades": 90,
+   "win_rate": 0.444,
+   "profit_factor": 3.35,
+   "avg_trade_return": 0.0522,
+   "exits": {
+    "signal": 51,
+    "stop": 29,
+    "open_at_end": 10
+   },
+   "halves": {
+    "primera_mitad": {
+     "return": 0.1602,
+     "max_drawdown": -0.0711
+    },
+    "segunda_mitad": {
+     "return": 0.2851,
+     "max_drawdown": -0.1199
+    }
+   }
+  },
+  {
+   "key": "regimen_spy_sma200",
+   "description": "Filtro de régimen: solo entra si SPY > SMA 200",
+   "initial_cash": 100000,
+   "final_equity": 139980.85,
+   "total_return": 0.3998,
+   "cagr": 0.1838,
+   "sharpe": 1.04,
+   "max_drawdown": -0.188,
+   "trades": 66,
+   "win_rate": 0.424,
+   "profit_factor": 3.29,
+   "avg_trade_return": 0.0528,
+   "exits": {
+    "signal": 35,
+    "stop": 21,
+    "open_at_end": 10
+   },
+   "halves": {
+    "primera_mitad": {
+     "return": 0.0603,
+     "max_drawdown": -0.0271
+    },
+    "segunda_mitad": {
+     "return": 0.3202,
+     "max_drawdown": -0.188
+    }
+   }
+  },
+  {
+   "key": "regimen_spy_sma100",
+   "description": "Filtro de régimen: solo entra si SPY > SMA 100",
+   "initial_cash": 100000,
+   "final_equity": 147074.1,
+   "total_return": 0.4707,
+   "cagr": 0.2135,
+   "sharpe": 1.36,
+   "max_drawdown": -0.1281,
+   "trades": 78,
+   "win_rate": 0.423,
+   "profit_factor": 3.49,
+   "avg_trade_return": 0.0579,
+   "exits": {
+    "signal": 42,
+    "stop": 26,
+    "open_at_end": 10
+   },
+   "halves": {
+    "primera_mitad": {
+     "return": 0.1367,
+     "max_drawdown": -0.0614
+    },
+    "segunda_mitad": {
+     "return": 0.2939,
+     "max_drawdown": -0.1281
+    }
+   }
+  },
+  {
+   "key": "regimen_spy_sma200_salida",
+   "description": "Régimen SPY > SMA 200 con salida de todo cuando SPY cae bajo la media",
+   "initial_cash": 100000,
+   "final_equity": 144430.49,
+   "total_return": 0.4443,
+   "cagr": 0.2026,
+   "sharpe": 1.13,
+   "max_drawdown": -0.188,
+   "trades": 68,
+   "win_rate": 0.441,
+   "profit_factor": 3.92,
+   "avg_trade_return": 0.0545,
+   "exits": {
+    "signal": 33,
+    "stop": 20,
+    "open_at_end": 10,
+    "regime": 5
+   },
+   "halves": {
+    "primera_mitad": {
+     "return": 0.0603,
+     "max_drawdown": -0.0271
+    },
+    "segunda_mitad": {
+     "return": 0.3621,
+     "max_drawdown": -0.188
+    }
+   }
+  },
+  {
+   "key": "vol_10pb",
+   "description": "Tamaño por volatilidad: objetivo 0.10 % diario por posición (tope 12 %)",
+   "initial_cash": 100000,
+   "final_equity": 133160.58,
+   "total_return": 0.3316,
+   "cagr": 0.1545,
+   "sharpe": 1.22,
+   "max_drawdown": -0.1181,
+   "trades": 95,
+   "win_rate": 0.421,
+   "profit_factor": 3.21,
+   "avg_trade_return": 0.0476,
+   "exits": {
+    "signal": 54,
+    "stop": 31,
+    "open_at_end": 10
+   },
+   "halves": {
+    "primera_mitad": {
+     "return": 0.0969,
+     "max_drawdown": -0.0658
+    },
+    "segunda_mitad": {
+     "return": 0.2139,
+     "max_drawdown": -0.1181
+    }
+   }
+  },
+  {
+   "key": "vol_11pb",
+   "description": "Tamaño por volatilidad: objetivo 0.12 % diario por posición (tope 12 %)",
+   "initial_cash": 100000,
+   "final_equity": 139923.81,
+   "total_return": 0.3992,
+   "cagr": 0.1836,
+   "sharpe": 1.27,
+   "max_drawdown": -0.1342,
+   "trades": 95,
+   "win_rate": 0.421,
+   "profit_factor": 3.34,
+   "avg_trade_return": 0.0476,
+   "exits": {
+    "signal": 54,
+    "stop": 31,
+    "open_at_end": 10
+   },
+   "halves": {
+    "primera_mitad": {
+     "return": 0.1173,
+     "max_drawdown": -0.0667
+    },
+    "segunda_mitad": {
+     "return": 0.2523,
+     "max_drawdown": -0.1342
+    }
+   }
+  },
+  {
+   "key": "vol_15pb",
+   "description": "Tamaño por volatilidad: objetivo 0.15 % diario por posición (tope 12 %)",
+   "initial_cash": 100000,
+   "final_equity": 149050.98,
+   "total_return": 0.4905,
+   "cagr": 0.2217,
+   "sharpe": 1.32,
+   "max_drawdown": -0.1551,
+   "trades": 94,
+   "win_rate": 0.426,
+   "profit_factor": 3.55,
+   "avg_trade_return": 0.0482,
+   "exits": {
+    "signal": 53,
+    "stop": 31,
+    "open_at_end": 10
+   },
+   "halves": {
+    "primera_mitad": {
+     "return": 0.1317,
+     "max_drawdown": -0.0753
+    },
+    "segunda_mitad": {
+     "return": 0.3171,
+     "max_drawdown": -0.1551
+    }
+   }
+  },
+  {
+   "key": "caida_2pct",
+   "description": "Salida si el cierre cae más de 2 % en el día",
+   "initial_cash": 100000,
+   "final_equity": 148120.16,
+   "total_return": 0.4812,
+   "cagr": 0.2179,
+   "sharpe": 1.57,
+   "max_drawdown": -0.1255,
+   "trades": 325,
+   "win_rate": 0.449,
+   "profit_factor": 1.63,
+   "avg_trade_return": 0.0113,
+   "exits": {
+    "drop": 209,
+    "stop": 54,
+    "signal": 52,
+    "open_at_end": 10
+   },
+   "halves": {
+    "primera_mitad": {
+     "return": 0.1507,
+     "max_drawdown": -0.0603
+    },
+    "segunda_mitad": {
+     "return": 0.2872,
+     "max_drawdown": -0.1255
+    }
+   }
+  },
+  {
+   "key": "caida_2pct_con_ganancia",
+   "description": "Salida por caída de 2 % solo si la posición gana",
+   "initial_cash": 100000,
+   "final_equity": 150316.13,
+   "total_return": 0.5032,
+   "cagr": 0.2269,
+   "sharpe": 1.59,
+   "max_drawdown": -0.1228,
+   "trades": 254,
+   "win_rate": 0.528,
+   "profit_factor": 1.68,
+   "avg_trade_return": 0.0157,
+   "exits": {
+    "drop": 106,
+    "stop": 89,
+    "signal": 49,
+    "open_at_end": 10
+   },
+   "halves": {
+    "primera_mitad": {
+     "return": 0.1417,
+     "max_drawdown": -0.0656
+    },
+    "segunda_mitad": {
+     "return": 0.3166,
+     "max_drawdown": -0.1228
+    }
+   }
+  },
+  {
+   "key": "caida_3pct",
+   "description": "Salida si el cierre cae más de 3 % en el día",
+   "initial_cash": 100000,
+   "final_equity": 155827.92,
+   "total_return": 0.5583,
+   "cagr": 0.2493,
+   "sharpe": 1.68,
+   "max_drawdown": -0.1323,
+   "trades": 217,
+   "win_rate": 0.461,
+   "profit_factor": 1.94,
+   "avg_trade_return": 0.0173,
+   "exits": {
+    "drop": 100,
+    "stop": 57,
+    "signal": 51,
+    "open_at_end": 9
+   },
+   "halves": {
+    "primera_mitad": {
+     "return": 0.1542,
+     "max_drawdown": -0.0735
+    },
+    "segunda_mitad": {
+     "return": 0.3501,
+     "max_drawdown": -0.1323
+    }
+   }
+  },
+  {
+   "key": "caida_3pct_con_ganancia",
+   "description": "Salida por caída de 3 % solo si la posición gana",
+   "initial_cash": 100000,
+   "final_equity": 153347.27,
+   "total_return": 0.5335,
+   "cagr": 0.2392,
+   "sharpe": 1.58,
+   "max_drawdown": -0.1348,
+   "trades": 187,
+   "win_rate": 0.487,
+   "profit_factor": 1.91,
+   "avg_trade_return": 0.0215,
+   "exits": {
+    "stop": 70,
+    "drop": 58,
+    "signal": 50,
+    "open_at_end": 9
+   },
+   "halves": {
+    "primera_mitad": {
+     "return": 0.1555,
+     "max_drawdown": -0.0738
+    },
+    "segunda_mitad": {
+     "return": 0.3272,
+     "max_drawdown": -0.1348
+    }
+   }
+  },
+  {
+   "key": "caida_3pct_espera5d",
+   "description": "Salida por caída de 3 % y sin reentrar en 5 días (salvo cruce nuevo)",
+   "initial_cash": 100000,
+   "final_equity": 136449.17,
+   "total_return": 0.3645,
+   "cagr": 0.1687,
+   "sharpe": 1.39,
+   "max_drawdown": -0.1058,
+   "trades": 169,
+   "win_rate": 0.456,
+   "profit_factor": 1.82,
+   "avg_trade_return": 0.0192,
+   "exits": {
+    "drop": 73,
+    "stop": 44,
+    "signal": 43,
+    "open_at_end": 9
+   },
+   "halves": {
+    "primera_mitad": {
+     "return": 0.1068,
+     "max_drawdown": -0.0702
+    },
+    "segunda_mitad": {
+     "return": 0.2328,
+     "max_drawdown": -0.1058
+    }
+   }
+  },
+  {
+   "key": "caida_3pct_con_ganancia_espera5d",
+   "description": "Salida por caída de 3 % solo con ganancia, sin reentrar en 5 días",
+   "initial_cash": 100000,
+   "final_equity": 138274.89,
+   "total_return": 0.3827,
+   "cagr": 0.1766,
+   "sharpe": 1.44,
+   "max_drawdown": -0.0861,
+   "trades": 155,
+   "win_rate": 0.458,
+   "profit_factor": 1.83,
+   "avg_trade_return": 0.0201,
+   "exits": {
+    "stop": 61,
+    "signal": 43,
+    "drop": 42,
+    "open_at_end": 9
+   },
+   "halves": {
+    "primera_mitad": {
+     "return": 0.1142,
+     "max_drawdown": -0.0703
+    },
+    "segunda_mitad": {
+     "return": 0.241,
+     "max_drawdown": -0.0861
+    }
+   }
+  },
+  {
+   "key": "caida_3pct_espera10d",
+   "description": "Salida por caída de 3 % y sin reentrar en 10 días (salvo cruce nuevo)",
+   "initial_cash": 100000,
+   "final_equity": 137612.89,
+   "total_return": 0.3761,
+   "cagr": 0.1737,
+   "sharpe": 1.5,
+   "max_drawdown": -0.0874,
+   "trades": 144,
+   "win_rate": 0.479,
+   "profit_factor": 2.04,
+   "avg_trade_return": 0.0219,
+   "exits": {
+    "drop": 65,
+    "signal": 37,
+    "stop": 33,
+    "open_at_end": 9
+   },
+   "halves": {
+    "primera_mitad": {
+     "return": 0.1257,
+     "max_drawdown": -0.0737
+    },
+    "segunda_mitad": {
+     "return": 0.2224,
+     "max_drawdown": -0.0874
+    }
+   }
+  },
+  {
+   "key": "caida_3pct_con_ganancia_espera10d",
+   "description": "Salida por caída de 3 % solo con ganancia, sin reentrar en 10 días",
+   "initial_cash": 100000,
+   "final_equity": 142420.61,
+   "total_return": 0.4242,
+   "cagr": 0.1941,
+   "sharpe": 1.62,
+   "max_drawdown": -0.0945,
+   "trades": 134,
+   "win_rate": 0.47,
+   "profit_factor": 2.13,
+   "avg_trade_return": 0.0242,
+   "exits": {
+    "stop": 49,
+    "drop": 40,
+    "signal": 37,
+    "open_at_end": 8
+   },
+   "halves": {
+    "primera_mitad": {
+     "return": 0.1388,
+     "max_drawdown": -0.0739
+    },
+    "segunda_mitad": {
+     "return": 0.2506,
+     "max_drawdown": -0.0945
+    }
+   }
+  },
+  {
+   "key": "stop_espera5d",
+   "description": "Solo espera de 5 días tras un stop antes de reentrar (sin regla de caída)",
+   "initial_cash": 100000,
+   "final_equity": 145482.24,
+   "total_return": 0.4548,
+   "cagr": 0.2069,
+   "sharpe": 1.35,
+   "max_drawdown": -0.1165,
+   "trades": 82,
+   "win_rate": 0.427,
+   "profit_factor": 3.14,
+   "avg_trade_return": 0.0558,
+   "exits": {
+    "signal": 45,
+    "stop": 27,
+    "open_at_end": 10
+   },
+   "halves": {
+    "primera_mitad": {
+     "return": 0.1366,
+     "max_drawdown": -0.0743
+    },
+    "segunda_mitad": {
+     "return": 0.2799,
+     "max_drawdown": -0.1165
+    }
+   }
+  },
+  {
+   "key": "regimen200_vol12",
+   "description": "Régimen SPY > SMA 200 + tamaño por volatilidad 0,12 %",
+   "initial_cash": 100000,
+   "final_equity": 136325.67,
+   "total_return": 0.3633,
+   "cagr": 0.1682,
+   "sharpe": 1.17,
+   "max_drawdown": -0.1479,
+   "trades": 65,
+   "win_rate": 0.431,
+   "profit_factor": 4.83,
+   "avg_trade_return": 0.0548,
+   "exits": {
+    "signal": 35,
+    "stop": 20,
+    "open_at_end": 10
+   },
+   "halves": {
+    "primera_mitad": {
+     "return": 0.0607,
+     "max_drawdown": -0.0197
+    },
+    "segunda_mitad": {
+     "return": 0.2853,
+     "max_drawdown": -0.1479
+    }
+   }
+  },
+  {
+   "key": "regimen200_vol12_caida3g",
+   "description": "Régimen + volatilidad 0,12 % + salida por caída 3 % con ganancia",
+   "initial_cash": 100000,
+   "final_equity": 124176.82,
+   "total_return": 0.2418,
+   "cagr": 0.1148,
+   "sharpe": 1.57,
+   "max_drawdown": -0.0622,
+   "trades": 146,
+   "win_rate": 0.486,
+   "profit_factor": 2.43,
+   "avg_trade_return": 0.0219,
+   "exits": {
+    "stop": 54,
+    "drop": 51,
+    "signal": 32,
+    "open_at_end": 9
+   },
+   "halves": {
+    "primera_mitad": {
+     "return": 0.048,
+     "max_drawdown": -0.0209
+    },
+    "segunda_mitad": {
+     "return": 0.1849,
+     "max_drawdown": -0.0622
+    }
+   }
+  }
+ ],
+ "source": "Kakushadze & Serur (2018), 151 Trading Strategies, secciones 3.12, 4.1.2, 4.6, 6.5 y 10.4"
+}

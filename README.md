@@ -260,6 +260,29 @@ tendencial ni con operaciones manuales. Cada ciclo publica `docs/swing_state.jso
 muestra la cuenta en la pestaña "Fusion · swing 200 USD". Oro y petróleo se descartan solos porque su lote mínimo
 arriesga más del tope mientras la cuenta sea pequeña.
 
+### Variantes probadas de "151 Trading Strategies" (Alpaca)
+
+`scripts/alpaca_variants.py` (resultados en `docs/alpaca_variants.json`, datos de 2 años cacheados en
+`data/research/alpaca_daily_2y.csv`) prueba tres ideas del catálogo de Kakushadze y Serur (2018,
+`docs/ssrn-3247865.pdf`) sobre el bot de tendencia con el motor de backtest y ganchos opcionales de
+`run_backtest` (`entry_allowed`, `size_fn`, `drop_exit_pct`, `reentry_cooldown_days`):
+
+| Variante | Retorno | Sharpe | Caída máx. | Ops. | PF |
+|---|---|---|---|---|---|
+| **Configuración actual** | 49,1 % | 1,43 | −12,0 % | 90 | 3,35 |
+| Régimen: solo entra si SPY > SMA 200 | 40,0 % | 1,04 | −18,8 % | 66 | 3,29 |
+| Régimen SPY > SMA 100 | 47,1 % | 1,36 | −12,8 % | 78 | 3,49 |
+| Tamaño por volatilidad (0,12 % diario por posición) | 39,9 % | 1,27 | −13,4 % | 95 | 3,34 |
+| Salida por caída diaria > 3 %, recompra al día siguiente | 55,8 % | 1,68 | −13,2 % | 217 | 1,94 |
+| Salida por caída > 3 % con ganancia, sin reentrar 10 días | 42,4 % | 1,62 | −9,4 % | 134 | 2,13 |
+| Comprar y mantener SPY | 33,6 % | 0,97 | −19,0 % | — | — |
+
+Conclusiones: el filtro de régimen con SPY empeora porque el universo es multiactivo y bloquea oro, plata y
+agrícolas justo cuando diversifican; el tamaño por volatilidad recorta a los grandes ganadores (NVDA) sin reducir la
+caída; la salida por caída diaria solo mejora si se recompra al día siguiente, cosa que el bot horario no
+reproduce (vendería y recompraría en la hora siguiente), y con una espera realista de 5 a 10 días baja la caída
+máxima a cambio de menos retorno. Ninguna variante se activó.
+
 ### Cuenta agresiva (500 USD)
 
 Tercera cuenta demo, workflow `ctrader-aggr.yml`, mismo motor que el bot swing con otro perfil

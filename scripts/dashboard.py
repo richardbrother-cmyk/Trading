@@ -36,6 +36,7 @@ AGGR_STATE = "docs/aggr_state.json"
 AGGR_BREAKEVEN = "docs/aggr_breakeven.json"
 SWING_WALKFORWARD = "docs/swing_walkforward.json"
 KRONOS_REPORT = "docs/kronos_report.json"
+ALPACA_VARIANTS = "docs/alpaca_variants.json"
 
 
 def collect(no_live: bool) -> dict:
@@ -201,7 +202,8 @@ def collect(no_live: bool) -> dict:
         "min_gain": s.event_min_gain, "trail_pct": s.event_trail_pct}, "settings": {
         "fast_sma": s.fast_sma, "slow_sma": s.slow_sma, "rsi_max_entry": s.rsi_max_entry, "risk_per_trade": s.risk_per_trade,
         "stop_loss_pct": s.stop_loss_pct, "max_daily_loss_pct": s.max_daily_loss_pct, "initial_cash": s.initial_cash},
-        "backtests": backtests, "live": live, "last_run": last_run, "cycles": cycles, "ctrader": ctrader, "swing": swing, "aggr": aggr}
+        "backtests": backtests, "live": live, "last_run": last_run, "cycles": cycles, "ctrader": ctrader, "swing": swing, "aggr": aggr,
+        "alpaca_variants": (json.load(open(ALPACA_VARIANTS, encoding="utf-8")) if os.path.exists(ALPACA_VARIANTS) else None)}
 
 
 def render(d: dict) -> str:
