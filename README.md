@@ -343,6 +343,19 @@ PF 1,19; solo martes a jueves, PF 1,29 (filtro que en el universo mixto salía n
 ajuste a la muestra); viernes de empleo, negativo (PF 0,80); días de FOMC, la mejor de todas pero con 25 operaciones:
 acierto 60 %, PF 2,08, aunque solo el 8 % llega al 3R y la mayoría de ganancias son cierres al final de la sesión.
 
+### Corroboración: el rango de Londres en el oro
+
+`scripts/london_range_gold.py` (resultado en `docs/london_range_gold.json`) cuenta sobre 3 años de M15 de XAUUSD, con
+sesiones en hora de Nueva York (Asia 19:00-03:00, Londres 03:00-08:00, mañana de NY 08:00-12:00), las afirmaciones de
+un hilo público: la mañana de NY rompe el máximo o el mínimo de Londres el 96,4 % de los últimos 250 días (95,5 % en
+3 años); Londres cubre el 38 % del rango del día y la mañana de NY el 59 %; Londres marca el máximo o mínimo del día
+solo el 17 % de los días, la mañana de NY el 50 % y Asia el 57 %. Lo que el hilo no dice: tras la primera ruptura, el
+precio sigue fuera del rango a las 12:00 solo el 52 % de las veces (moneda al aire) y la extensión mediana más allá
+del nivel es 0,65 rangos de Londres. Operar la primera ruptura con 100 USD de riesgo (stop en mitad del rango o en el
+lado contrario, objetivo 2R o 3R, salida a las 12:00 o 17:00) da PF entre 1,01 y 1,10 con 2024 negativo y 2025 muy
+positivo (año de rally del oro); hacer lo contrario (vender la ruptura) es peor (PF 0,90 a 0,97). Conclusión: la
+cuenta es cierta y es aritmética (una caja pequeña delante de un movimiento grande), no una ventaja operable.
+
 ### Cuenta agresiva (500 USD)
 
 Tercera cuenta demo, workflow `ctrader-aggr.yml`, mismo motor que el bot swing con otro perfil
