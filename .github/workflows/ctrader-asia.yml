@@ -1,0 +1,102 @@
+name: ctrader-asia
+
+# Bot intradia "retest de Asia" sobre el oro (XAUUSD) en la MISMA cuenta demo agresiva de cTrader (500 USD):
+# rango de Asia (19:00-03:00 NY), primera vela de 15 min de la manana de NY que cierra fuera, retest del nivel sin
+# cerrar dentro, entrada a favor con stop en la mitad del rango y objetivo 2R, cierre a las 12:00 NY. Una operacion al dia.
+# Corre cada 15 minutos de 12:00 a 17:59 UTC (cubre la manana de NY en horario de verano e invierno); el bot decide por
+# hora de Nueva York. Secrets: los mismos que ctrader-aggr.
+on:
+  schedule:
+    - cron: "*/15 12-17 * * 1-5"
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "Solo decidir, sin enviar ordenes"
+        type: boolean
+        default: false
+
+# Un solo run a la vez: si un ciclo se retrasa y se solapa con el siguiente, el nuevo espera en cola.
+concurrency:
+  group: ${{ github.workflow }}
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+env:
+  SCHEDULE_ENABLED: "true"
+
+jobs:
+  gate:
+    runs-on: ubuntu-latest
+    outputs:
+      enabled: ${{ steps.check.outputs.enabled }}
+    steps:
+      - id: check
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ] || [ "$SCHEDULE_ENABLED" = "true" ]; then echo "enabled=true" >> "$GITHUB_OUTPUT"; else echo "enabled=false" >> "$GITHUB_OUTPUT"; fi
+
+  asia:
+    needs: gate
+    if: ${{ needs.gate.outputs.enabled == 'true' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    env:
+      BROKER: ctrader
+      DATA_PROVIDER: ctrader
+      CTRADER_DEMO: "true"
+      CTRADER_CLIENT_ID: ${{ secrets.CTRADER_CLIENT_ID }}
+      CTRADER_CLIENT_SECRET: ${{ secrets.CTRADER_CLIENT_SECRET }}
+      CTRADER_ACCOUNT_LOGIN: ${{ secrets.CTRADER_AGGR_ACCOUNT_LOGIN }}
+      CTRADER_ACCESS_TOKEN: ${{ secrets.CTRADER_ACCESS_TOKEN }}
+      # Freno compartido con el bot agresivo (misma cuenta): interruptor manual y drawdown desde el maximo
+      BOT_HALT: ${{ vars.AGGR_BOT_HALT || vars.BOT_HALT || 'off' }}
+      MAX_DRAWDOWN_PCT: "0.50"
+      SYMBOLS: "XAUUSD"
+      RISK_PER_TRADE: "0.03"
+      ASIA_RR: "2.0"
+      ASIA_MAX_WAIT_BARS: "8"
+      ASIA_LABEL: "autotrader-asia"
+      ASIA_STATE_PATH: "docs/asia_state.json"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install -r requirements.txt
+      - name: Tests
+        run: python -m pytest -q tests/test_asiabot.py tests/test_guard.py
+      - name: Ciclo Asia
+        id: cycle
+        run: |
+          python -m autotrader.cli --env /dev/null asia-run ${{ inputs.dry_run && '--dry-run' || '' }} | tee /tmp/asia.json
+          python - <<'PY' >> "$GITHUB_OUTPUT"
+          import json, re
+          txt = open("/tmp/asia.json").read()
+          d = json.loads(txt[txt.index("{"):])
+          print("publish=" + ("true" if d.get("publish") else "false"))
+          PY
+      - name: Publicar estado
+        if: ${{ !inputs.dry_run && steps.cycle.outputs.publish == 'true' }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          python scripts/dashboard.py --no-live --out reports/dashboard.html
+          cp reports/dashboard.html docs/index.html
+          cp reports/dashboard.html docs/dashboard.html
+          git add docs/asia_state.json docs/index.html docs/dashboard.html
+          if git diff --cached --quiet; then echo "sin cambios"; exit 0; fi
+          git commit -m "Panel: actualización automática (asia)"
+          ok=0
+          for i in 1 2 3 4; do
+            if git pull --rebase -X theirs -q origin "${GITHUB_REF_NAME}" && git push; then ok=1; break; fi
+            git rebase --abort 2>/dev/null || true
+            sleep $((i * 5))
+          done
+          [ "$ok" = "1" ] || { echo "::error::no se pudo publicar el estado tras 4 intentos"; exit 1; }
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: asia-log-${{ github.run_id }}
+          path: state/run_log.jsonl
+          if-no-files-found: ignore

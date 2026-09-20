@@ -277,6 +277,12 @@ footer { color: var(--muted); font-size: 12.5px; }
       <div class="tbl-wrap"><table id="sw-kronos"></table></div>
       <p class="note" id="sw-kr-note" style="margin:10px 0 0"></p>
     </section>
+    <section id="sw-asia-section" style="display:none">
+      <div class="sec-head"><div><h2>Bot "retest de Asia" en oro (misma cuenta)</h2><p class="lede" id="sw-asia-lede"></p></div></div>
+      <div class="kpis" id="sw-asia-kpis" style="margin-bottom:12px"></div>
+      <div class="tbl-wrap"><table id="sw-asia-trades"></table></div>
+      <p class="note" id="sw-asia-note" style="margin:10px 0 0"></p>
+    </section>
     <section id="sw-sim-section" style="display:none">
       <div class="sec-head"><div><h2>Simulación: qué puede pasar con los parámetros actuales</h2><p class="lede" id="sw-sim-lede"></p></div></div>
       <div class="kpis" id="sw-sim-kpis" style="margin-bottom:12px"></div>
@@ -686,6 +692,23 @@ function renderSwingTab(prefix, SW, badgeId, base0, research){
   } else if (research) {
     $("sw-kr-lede").textContent = "Sin resultados todavía.";
     $("sw-kronos").innerHTML = "";
+  }
+  const AS = SW.asia;
+  if (AS && AS.plan) {
+    $("sw-asia-section").style.display = "";
+    const ap = AS.params || {}, pl = AS.plan || {}, st = AS.stats || {};
+    const phases = {waiting_break:"esperando la ruptura del rango", broke:"rango roto, esperando el retest", retest:"retest visto (entrada no perseguida)", ready:"retest en la última vela: entrada", failed:"ruptura fallida (cerró dentro): sin operación hoy", expired:"sin retest a tiempo: sin operación hoy", "fuera de horario":"fuera de la mañana de Nueva York", "sin datos":"sin datos", "sin rango de Asia":"rango de Asia incompleto"};
+    $("sw-asia-lede").textContent = `Rango de Asia (19:00 a 03:00 de Nueva York) del oro; en la mañana de NY (08:00 a 12:00) espera la primera vela de 15 min que cierra fuera, el retest del nivel sin cerrar dentro, y entra a favor con stop en la mitad del rango y objetivo ${ap.rr} R; cierre a las 12:00. Una operación al día, ${(ap.risk_pct*100).toFixed(0)} % de riesgo, etiqueta ${esc(AS.label||"")}. Último ciclo ${esc(AS.ny_time||"")} NY.`;
+    const tiles = [
+      {label:"Hoy", value: phases[pl.phase] ? (pl.phase==="ready"?"Entrada":pl.phase==="broke"?"Rango roto":pl.phase==="waiting_break"?"Esperando":pl.phase==="failed"?"Fallida":pl.phase==="expired"?"Sin retest":pl.phase) : esc(pl.phase||"—"), sub: esc(phases[pl.phase]||"") + (pl.asia_hi?` · Asia ${fx(pl.asia_lo,"XAUUSD")}–${fx(pl.asia_hi,"XAUUSD")}`:"") + (pl.break_at?` · ruptura ${pl.side===1?"al alza":"a la baja"} ${pl.break_at}`:"") + (pl.retest_at?` · retest ${pl.retest_at}`:"")},
+      {label:"Posición abierta", value: AS.open_position ? `${AS.open_position.side==="buy"?"Largo":"Corto"} ${AS.open_position.units}` : "ninguna", sub: AS.open_position ? `entrada ${fx(AS.open_position.entry,"XAUUSD")}` : "se cierra a las 12:00 NY si sigue abierta"},
+      {label:"Operaciones cerradas", value: String(st.trades||0), sub: st.trades ? `${st.wins} ganadoras · neto ${fmtUSD2(st.net_usd)}` : "todavía ninguna", cls: (st.net_usd||0)>=0?"good":"bad"},
+    ];
+    if (AS.guard && AS.guard.mode && AS.guard.mode!=="off") tiles.push({label:"Freno", value:"activo", sub:esc(AS.guard.reason||""), cls:"bad"});
+    $("sw-asia-kpis").innerHTML = tiles.map(k => `<div class="tile"><div class="label">${esc(k.label)}</div><div class="value">${esc(k.value)}</div><div class="sub ${k.cls||""}">${k.sub}</div></div>`).join("");
+    const tr = AS.trades || [];
+    $("sw-asia-trades").innerHTML = tr.length ? `<thead><tr><th>Cierre (UTC)</th><th class="num">Unidades</th><th class="num">Entrada</th><th class="num">Salida</th><th class="num">Neto</th></tr></thead><tbody>` + [...tr].reverse().map(t=>`<tr><td class="mono" style="font-size:12px">${esc(t.at)}</td><td class="num">${t.units}</td><td class="num">${fx(t.entry,"XAUUSD")}</td><td class="num">${fx(t.exit,"XAUUSD")}</td><td class="num ${t.net>=0?"pos":"neg"}">${fmtUSD2(t.net)}</td></tr>`).join("") + "</tbody>" : `<tbody><tr><td class="empty">Sin operaciones cerradas todavía.</td></tr></tbody>`;
+    $("sw-asia-note").textContent = "Origen: única variante consistente del estudio del rango de Londres (docs/london_range_gold.json): 238 operaciones en 3 años, acierto 50 %, PF 1,19, positiva los cuatro años. Sigue siendo una sola variante entre veinte, así que se evalúa en demo antes de creer en ella.";
   }
   const SIM = SW.simulation;
   if (SIM && SIM.scenarios) {

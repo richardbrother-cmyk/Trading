@@ -139,6 +139,28 @@ def cmd_swing_run(args) -> int:
     return 0
 
 
+def cmd_asia_run(args) -> int:
+    """Ciclo del bot intradia 'retest de Asia' sobre el oro en la cuenta demo de cTrader."""
+    from .asiabot import ASIA_LABEL, params_from_env, run_asia_cycle
+    from .ctrader import CTraderSession
+    from .ctrader_auth import load_access_token
+
+    s = _settings(args)
+    s.broker = "ctrader"
+    s.validate()
+    token = load_access_token(os.path.join(s.state_dir, "ctrader_tokens.json"), s.ctrader_client_id,
+                              s.ctrader_client_secret, s.ctrader_access_token, s.ctrader_refresh_token)
+    session = CTraderSession(s.ctrader_client_id, s.ctrader_client_secret, token, s.ctrader_account_login or None, demo=s.ctrader_demo)
+    try:
+        session.load_symbols(s.symbols)
+        summary = run_asia_cycle(s, session, p=params_from_env(s), dry_run=args.dry_run, label=os.getenv("ASIA_LABEL", ASIA_LABEL),
+                                 state_path=os.getenv("ASIA_STATE_PATH", "docs/asia_state.json"))
+    finally:
+        session.close()
+    print(json.dumps(summary, indent=2, default=str, ensure_ascii=False))
+    return 0
+
+
 def cmd_ctrader_check(args) -> int:
     """Verifica autorizacion, cuenta y simbolos de cTrader sin operar."""
     s = _settings(args)
@@ -205,6 +227,9 @@ def main(argv: list[str] | None = None) -> int:
     sw = sub.add_parser("swing-run", help="ciclo del bot swing (bandas H4, solo largos) en cTrader")
     sw.add_argument("--dry-run", action="store_true")
     sw.set_defaults(func=cmd_swing_run)
+    asb = sub.add_parser("asia-run", help="ciclo del bot intradia 'retest de Asia' (XAUUSD) en cTrader")
+    asb.add_argument("--dry-run", action="store_true")
+    asb.set_defaults(func=cmd_asia_run)
 
     cc = sub.add_parser("ctrader-check", help="verifica autorizacion, cuenta y simbolos de cTrader")
     cc.set_defaults(func=cmd_ctrader_check)

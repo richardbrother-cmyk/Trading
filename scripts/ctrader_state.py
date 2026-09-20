@@ -129,8 +129,11 @@ def collect(s: Settings, swing: bool = False, initial: float | None = None, labe
         pnl = sum(by_pos.values())
         positions = []
         prices: dict[str, float] = {}
+        labels = {x.strip() for x in str(label).split(",") if x.strip()}
         for p in session.positions(only_bot=False):
-            if p.side != "buy" or (swing and p.label != SWING_LABEL):
+            if swing and p.label not in labels:
+                continue
+            if not swing and p.side != "buy":
                 continue
             if p.position_id in by_pos and p.units > 0:
                 # precio implicito en el resultado neto del servidor: mas fiel que el ultimo cierre diario
@@ -143,17 +146,17 @@ def collect(s: Settings, swing: bool = False, initial: float | None = None, labe
                     except Exception:  # noqa: BLE001
                         prices[p.symbol] = p.price
                 px = prices[p.symbol]
-                pos_pnl = (px - p.price) * p.units
-            own_label = label if swing else BOT_LABEL
-            positions.append({"symbol": p.symbol, "qty": p.units, "avg": p.price, "price": round(px, 6), "stop": p.stop_loss,
+                pos_pnl = (px - p.price) * p.units * (1 if p.side == "buy" else -1)
+            is_own = (p.label in labels) if swing else (p.label == BOT_LABEL)
+            positions.append({"symbol": p.symbol, "qty": p.units, "side": p.side, "avg": p.price, "price": round(px, 6), "stop": p.stop_loss,
                               "target": p.take_profit or None, "opened_at": p.opened_at.strftime("%Y-%m-%dT%H:%MZ") if p.opened_at else None,
-                              "pnl": round(pos_pnl, 2), "position_id": p.position_id, "bot": p.label == own_label,
-                              "origin": classify(p.label == own_label, p.opened_at, cutoff)})
+                              "pnl": round(pos_pnl, 2), "position_id": p.position_id, "bot": is_own, "label": p.label,
+                              "origin": classify(is_own, p.opened_at, cutoff)})
         trades = []
         try:
             for d in session.deals(days=14):
                 if d["closes"]:
-                    is_bot = d.get("label") == (label if swing else BOT_LABEL)
+                    is_bot = (d.get("label") in labels) if swing else (d.get("label") == BOT_LABEL)
                     trades.append({"symbol": d["symbol"], "at": d["at"].strftime("%Y-%m-%dT%H:%MZ"), "units": d["units"], "entry": d["entry_price"],
                                    "exit": d["price"], "gross": round(d["gross"], 2), "swap": round(d["swap"], 2),
                                    "commission": round(d["close_commission"], 2), "net": d["net"], "balance_after": d["balance_after"],
@@ -211,7 +214,7 @@ def collect(s: Settings, swing: bool = False, initial: float | None = None, labe
                     flows.append({"at": snapshot["at"], "type": "deposit", "delta": flow, "balance_after": round(balance, 2)})
             snapshot["cash_flows"] = flows[-20:]
             snapshot["withdrawal"] = withdrawal_status(snapshot["equity"], base, trigger, withdraw_pct, last_at)
-        rec = last_cycle(s.state_dir, swing=True, label=label)
+        rec = last_cycle(s.state_dir, swing=True, label=str(label).split(",")[0].strip())
         cycle = swing_cycle(rec) if rec else None
         if cycle:
             snapshot["last_run"] = cycle
