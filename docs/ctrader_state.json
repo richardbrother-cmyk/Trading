@@ -2,7 +2,7 @@
  "available": true,
  "broker": "Fusion Markets · cTrader demo",
  "account": 10136967,
- "at": "2026-09-20T18:11Z",
+ "at": "2026-09-20T21:27Z",
  "balance": 9272.48,
  "equity": 9291.36,
  "unrealized_pnl": 18.88,
@@ -11,6 +11,7 @@
   {
    "symbol": "XAGUSD",
    "qty": 50.0,
+   "side": "buy",
    "avg": 63.137,
    "price": 66.159,
    "stop": 61.203,
@@ -19,11 +20,13 @@
    "pnl": 151.1,
    "position_id": 43025194,
    "bot": true,
+   "label": "autotrader",
    "origin": "excluded"
   },
   {
    "symbol": "XPTUSD",
    "qty": 3.0,
+   "side": "buy",
    "avg": 1768.39,
    "price": 1795.253333,
    "stop": 1714.67,
@@ -32,11 +35,13 @@
    "pnl": 80.59,
    "position_id": 43025196,
    "bot": true,
+   "label": "autotrader",
    "origin": "excluded"
   },
   {
    "symbol": "WHEAT",
    "qty": 8.0,
+   "side": "buy",
    "avg": 702.9,
    "price": 693.94625,
    "stop": 681.68,
@@ -45,11 +50,13 @@
    "pnl": -71.63,
    "position_id": 43025294,
    "bot": true,
+   "label": "autotrader",
    "origin": "excluded"
   },
   {
    "symbol": "CORN",
    "qty": 10.0,
+   "side": "buy",
    "avg": 516.05,
    "price": 508.778,
    "stop": 500.63,
@@ -58,11 +65,13 @@
    "pnl": -72.72,
    "position_id": 43025295,
    "bot": true,
+   "label": "autotrader",
    "origin": "excluded"
   },
   {
    "symbol": "XTIUSD",
    "qty": 50.0,
+   "side": "buy",
    "avg": 102.164,
    "price": 100.236,
    "stop": 99.103,
@@ -71,11 +80,13 @@
    "pnl": -96.4,
    "position_id": 43036316,
    "bot": true,
+   "label": "autotrader",
    "origin": "excluded"
   },
   {
    "symbol": "XNGUSD",
    "qty": 2000.0,
+   "side": "buy",
    "avg": 2.879,
    "price": 2.88079,
    "stop": 2.793,
@@ -84,11 +95,13 @@
    "pnl": 3.58,
    "position_id": 43036317,
    "bot": true,
+   "label": "autotrader",
    "origin": "excluded"
   },
   {
    "symbol": "XAUUSD",
    "qty": 1.0,
+   "side": "buy",
    "avg": 4292.57,
    "price": 4373.99,
    "stop": 4163.61,
@@ -97,11 +110,13 @@
    "pnl": 81.42,
    "position_id": 43068680,
    "bot": true,
+   "label": "autotrader",
    "origin": "bot"
   },
   {
    "symbol": "XBRUSD",
    "qty": 50.0,
+   "side": "buy",
    "avg": 105.358,
    "price": 104.2168,
    "stop": 102.168,
@@ -110,6 +125,7 @@
    "pnl": -57.06,
    "position_id": 43197234,
    "bot": true,
+   "label": "autotrader",
    "origin": "bot"
   }
  ],
@@ -299,7 +315,7 @@
   "entries_before": "2026-09-15T00:00Z"
  },
  "last_run": {
-  "at": "2026-09-20 18:11",
+  "at": "2026-09-20 21:27",
   "equity": 9291.359999999999,
   "positions": 8,
   "buys": 0,
@@ -500,6 +516,10 @@
   ],
   [
    "2026-09-20T18:11Z",
+   9291.36
+  ],
+  [
+   "2026-09-20T21:27Z",
    9291.36
   ]
  ],
@@ -2978,6 +2998,109 @@
   },
   {
    "at": "2026-09-20 18:11",
+   "equity": 9291.359999999999,
+   "positions": 8,
+   "buys": 0,
+   "sells": 0,
+   "errors": 0,
+   "note": "mercado cerrado",
+   "decisions": [
+    {
+     "symbol": "XAUUSD",
+     "action": "HOLD",
+     "rsi": 51.03186254844831,
+     "trend_up": true,
+     "close": 4377.89
+    },
+    {
+     "symbol": "XAGUSD",
+     "action": "HOLD",
+     "rsi": 53.947304373944284,
+     "trend_up": true,
+     "close": 66.23400000000001
+    },
+    {
+     "symbol": "XPTUSD",
+     "action": "HOLD",
+     "rsi": 51.98776901274111,
+     "trend_up": true,
+     "close": 1797.93
+    },
+    {
+     "symbol": "XTIUSD",
+     "action": "HOLD",
+     "rsi": 61.6497027389391,
+     "trend_up": true,
+     "close": 100.151
+    },
+    {
+     "symbol": "XBRUSD",
+     "action": "HOLD",
+     "rsi": 59.92998596559879,
+     "trend_up": true,
+     "close": 104.092
+    },
+    {
+     "symbol": "XNGUSD",
+     "action": "HOLD",
+     "rsi": 52.35135182137534,
+     "trend_up": true,
+     "close": 2.887
+    },
+    {
+     "symbol": "COFARA",
+     "action": "HOLD",
+     "rsi": 32.093825904179084,
+     "trend_up": false,
+     "close": 292.65000000000003
+    },
+    {
+     "symbol": "COTTON",
+     "action": "BUY",
+     "rsi": 34.677326681817505,
+     "trend_up": true,
+     "close": 79.75999999999999
+    },
+    {
+     "symbol": "WHEAT",
+     "action": "HOLD",
+     "rsi": 48.03670794563049,
+     "trend_up": true,
+     "close": 695.65
+    },
+    {
+     "symbol": "CORN",
+     "action": "HOLD",
+     "rsi": 59.997207771345394,
+     "trend_up": true,
+     "close": 510.75
+    },
+    {
+     "symbol": "SUGAR",
+     "action": "BUY",
+     "rsi": 44.3049813136352,
+     "trend_up": true,
+     "close": 512.79
+    },
+    {
+     "symbol": "US500",
+     "action": "BUY",
+     "rsi": 51.18161079831198,
+     "trend_up": true,
+     "close": 7658.56
+    },
+    {
+     "symbol": "NAS100",
+     "action": "BUY",
+     "rsi": 56.37416402560894,
+     "trend_up": true,
+     "close": 29666.11
+    }
+   ],
+   "protection": []
+  },
+  {
+   "at": "2026-09-20 21:27",
    "equity": 9291.359999999999,
    "positions": 8,
    "buys": 0,
