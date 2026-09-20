@@ -356,6 +356,16 @@ lado contrario, objetivo 2R o 3R, salida a las 12:00 o 17:00) da PF entre 1,01 y
 positivo (año de rally del oro); hacer lo contrario (vender la ruptura) es peor (PF 0,90 a 0,97). Conclusión: la
 cuenta es cierta y es aritmética (una caja pequeña delante de un movimiento grande), no una ventaja operable.
 
+Segunda parte del hilo: la vela de las 08:30 de Nueva York mide 1,62 veces la vela media del día en los últimos 250
+días (el hilo dice 1,63; en 3 años, 2,07) y es mayor que la media el 72 % de los días: cierto. Entrar en el retest
+del nivel tras el cierre fuera (invalidación en mitad del rango o en el lado contrario, 2R o 3R, salida 12:00 o
+17:00): 273 operaciones, PF entre 1,01 y 1,06, solo 2025 positivo, sin borde. Vender la ruptura fallida (cierre de
+vuelta dentro del rango, stop en el extremo, objetivo 1R, 2R o el lado contrario): 427 operaciones, PF entre 0,78 y
+0,95, negativo los cuatro años; es la peor de todas. La única variante consistente es el retest del rango de ASIA
+(19:00-03:00 NY), 2R, stop en mitad: 238 operaciones, acierto 50 %, PF 1,19, positiva los cuatro años, racha máxima
+de 5 y caída máxima de 640 USD por cada 100 de riesgo; coincide con "respeta el extremo de Asia" del hilo, pero es una
+sola variante entre veinte y la ganancia media es de 7 USD por cada 100 arriesgados.
+
 ### Cuenta agresiva (500 USD)
 
 Tercera cuenta demo, workflow `ctrader-aggr.yml`, mismo motor que el bot swing con otro perfil

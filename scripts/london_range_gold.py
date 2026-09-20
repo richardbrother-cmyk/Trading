@@ -138,6 +138,133 @@ def trade_first_break(S: pd.DataFrame, risk: float, rr: float, stop_mode: str = 
     return trades
 
 
+def bar_830_stats(S: pd.DataFrame, df: pd.DataFrame) -> dict:
+    """Tamano de la vela 08:30-08:45 NY frente a la vela media de 15 min del mismo dia."""
+    ny = df.tz_convert(NY)
+    tday = (ny.index + pd.Timedelta(hours=6)).date
+    ny = ny.assign(tday=tday, hm=ny.index.hour * 60 + ny.index.minute, rng=ny.high - ny.low)
+    ratios, rank = [], []
+    for day, g in ny.groupby("tday"):
+        b = g[g.hm == 8 * 60 + 30]
+        if len(b) != 1 or len(g) < 40:
+            continue
+        ratios.append(float(b.rng.iloc[0] / g.rng.mean()))
+        rank.append(float((g.rng > b.rng.iloc[0]).mean()))  # fraccion de velas del dia mas grandes que la de las 8:30
+    return {"days": len(ratios), "ratio_mean": round(float(np.mean(ratios)), 2), "ratio_median": round(float(np.median(ratios)), 2),
+            "share_days_bigger_than_avg": round(float(np.mean(np.array(ratios) > 1)), 3), "median_share_of_bars_bigger": round(float(np.median(rank)), 3)}
+
+
+def _bars_window(r, exit_hm: int) -> pd.DataFrame:
+    bars = pd.concat([r.nym, r.after]) if exit_hm > 12 * 60 else r.nym
+    hm = bars.index.hour * 60 + bars.index.minute
+    return bars[hm < exit_hm]
+
+
+def _run(bars: pd.DataFrame, i_entry: int, d: int, entry: float, stop: float, tp: float, risk: float) -> tuple[float, str]:
+    for j in range(i_entry, len(bars)):
+        b = bars.iloc[j]
+        if (d == 1 and b.low <= stop) or (d == -1 and b.high >= stop):
+            return stop, "stop"
+        if (d == 1 and b.high >= tp) or (d == -1 and b.low <= tp):
+            return tp, "objetivo"
+    return float(bars.close.iloc[-1]), "cierre"
+
+
+def trade_retest(S: pd.DataFrame, risk: float, rr: float, max_wait: int = 8, exit_hm: int = 12 * 60, stop_mode: str = "mid",
+                 level: str = "london") -> list[dict]:
+    """Regla del hilo: vela que cierra fuera del rango, luego el precio vuelve a tocar el nivel (retest) sin cerrar dentro;
+    entrada en la apertura de la vela siguiente al retest, invalidacion dentro del rango (mitad) o en el lado contrario."""
+    trades = []
+    for _, r in S.iterrows():
+        hi, lo = (r.lon_hi, r.lon_lo) if level == "london" else (r.asia_hi, r.asia_lo)
+        rng = hi - lo
+        if rng <= 0:
+            continue
+        bars = _bars_window(r, exit_hm)
+        side, i0 = 0, None
+        for i, (t, b) in enumerate(bars.iterrows()):
+            if t.hour * 60 + t.minute >= 12 * 60:
+                break
+            if b.close > hi:
+                side, i0 = 1, i; break
+            if b.close < lo:
+                side, i0 = -1, i; break
+        if side == 0:
+            continue
+        lvl = hi if side == 1 else lo
+        i_re = None
+        for j in range(i0 + 1, min(len(bars), i0 + 1 + max_wait)):
+            b = bars.iloc[j]
+            if (side == 1 and b.close < hi) or (side == -1 and b.close > lo):
+                break  # cierre de vuelta dentro: ruptura fallida, no hay retest valido
+            if (side == 1 and b.low <= lvl) or (side == -1 and b.high >= lvl):
+                i_re = j; break
+        if i_re is None or i_re + 1 >= len(bars):
+            continue
+        entry = float(bars.open.iloc[i_re + 1]) + side * SPREAD / 2
+        stop = (hi + lo) / 2 if stop_mode == "mid" else (lo if side == 1 else hi)
+        dist = abs(entry - stop)
+        if dist <= 0 or (side == 1 and entry <= stop) or (side == -1 and entry >= stop):
+            continue
+        tp = entry + side * rr * dist
+        units = risk / dist
+        exit_px, reason = _run(bars, i_re + 1, side, entry, stop, tp, risk)
+        pnl = (exit_px - entry) * side * units - SPREAD / 2 * units
+        trades.append({"day": r.day, "side": side, "entry": round(entry, 2), "stop": round(stop, 2), "exit": round(exit_px, 2), "reason": reason,
+                       "pnl": round(pnl, 2), "r": round(pnl / risk, 3)})
+    return trades
+
+
+def trade_failed_break(S: pd.DataFrame, risk: float, rr: float | None = 2.0, exit_hm: int = 12 * 60, level: str = "london",
+                       target: str = "rr") -> list[dict]:
+    """Regla del hilo: el precio rompe el rango (cierre fuera) y luego una vela cierra de vuelta dentro; se opera en contra
+    con stop en el extremo alcanzado fuera y objetivo rr x riesgo o el lado contrario del rango."""
+    trades = []
+    for _, r in S.iterrows():
+        hi, lo = (r.lon_hi, r.lon_lo) if level == "london" else (r.asia_hi, r.asia_lo)
+        if hi - lo <= 0:
+            continue
+        bars = _bars_window(r, exit_hm)
+        side, i0 = 0, None
+        for i, (t, b) in enumerate(bars.iterrows()):
+            if t.hour * 60 + t.minute >= 12 * 60:
+                break
+            if b.close > hi:
+                side, i0 = 1, i; break
+            if b.close < lo:
+                side, i0 = -1, i; break
+        if side == 0:
+            continue
+        i_fail, ext = None, None
+        for j in range(i0 + 1, len(bars)):
+            t = bars.index[j]
+            if t.hour * 60 + t.minute >= 12 * 60:
+                break
+            b = bars.iloc[j]
+            if (side == 1 and b.close < hi) or (side == -1 and b.close > lo):
+                i_fail = j
+                seg = bars.iloc[i0:j + 1]
+                ext = float(seg.high.max()) if side == 1 else float(seg.low.min())
+                break
+        if i_fail is None or i_fail + 1 >= len(bars):
+            continue
+        d = -side
+        entry = float(bars.open.iloc[i_fail + 1]) + d * SPREAD / 2
+        stop = ext
+        dist = abs(entry - stop)
+        if dist <= 0:
+            continue
+        tp = (lo if side == 1 else hi) if target == "opposite" else entry + d * rr * dist
+        if (d == 1 and tp <= entry) or (d == -1 and tp >= entry):
+            continue
+        units = risk / dist
+        exit_px, reason = _run(bars, i_fail + 1, d, entry, stop, tp, risk)
+        pnl = (exit_px - entry) * d * units - SPREAD / 2 * units
+        trades.append({"day": r.day, "side": d, "entry": round(entry, 2), "stop": round(stop, 2), "exit": round(exit_px, 2), "reason": reason,
+                       "pnl": round(pnl, 2), "r": round(pnl / risk, 3)})
+    return trades
+
+
 def summarize(tr: list[dict]) -> dict:
     if not tr:
         return {"trades": 0}
@@ -162,13 +289,17 @@ def main() -> int:
     ap.add_argument("--risk", type=float, default=100.0)
     ap.add_argument("--out", default="docs/london_range_gold.json")
     args = ap.parse_args()
-    S = sessions(load_bars(args.data))
+    raw = load_bars(args.data)
+    S = sessions(raw)
     last = S.tail(args.days)
     res = {"generated_at": datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC"), "period": [S.day.iloc[0], S.day.iloc[-1]],
            "counts_last": {"days_requested": args.days, **counts(last)}, "counts_all": counts(S), "risk_usd": args.risk, "strategies": {}}
     print(f"periodo {res['period']} · {len(S)} dias")
     for k, v in (("ultimos %d dias" % args.days, res["counts_last"]), ("3 anos", res["counts_all"])):
         print(f"[{k}] " + ", ".join(f"{a}={b}" for a, b in v.items()))
+    res["bar_830"] = {"last": bar_830_stats(last, raw.tz_convert(NY)[raw.tz_convert(NY).index.date >= pd.Timestamp(last.day.iloc[0]).date()].tz_convert("UTC")),
+                      "all": bar_830_stats(S, raw)}
+    print("[vela 08:30 NY]", res["bar_830"])
     variants = [
         ("ruptura_mid_rr2", "Primera ruptura, stop en mitad del rango, 2R, salida 12:00 NY", dict(rr=2.0, stop_mode="mid")),
         ("ruptura_mid_rr3", "Primera ruptura, stop en mitad del rango, 3R, salida 12:00 NY", dict(rr=3.0, stop_mode="mid")),
@@ -179,8 +310,22 @@ def main() -> int:
         ("fade_mid_rr2", "Lo contrario: vender la ruptura (vuelta al rango), stop medio rango, 2R", dict(rr=2.0, stop_mode="mid", fade=True)),
         ("fade_mid_rr1", "Lo contrario con objetivo 1R", dict(rr=1.0, stop_mode="mid", fade=True)),
     ]
+    extra = [
+        ("retest_mid_rr2", "Cierre fuera + retest del nivel, stop en mitad del rango, 2R, salida 12:00", lambda: trade_retest(S, args.risk, 2.0)),
+        ("retest_mid_rr3", "Retest, stop en mitad, 3R, salida 12:00", lambda: trade_retest(S, args.risk, 3.0)),
+        ("retest_opp_rr2", "Retest, stop en el lado contrario, 2R", lambda: trade_retest(S, args.risk, 2.0, stop_mode="opposite")),
+        ("retest_mid_rr2_17h", "Retest, stop en mitad, 2R, salida 17:00", lambda: trade_retest(S, args.risk, 2.0, exit_hm=17 * 60)),
+        ("retest_asia_mid_rr2", "Retest del rango de ASIA, stop en mitad, 2R", lambda: trade_retest(S, args.risk, 2.0, level="asia")),
+        ("fallida_rr2", "Ruptura fallida (cierre de vuelta dentro): en contra, stop en el extremo, 2R, salida 12:00", lambda: trade_failed_break(S, args.risk, 2.0)),
+        ("fallida_rr1", "Ruptura fallida, objetivo 1R", lambda: trade_failed_break(S, args.risk, 1.0)),
+        ("fallida_lado_contrario", "Ruptura fallida, objetivo el lado contrario del rango", lambda: trade_failed_break(S, args.risk, None, target="opposite")),
+        ("fallida_rr2_17h", "Ruptura fallida, 2R, salida 17:00", lambda: trade_failed_break(S, args.risk, 2.0, exit_hm=17 * 60)),
+        ("fallida_asia_rr2", "Ruptura fallida del rango de ASIA, 2R", lambda: trade_failed_break(S, args.risk, 2.0, level="asia")),
+    ]
+    for key, desc, fn in extra:
+        variants.append((key, desc, fn))
     for key, desc, kw in variants:
-        tr = trade_first_break(S, args.risk, **kw)
+        tr = kw() if callable(kw) else trade_first_break(S, args.risk, **kw)
         m = summarize(tr)
         res["strategies"][key] = {"description": desc, **m}
         print(f"{key:32s} ops {m['trades']:3d} acierto {m.get('win_rate',0):.0%} objetivo {m.get('target_rate',0):.0%} R medio {m.get('avg_r',0):+.2f} "
