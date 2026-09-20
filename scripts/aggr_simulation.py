@@ -5,7 +5,7 @@
 2. Se simula una sola cuenta de 500 USD que recorre esa secuencia en orden: riesgo 6 % del equity por operacion, lote
    minimo del simbolo (se descarta la operacion si el lote minimo arriesga mas del 9 %), maximo 3 posiciones a la vez y
    freno del 30 % de caida desde el maximo (cuando salta, deja de abrir posiciones hasta que alguien lo rearme; aqui se
-   supone que no se rearma). Parametros vivos: riesgo 3 %, freno 50 %.
+   supone que no se rearma). Parametros vivos: riesgo 6 %, freno 50 %, regla de retiros 30 % al ganar 80 %.
 3. Monte Carlo: se repite la misma agenda de operaciones (fechas, solapes, distancias al stop) barajando los resultados
    en R con reemplazo, para ver el abanico de trayectorias que la misma estrategia y los mismos parametros pueden dar.
 
@@ -50,7 +50,7 @@ def ensure_specs(symbols: list[str], data_dir: str, spread_mult: float = 1.0) ->
 
 PARAMS = dict(strategy="breakout", timeframe="H4", stop_atr=0.75, tp_atr=4.5, pure_rr=True, allow_short=False, max_hold_days=7.0,
               breakout_bars=20, breakeven_r=2.0, breakeven_lock_r=0.1)
-ACCOUNT = dict(initial=500.0, risk_pct=0.03, max_risk_pct=0.045, max_positions=3, max_drawdown_pct=0.50,
+ACCOUNT = dict(initial=500.0, risk_pct=0.06, max_risk_pct=0.09, max_positions=3, max_drawdown_pct=0.50,
                # Regla de retiros (escenario "retiros"): cuando la cuenta gana withdraw_trigger sobre su base (el saldo tras el
                # ultimo retiro, o el inicial) se retira withdraw_pct del saldo; la base y el maximo del freno pasan a ser lo que queda.
                withdraw_trigger=0.80, withdraw_pct=0.30)

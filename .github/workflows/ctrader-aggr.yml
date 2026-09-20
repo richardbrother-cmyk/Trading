@@ -72,9 +72,10 @@ jobs:
       SWING_BREAKEVEN_LOCK_R: ${{ vars.AGGR_BREAKEVEN_LOCK_R || '0.1' }}
       SWING_LABEL: "autotrader-aggr"
       SWING_MAX_POSITIONS: "3"
-      # Riesgo por operacion 3 % (decidido con la simulacion a 3 anos: con 6 % la cuenta no sobrevivia al ano plano).
+      # Riesgo por operacion 6 % (cuenta demo: se prueba la regla de forma agresiva junto con la regla de retiros del 30 %
+      # al ganar 80 %; la simulacion a 3 anos con 6 % y freno 50 % esta en docs/aggr_simulation.json).
       # Valor fijo en el workflow: la variable AGGR_RISK_PER_TRADE del repositorio ya no se lee.
-      RISK_PER_TRADE: "0.03"
+      RISK_PER_TRADE: "0.06"
       # Tope para aceptar el lote minimo: si no se fija, 1,5x el riesgo por operacion
       SWING_MAX_RISK_PCT: ${{ vars.AGGR_MAX_RISK_PCT || '0' }}
       SWING_MAX_SIGNAL_AGE_HOURS: "2"

@@ -374,8 +374,8 @@ Regla: rango de Asia (19:00 a 03:00 de Nueva York) de XAUUSD; en la mañana de N
 min que cierra fuera del rango marca el lado; después el precio debe volver a tocar el nivel en las 8 velas siguientes
 sin que ninguna cierre de vuelta dentro; entrada a mercado en la vela siguiente al retest, stop en la mitad del rango y
 objetivo 2R enviados con la orden; cierre de lo que quede a las 12:00 NY; una operación al día. Riesgo 6 % del equity
-(lote mínimo aceptado hasta 9 %; al ser demo se prueba la regla de forma agresiva, el bot de rupturas de la misma
-cuenta sigue al 3 %). El bot recalcula el plan del día en cada ciclo a partir de las velas cerradas, así
+(lote mínimo aceptado hasta 9 %; al ser demo se prueba la regla de forma agresiva, igual que el bot de rupturas de
+la misma cuenta). El bot recalcula el plan del día en cada ciclo a partir de las velas cerradas, así
 que no depende de un estado en memoria; solo entra si la vela del retest es la última cerrada (no persigue entradas
 tardías). Respeta `BOT_HALT` y el freno del 50 % de la cuenta; no aplica las ventanas de eventos (el estudio incluyó
 esos días). El estado de la cuenta agresiva trata las etiquetas `autotrader-aggr` y `autotrader-asia` como propias.
@@ -386,10 +386,10 @@ Tercera cuenta demo, workflow `ctrader-aggr.yml`, mismo motor que el bot swing c
 (`SWING_STRATEGY`, `SWING_STOP_ATR`, `SWING_TP_ATR`, `SWING_PURE_RR`, `SWING_MAX_HOLD_DAYS`,
 `SWING_LABEL`, `SWING_MAX_POSITIONS`): ruptura de 4 h (cierre sobre el máximo de 20 barras y sobre la
 EMA200), solo largos, stop a 0,75 ATR y objetivo fijo a 6 veces el stop enviados con la orden, salida a
-los 7 días, máximo 3 posiciones abiertas, etiqueta `autotrader-aggr`. Riesgo por operación 3 % y freno
-por drawdown al 50 % desde el máximo, fijados en el workflow tras la simulación a 3 años (con 6 % y 30 % el
-freno saltaba a los dos meses en todos los recorridos y sin freno la cuenta no sobrevivía a 2025); las variables
-`AGGR_RISK_PER_TRADE` y `AGGR_MAX_DRAWDOWN_PCT` ya no se leen. Estado en `docs/aggr_state.json` y pestaña propia
+los 7 días, máximo 3 posiciones abiertas, etiqueta `autotrader-aggr`. Riesgo por operación 6 % y freno
+por drawdown al 50 % desde el máximo, fijados en el workflow (al ser demo se prueba de forma agresiva junto con la
+regla de retiros; la simulación a 3 años con 6 % y freno 30 % mostraba el freno saltando a los dos meses, con 50 %
+salta de mediana al cuarto mes); las variables `AGGR_RISK_PER_TRADE` y `AGGR_MAX_DRAWDOWN_PCT` ya no se leen. Estado en `docs/aggr_state.json` y pestaña propia
 en el panel.
 
 **Stop a break even** (`SWING_BREAKEVEN_R`, variable `AGGR_BREAKEVEN_R`, 2 R por defecto; `SWING_BREAKEVEN_LOCK_R`,
