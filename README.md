@@ -373,8 +373,9 @@ a viernes), etiqueta `autotrader-asia`, estado en `docs/asia_state.json` y secci
 Regla: rango de Asia (19:00 a 03:00 de Nueva York) de XAUUSD; en la mañana de NY (08:00 a 12:00) la primera vela de 15
 min que cierra fuera del rango marca el lado; después el precio debe volver a tocar el nivel en las 8 velas siguientes
 sin que ninguna cierre de vuelta dentro; entrada a mercado en la vela siguiente al retest, stop en la mitad del rango y
-objetivo 2R enviados con la orden; cierre de lo que quede a las 12:00 NY; una operación al día. Riesgo 3 % del equity
-(lote mínimo aceptado hasta 4,5 %). El bot recalcula el plan del día en cada ciclo a partir de las velas cerradas, así
+objetivo 2R enviados con la orden; cierre de lo que quede a las 12:00 NY; una operación al día. Riesgo 6 % del equity
+(lote mínimo aceptado hasta 9 %; al ser demo se prueba la regla de forma agresiva, el bot de rupturas de la misma
+cuenta sigue al 3 %). El bot recalcula el plan del día en cada ciclo a partir de las velas cerradas, así
 que no depende de un estado en memoria; solo entra si la vela del retest es la última cerrada (no persigue entradas
 tardías). Respeta `BOT_HALT` y el freno del 50 % de la cuenta; no aplica las ventanas de eventos (el estudio incluyó
 esos días). El estado de la cuenta agresiva trata las etiquetas `autotrader-aggr` y `autotrader-asia` como propias.

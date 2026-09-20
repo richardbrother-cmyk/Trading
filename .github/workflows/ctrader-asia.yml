@@ -53,7 +53,8 @@ jobs:
       BOT_HALT: ${{ vars.AGGR_BOT_HALT || vars.BOT_HALT || 'off' }}
       MAX_DRAWDOWN_PCT: "0.50"
       SYMBOLS: "XAUUSD"
-      RISK_PER_TRADE: "0.03"
+      # 6 % de riesgo por operacion (cuenta demo: se prueba la regla de forma agresiva); lote minimo aceptado hasta 9 %
+      RISK_PER_TRADE: "0.06"
       ASIA_RR: "2.0"
       ASIA_MAX_WAIT_BARS: "8"
       ASIA_LABEL: "autotrader-asia"
