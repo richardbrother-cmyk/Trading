@@ -1,18 +1,9 @@
 {
- "at": "2026-09-21T14:30Z",
- "ny_time": "2026-09-21 10:30",
- "equity": 545.06,
+ "at": "2026-09-21T16:00Z",
+ "ny_time": "2026-09-21 12:00",
+ "equity": 561.29,
  "plan": {
-  "phase": "retest",
-  "side": -1,
-  "level": 4346.39,
-  "break_at": "09:45",
-  "retest_at": "10:00",
-  "stop": 4364.885,
-  "day": "2026-09-21",
-  "asia_hi": 4383.38,
-  "asia_lo": 4346.39,
-  "bars_seen": 10
+  "phase": "fuera de horario"
  },
  "open_position": {
   "symbol": "XAUUSD",
@@ -35,7 +26,17 @@
    "status": "order_accepted"
   }
  ],
- "trades": [],
+ "trades": [
+  {
+   "at": "2026-09-21T16:00Z",
+   "symbol": "XAUUSD",
+   "units": 1.0,
+   "entry": 4339.1,
+   "exit": 4345.68,
+   "net": -6.68,
+   "opened_at": "2026-09-21T14:15Z"
+  }
+ ],
  "params": {
   "rr": 2.0,
   "max_wait_bars": 8,
@@ -45,10 +46,15 @@
  "guard": {
   "mode": "off",
   "reason": "",
-  "peak": 545.06,
-  "drawdown": 0.0
+  "peak": 561.46,
+  "drawdown": -0.0003
  },
  "label": "autotrader-asia",
  "symbol": "XAUUSD",
- "last_trade_day": "2026-09-21"
+ "last_trade_day": "2026-09-21",
+ "stats": {
+  "trades": 1,
+  "wins": 0,
+  "net_usd": -6.68
+ }
 }
