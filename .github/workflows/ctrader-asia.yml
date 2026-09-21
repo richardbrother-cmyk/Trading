@@ -3,11 +3,14 @@ name: ctrader-asia
 # Bot intradia "retest de Asia" sobre el oro (XAUUSD) en la MISMA cuenta demo agresiva de cTrader (500 USD):
 # rango de Asia (19:00-03:00 NY), primera vela de 15 min de la manana de NY que cierra fuera, retest del nivel sin
 # cerrar dentro, entrada a favor con stop en la mitad del rango y objetivo 2R, cierre a las 12:00 NY. Una operacion al dia.
-# Corre cada 15 minutos de 12:00 a 17:59 UTC (cubre la manana de NY en horario de verano e invierno); el bot decide por
-# hora de Nueva York. Secrets: los mismos que ctrader-aggr.
+# El cron de GitHub es poco fiable (hoy dispara cada varias horas), asi que en vez de un run cada 15 minutos hay UN run
+# diario que arranca antes de las 08:00 de Nueva York y repite el ciclo cada cuarto de hora dentro del propio job hasta
+# las 12:06 NY. Si el cron llega tarde, el bucle empieza donde este; si no llega, el vigilante de la sesion de Claude
+# lo lanza a mano (workflow_dispatch). Secrets: los mismos que ctrader-aggr.
 on:
   schedule:
-    - cron: "*/15 12-17 * * 1-5"
+    - cron: "50 11 * * 1-5"
+    - cron: "50 12 * * 1-5"
   workflow_dispatch:
     inputs:
       dry_run:
@@ -40,7 +43,7 @@ jobs:
     needs: gate
     if: ${{ needs.gate.outputs.enabled == 'true' }}
     runs-on: ubuntu-latest
-    timeout-minutes: 8
+    timeout-minutes: 330
     env:
       BROKER: ctrader
       DATA_PROVIDER: ctrader
@@ -67,34 +70,43 @@ jobs:
       - run: pip install -r requirements.txt
       - name: Tests
         run: python -m pytest -q tests/test_asiabot.py tests/test_guard.py
-      - name: Ciclo Asia
-        id: cycle
-        run: |
-          python -m autotrader.cli --env /dev/null asia-run ${{ inputs.dry_run && '--dry-run' || '' }} | tee /tmp/asia.json
-          python - <<'PY' >> "$GITHUB_OUTPUT"
-          import json, re
-          txt = open("/tmp/asia.json").read()
-          d = json.loads(txt[txt.index("{"):])
-          print("publish=" + ("true" if d.get("publish") else "false"))
-          PY
-      - name: Publicar estado
-        if: ${{ !inputs.dry_run && steps.cycle.outputs.publish == 'true' }}
+      - name: Ciclos de la manana de NY (bucle cada 15 min hasta las 12:06 NY)
+        env:
+          DRY_RUN: ${{ inputs.dry_run && '--dry-run' || '' }}
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          python scripts/dashboard.py --no-live --out reports/dashboard.html
-          cp reports/dashboard.html docs/index.html
-          cp reports/dashboard.html docs/dashboard.html
-          git add docs/asia_state.json docs/index.html docs/dashboard.html
-          if git diff --cached --quiet; then echo "sin cambios"; exit 0; fi
-          git commit -m "Panel: actualización automática (asia)"
-          ok=0
-          for i in 1 2 3 4; do
-            if git pull --rebase -X theirs -q origin "${GITHUB_REF_NAME}" && git push; then ok=1; break; fi
-            git rebase --abort 2>/dev/null || true
-            sleep $((i * 5))
+          publish_state() {
+            python scripts/dashboard.py --no-live --out reports/dashboard.html
+            cp reports/dashboard.html docs/index.html
+            cp reports/dashboard.html docs/dashboard.html
+            git add docs/asia_state.json docs/index.html docs/dashboard.html
+            if git diff --cached --quiet; then echo "sin cambios que publicar"; return 0; fi
+            git commit -q -m "Panel: actualización automática (asia)"
+            for i in 1 2 3 4; do
+              if git pull --rebase -X theirs -q origin "${GITHUB_REF_NAME}" && git push -q; then echo "estado publicado"; return 0; fi
+              git rebase --abort 2>/dev/null || true
+              sleep $((i * 5))
+            done
+            echo "::warning::no se pudo publicar el estado tras 4 intentos"
+          }
+          while true; do
+            python -m autotrader.cli --env /dev/null asia-run $DRY_RUN | tee /tmp/asia.json
+            read -r publish nyhm < <(python - <<'PY'
+          import json
+          from datetime import datetime
+          from zoneinfo import ZoneInfo
+          txt = open("/tmp/asia.json").read()
+          d = json.loads(txt[txt.index("{"):])
+          print("true" if d.get("publish") else "false", datetime.now(ZoneInfo("America/New_York")).strftime("%H%M"))
+          PY
+          )
+            if [ -z "$DRY_RUN" ] && [ "$publish" = "true" ]; then publish_state; fi
+            if [ -n "$DRY_RUN" ]; then echo "dry run: un solo ciclo"; break; fi
+            if [ "$nyhm" -ge 1206 ]; then echo "fin de la ventana (12:06 NY)"; break; fi
+            # dormir hasta el siguiente cuarto de hora (+40 s para que la vela este cerrada en el servidor)
+            sleep $(python -c "import time; t=time.time(); print(int(900 - (t % 900)) + 40)")
           done
-          [ "$ok" = "1" ] || { echo "::error::no se pudo publicar el estado tras 4 intentos"; exit 1; }
       - uses: actions/upload-artifact@v4
         if: always()
         with:

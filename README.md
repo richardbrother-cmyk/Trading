@@ -368,8 +368,10 @@ sola variante entre veinte y la ganancia media es de 7 USD por cada 100 arriesga
 
 ### Bot "retest de Asia" en oro (quinto bot, misma cuenta agresiva)
 
-`autotrader/asiabot.py`, comando `asia-run`, workflow `ctrader-asia.yml` (cada 15 minutos de 12:00 a 17:59 UTC, lunes
-a viernes), etiqueta `autotrader-asia`, estado en `docs/asia_state.json` y sección propia en la pestaña agresiva.
+`autotrader/asiabot.py`, comando `asia-run`, workflow `ctrader-asia.yml` (un run diario que arranca a las 11:50 UTC,
+con un segundo cron a las 12:50 por si el primero no llega, y repite el ciclo cada 15 minutos dentro del mismo job
+hasta las 12:06 de Nueva York; el cron de GitHub resultó demasiado poco fiable para un run por cuarto de hora), etiqueta
+`autotrader-asia`, estado en `docs/asia_state.json` y sección propia en la pestaña agresiva.
 Regla: rango de Asia (19:00 a 03:00 de Nueva York) de XAUUSD; en la mañana de NY (08:00 a 12:00) la primera vela de 15
 min que cierra fuera del rango marca el lado; después el precio debe volver a tocar el nivel en las 8 velas siguientes
 sin que ninguna cierre de vuelta dentro; entrada a mercado en la vela siguiente al retest, stop en la mitad del rango y
