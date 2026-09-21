@@ -382,6 +382,19 @@ que no depende de un estado en memoria; solo entra si la vela del retest es la �
 tardías). Respeta `BOT_HALT` y el freno del 50 % de la cuenta; no aplica las ventanas de eventos (el estudio incluyó
 esos días). El estado de la cuenta agresiva trata las etiquetas `autotrader-aggr` y `autotrader-asia` como propias.
 
+### Corrección estadística de los estudios intradía
+
+`autotrader/stats.py` (intervalo de confianza por bootstrap, p-valor unilateral por bootstrap centrado y q-valores de
+Benjamini-Hochberg; idea tomada de `research_common.py` de HKUDS/AI-Trader y reimplementada) y
+`scripts/variant_stats.py` (resultado en `docs/variant_stats.json`) recalculan las 40 variantes de los estudios "un tiro
+por semana", "rango de Londres" y "retest de Asia" con la media de R por operación, su IC 95 %, su p-valor y el q-valor
+dentro de cada estudio y en el conjunto. Resultado: **ninguna variante es significativa**. La mejor (oro en días de
+FOMC, 3R) tiene p 0,065 con solo 25 operaciones y q 0,67 tras la corrección; el retest de Asia que corre en demo tiene
+R medio +0,07 con IC [−0,06, +0,20], p 0,14 y q 0,67: indistinguible de cero. Las únicas con IC enteramente fuera de
+cero son negativas (vender la ruptura fallida, objetivo 1R o lado contrario, y la fallida de Asia). Lectura: con 3 años
+y 40 intentos, lo que parecía borde entra dentro de lo que produce el azar; el bot de Asia sigue en demo como prueba
+fuera de muestra, sin expectativa de ganancia.
+
 ### Cuenta agresiva (500 USD)
 
 Tercera cuenta demo, workflow `ctrader-aggr.yml`, mismo motor que el bot swing con otro perfil
