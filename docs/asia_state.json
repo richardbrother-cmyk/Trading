@@ -1,7 +1,7 @@
 {
- "at": "2026-09-22T16:00Z",
- "ny_time": "2026-09-22 12:00",
- "equity": 654.78,
+ "at": "2026-09-22T16:16Z",
+ "ny_time": "2026-09-22 12:16",
+ "equity": 655.11,
  "plan": {
   "phase": "fuera de horario"
  },
@@ -41,8 +41,8 @@
  "guard": {
   "mode": "off",
   "reason": "",
-  "peak": 684.13,
-  "drawdown": -0.0429
+  "peak": 664.06,
+  "drawdown": -0.0135
  },
  "label": "autotrader-asia",
  "symbol": "XAUUSD",
