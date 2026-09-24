@@ -49,6 +49,13 @@ class Settings:
     events_path: str = ""  # vacio = data/events.json
     max_gap_down: float = 0.015  # no abrir posicion si el precio en vivo cae mas de esto vs el ultimo cierre
     max_gap_up: float = 0.03  # ni si sube mas de esto (perseguir un hueco)
+    # Salida "en resistencia": cerrar el largo cuando el maximo del dia alcanza el maximo de las N barras anteriores
+    # (0 = desactivada); solo si la posicion gana. Reentrada: "signal" (solo tras un cruce alcista nuevo) o "trend"
+    # (en cuanto la tendencia siga vigente, como cualquier otra salida).
+    resistance_lookback: int = 0
+    resistance_tol: float = 0.0
+    resistance_reentry: str = "signal"
+    resistance_state_path: str = ""  # fichero con las salidas en resistencia pendientes de cruce (vacio = state_dir)
     ctrader_client_id: str = ""
     ctrader_client_secret: str = ""
     ctrader_access_token: str = ""
@@ -90,6 +97,10 @@ class Settings:
             events_path=_env("EVENTS_PATH", ""),
             max_gap_down=float(_env("MAX_GAP_DOWN", "0.015")),
             max_gap_up=float(_env("MAX_GAP_UP", "0.03")),
+            resistance_lookback=int(_env("RESISTANCE_LOOKBACK", "0")),
+            resistance_tol=float(_env("RESISTANCE_TOL", "0")),
+            resistance_reentry=_env("RESISTANCE_REENTRY", "signal").lower(),
+            resistance_state_path=_env("RESISTANCE_STATE_PATH", ""),
             ctrader_client_id=_env("CTRADER_CLIENT_ID", ""),
             ctrader_client_secret=_env("CTRADER_CLIENT_SECRET", ""),
             ctrader_access_token=_env("CTRADER_ACCESS_TOKEN", ""),

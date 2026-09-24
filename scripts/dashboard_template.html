@@ -652,6 +652,7 @@ function cyclesTable(cycles){
     <tr><td>Riesgo por operación</td><td>${(s.risk_per_trade*100).toFixed(1)} % del capital</td></tr>
     <tr><td>Tamaño por posición</td><td>hasta ${(s.max_position_pct*100).toFixed(0)} % del capital × ${s.exposure_leverage}x de exposición, redondeado al lote mínimo</td></tr>
     <tr><td>Máximo de posiciones</td><td>${s.max_positions}</td></tr>
+    <tr><td>Salida en resistencia</td><td>${s.resistance_lookback ? `cierra el largo si el máximo del día alcanza el máximo de las ${s.resistance_lookback} barras anteriores${s.resistance_tol?` (tolerancia ${(s.resistance_tol*100).toFixed(1)} %)`:""}, solo en beneficio; ${s.resistance_reentry==="signal"?"no reentra hasta un cruce alcista nuevo":"reentra en cuanto la tendencia siga"}${(s.resistance_waiting||[]).length?` · esperando cruce: ${esc(s.resistance_waiting.join(", "))}`:""}` : "desactivada"}</td></tr>
     <tr><td>Ciclos</td><td>cada hora, de domingo noche a viernes, desde GitHub Actions</td></tr>
   </tbody>`;
 })();

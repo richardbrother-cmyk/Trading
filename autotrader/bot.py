@@ -15,7 +15,45 @@ from .events import active_events, effective_mode, load_events, trailed_stop
 from .guard import evaluate as evaluate_guard
 from .preopen import gap_verdict
 from .risk import RiskParams, daily_loss_breached, position_size, stop_hit
-from .strategy import StrategyParams, latest_decision
+from .strategy import StrategyParams, compute_indicators, latest_decision
+
+
+def resistance_state_path(settings: Settings) -> str:
+    return settings.resistance_state_path or os.path.join(settings.state_dir, "resistance_exits.json")
+
+
+def _load_json(path: str) -> dict:
+    if path and os.path.exists(path):
+        try:
+            with open(path, encoding="utf-8") as fh:
+                return json.load(fh)
+        except (OSError, ValueError):
+            return {}
+    return {}
+
+
+def resistance_check(df: pd.DataFrame, price: float, avg_price: float, lookback: int, tol: float, today: pd.Timestamp) -> tuple[bool, float | None, float | None]:
+    """Salida en resistencia: (toca la resistencia y la posicion gana, nivel, maximo de hoy).
+
+    La resistencia es el maximo de las `lookback` barras completas anteriores a hoy; el maximo de hoy sale de la barra
+    parcial del dia si el proveedor la incluye, y nunca es menor que el ultimo precio."""
+    prev = df[df.index < today]
+    if len(prev) < lookback:
+        return False, None, None
+    level = float(prev["high"].tail(lookback).max())
+    hi_today = float(df["high"].iloc[-1]) if df.index[-1] >= today else price
+    hi_today = max(hi_today, price)
+    touched = hi_today >= level * (1 - tol)
+    return bool(touched and price > avg_price), level, hi_today
+
+
+def new_cross_since(df: pd.DataFrame, since: str, params: StrategyParams) -> bool:
+    """True si la tendencia (SMA rapida > lenta) se rompio en algun momento despues de `since`: si ahora vuelve a estar
+    arriba, ha habido un cruce alcista nuevo y la reentrada esta permitida."""
+    ind = compute_indicators(df, params)
+    after = ind[ind.index > pd.Timestamp(since)]
+    trend = after["trend_up"][after["sma_slow"].notna()].astype(bool)  # barras sin medias formadas no cuentan
+    return bool((~trend).any())
 
 
 def _log_path(state_dir: str) -> str:
@@ -89,6 +127,13 @@ def run_cycle(settings: Settings, broker: Broker, provider: DataProvider, dry_ru
     if guard.blocks_entries:
         summary["skipped"].append(f"freno activo: {guard.reason}")
 
+    # Salida en resistencia: simbolos cerrados en resistencia que esperan un cruce alcista nuevo para reentrar
+    res_path = resistance_state_path(settings) if settings.resistance_lookback > 0 else ""
+    res_state = _load_json(res_path) if res_path else {}
+    today = pd.Timestamp(datetime.now(timezone.utc).date())
+    if res_state:
+        summary["resistance_waiting"] = sorted(res_state)
+
     open_slots = risk.max_positions - len(account.positions) - len(account.pending_buys)
     for symbol, df in data.items():
         pos = account.positions.get(symbol)
@@ -101,6 +146,21 @@ def run_cycle(settings: Settings, broker: Broker, provider: DataProvider, dry_ru
             decision = {**decision, "action": "SELL", "reason": f"stop loss ({price:.2f} <= {pos.avg_price * (1 - risk.stop_loss_pct):.2f})"}
         if pos is not None and guard.closes_positions:
             decision = {**decision, "action": "SELL", "reason": f"cierre por freno: {guard.reason}"}
+        resistance_exit = None
+        if settings.resistance_lookback > 0:
+            if pos is not None and decision["action"] != "SELL":
+                hit, level, hi_today = resistance_check(df, price, pos.avg_price, settings.resistance_lookback, settings.resistance_tol, today)
+                if level is not None:
+                    decision["resistance"] = round(level, 6)
+                if hit:
+                    resistance_exit = {"date": today.date().isoformat(), "level": level, "price": price}
+                    decision = {**decision, "action": "SELL",
+                                "reason": f"resistencia de {settings.resistance_lookback} dias ({hi_today:.2f} >= {level:.2f}), reevaluar tras un cruce nuevo"}
+            elif pos is None and symbol in res_state and decision["action"] == "BUY" and settings.resistance_reentry == "signal":
+                if new_cross_since(df, res_state[symbol]["date"], strategy):
+                    res_state.pop(symbol, None)
+                else:
+                    decision = {**decision, "action": "HOLD", "reason": f"salida en resistencia el {res_state[symbol]['date']}: espera un cruce alcista nuevo"}
         if events_now and pos is not None and decision["action"] != "SELL" and market_open:
             gain = price / pos.avg_price - 1
             if gain >= settings.event_min_gain:
@@ -169,8 +229,15 @@ def run_cycle(settings: Settings, broker: Broker, provider: DataProvider, dry_ru
                 account.cash -= qty * price / risk.exposure_leverage
             else:
                 account.cash += qty * price / risk.exposure_leverage
+                if resistance_exit is not None and not str(order.get("status", "")).startswith("error"):
+                    res_state[symbol] = resistance_exit
         except Exception as exc:  # noqa: BLE001
             summary["orders"].append({"symbol": symbol, "side": side, "qty": qty, "price": price, "status": f"error: {exc}"})
+    if res_path:
+        os.makedirs(os.path.dirname(res_path) or ".", exist_ok=True)
+        with open(res_path, "w", encoding="utf-8") as fh:
+            json.dump(res_state, fh, ensure_ascii=False, indent=1)
+        summary["resistance_waiting"] = sorted(res_state)
 
     # Red de seguridad: toda posicion abierta debe tener su stop vivo en el broker
     if hasattr(broker, "ensure_stops") and not dry_run:

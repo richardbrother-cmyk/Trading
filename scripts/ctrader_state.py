@@ -69,6 +69,16 @@ def merge_slippage(prev: dict | None, new: list[dict]) -> dict:
     return {"items": items, "total_usd": usd, "avg_bps": bps, "count": len(items)}
 
 
+def _load_json(path: str) -> dict:
+    if path and os.path.exists(path):
+        try:
+            with open(path, encoding="utf-8") as fh:
+                return json.load(fh)
+        except (OSError, ValueError):
+            return {}
+    return {}
+
+
 def last_cycle(state_dir: str, swing: bool = False, label: str = SWING_LABEL) -> dict | None:
     log = os.path.join(state_dir, "run_log.jsonl")
     if not os.path.exists(log):
@@ -177,7 +187,9 @@ def collect(s: Settings, swing: bool = False, initial: float | None = None, labe
         "at": now.strftime("%Y-%m-%dT%H:%MZ"), "balance": round(balance, 2), "equity": round(balance + pnl, 2),
         "unrealized_pnl": round(pnl, 2), "leverage": leverage, "positions": positions, "symbols": s.symbols, "trades": trades,
         "settings": {"stop_loss_pct": s.stop_loss_pct, "max_positions": s.max_positions, "max_position_pct": s.max_position_pct,
-                     "exposure_leverage": s.exposure_leverage, "risk_per_trade": s.risk_per_trade},
+                     "exposure_leverage": s.exposure_leverage, "risk_per_trade": s.risk_per_trade,
+                     "resistance_lookback": s.resistance_lookback, "resistance_tol": s.resistance_tol, "resistance_reentry": s.resistance_reentry,
+                     "resistance_waiting": sorted(_load_json(s.resistance_state_path or "") or {})},
         "event_window": active, "initial": initial,
         "bot_metrics": bot_metrics([t for t in trades if "error" not in t], positions, initial or 0.0),
         "exclusions": {"reason": exclusions.get("reason", ""), "entries_before": cutoff.strftime("%Y-%m-%dT%H:%MZ") if cutoff else None},

@@ -67,6 +67,14 @@ jobs:
       STOP_LOSS_PCT: ${{ vars.CTRADER_STOP_LOSS_PCT || '0.03' }}
       MAX_POSITIONS: "8"
       MAX_POSITION_PCT: "0.12"
+      # Salida en resistencia (docs/resistance_exit.json): cerrar el largo cuando el maximo del dia alcanza el maximo
+      # de las 20 barras anteriores, solo si la posicion gana, y no reentrar hasta un cruce alcista nuevo. En el
+      # backtest recorta el drawdown a la mitad a cambio de un tercio del retorno. La lista de simbolos que esperan
+      # cruce se guarda en docs/ctrader_resistance.json (se publica con el panel).
+      RESISTANCE_LOOKBACK: ${{ vars.RESISTANCE_LOOKBACK || '20' }}
+      RESISTANCE_TOL: "0"
+      RESISTANCE_REENTRY: "signal"
+      RESISTANCE_STATE_PATH: "docs/ctrader_resistance.json"
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -92,7 +100,7 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add docs/ctrader_state.json docs/index.html docs/dashboard.html
+          git add docs/ctrader_state.json docs/ctrader_resistance.json docs/index.html docs/dashboard.html
           if git diff --cached --quiet; then echo "sin cambios"; exit 0; fi
           git commit -m "Panel: actualización automática (cTrader)"
           # Los ficheros del panel los regeneran varios workflows: ante conflicto gana la version recien generada.
