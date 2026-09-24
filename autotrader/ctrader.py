@@ -479,6 +479,15 @@ class CTraderBroker:
     def bars(self, symbol: str) -> pd.DataFrame:
         return self.session.daily_bars(symbol)
 
+    def quote(self, symbol: str) -> dict | None:
+        """Ultimo precio de 1 minuto. Las barras diarias de cTrader no incluyen la del dia en curso, asi que sin esto el
+        bot compararia stops y resistencias con el cierre de ayer."""
+        try:
+            last = self.session.last_price(symbol)
+        except Exception:  # noqa: BLE001
+            return None
+        return {"last": last, "at": datetime.now(timezone.utc), "prev_close": None} if last else None
+
     def submit_market_order(self, symbol: str, qty: float, side: str, price_hint: float | None = None) -> dict:
         if side.lower() == "buy":
             if price_hint is None:

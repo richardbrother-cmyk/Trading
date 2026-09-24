@@ -114,3 +114,22 @@ def test_backtest_resistance_hook_reduces_exposure():
     res = run_backtest({"AAA": df}, StrategyParams(20, 50, 14, 70.0), risk, resistance_lookback=20, resistance_reentry="signal")
     reasons = {t.reason for t in res.trades}
     assert "resistance" in reasons and len(res.trades) >= len(base.trades)
+
+
+def test_stop_uses_live_price_not_stale_daily_close(tmp_path):
+    """cTrader no incluye la barra del dia: con un cierre de ayer un 6 % por debajo del precio real, el stop del 3 %
+    saltaba nada mas comprar. Con el precio en vivo del broker no salta."""
+
+    class LiveBroker(FakeBroker):
+        def quote(self, symbol):
+            return {"last": 3.22, "at": None, "prev_close": None}
+
+    df = _uptrend()
+    df.iloc[-1, df.columns.get_loc("close")] = 3.02  # cierre de ayer, muy por debajo de la entrada de hoy
+    s = Settings(broker="sim", symbols=["AAA"], state_dir=str(tmp_path), event_mode="off", stop_loss_pct=0.03)
+    stale = FakeBroker({"AAA": Position("AAA", 1800, 3.22)})
+    out = run_cycle(s, stale, FakeProvider({"AAA": df}), force=True)
+    assert out["decisions"][0]["action"] == "SELL" and out["decisions"][0]["reason"].startswith("stop loss")
+    live = LiveBroker({"AAA": Position("AAA", 1800, 3.22)})
+    out2 = run_cycle(s, live, FakeProvider({"AAA": df}), force=True)
+    assert out2["decisions"][0]["action"] != "SELL" and out2["decisions"][0]["live"] == 3.22 and live.orders == []

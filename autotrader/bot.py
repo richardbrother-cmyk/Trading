@@ -142,6 +142,17 @@ def run_cycle(settings: Settings, broker: Broker, provider: DataProvider, dry_ru
             continue
         decision = latest_decision(df, strategy, in_position=pos is not None)
         price = prices[symbol]
+        # Precio en vivo del broker si lo ofrece (cTrader): las barras diarias no incluyen el dia en curso y el ultimo
+        # cierre puede estar a horas de distancia; stops, resistencias y ventanas de evento se evaluan con el precio real.
+        if pos is not None and hasattr(broker, "quote"):
+            try:
+                live = broker.quote(symbol)
+            except Exception as exc:  # noqa: BLE001
+                live = None
+                summary["skipped"].append(f"{symbol}: sin precio en vivo: {exc}")
+            if live and live.get("last"):
+                price = float(live["last"])
+                decision["live"] = price
         if pos is not None and stop_hit(pos.avg_price, price, risk):
             decision = {**decision, "action": "SELL", "reason": f"stop loss ({price:.2f} <= {pos.avg_price * (1 - risk.stop_loss_pct):.2f})"}
         if pos is not None and guard.closes_positions:
