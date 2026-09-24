@@ -1,0 +1,1389 @@
+{
+ "generated_at": "2026-09-24 18:11 UTC",
+ "strategy": "SMA 20/50, RSI < 70, ejecucion en la apertura siguiente",
+ "universes": {
+  "ctrader_demo": {
+   "label": "Cuenta demo cTrader (13 CFD, 10.000 USD, 8 posiciones, 12 % x5)",
+   "symbols": [
+    "COFARA",
+    "CORN",
+    "COTTON",
+    "NAS100",
+    "SUGAR",
+    "US500",
+    "WHEAT",
+    "XAGUSD",
+    "XAUUSD",
+    "XBRUSD",
+    "XNGUSD",
+    "XPTUSD",
+    "XTIUSD"
+   ],
+   "period": [
+    "2023-09-25",
+    "2026-09-24"
+   ],
+   "reference": {
+    "name": "referencia",
+    "params": {},
+    "initial_cash": 10000.0,
+    "final_equity": 22299.65,
+    "total_return": 1.23,
+    "cagr": 0.3067,
+    "sharpe": 0.98,
+    "max_drawdown": -0.3189,
+    "trades": 76,
+    "win_rate": 0.316,
+    "profit_factor": 1.99,
+    "avg_trade_return": 0.0313,
+    "by_year": {
+     "2023": -0.0175,
+     "2024": 0.0348,
+     "2025": 0.8837,
+     "2026": 0.1644
+    },
+    "exits": {
+     "signal": 28,
+     "stop": 45,
+     "open_at_end": 3
+    }
+   },
+   "variants": [
+    {
+     "name": "resistencia 20 d, tolerancia 0%, reentrada con cruce nuevo",
+     "params": {
+      "resistance_lookback": 20,
+      "resistance_tol": 0.0,
+      "resistance_reentry": "signal",
+      "reentry_cooldown_days": 0
+     },
+     "initial_cash": 10000.0,
+     "final_equity": 18362.38,
+     "total_return": 0.8362,
+     "cagr": 0.2247,
+     "sharpe": 1.2,
+     "max_drawdown": -0.1428,
+     "trades": 159,
+     "win_rate": 0.528,
+     "profit_factor": 1.54,
+     "avg_trade_return": 0.0071,
+     "by_year": {
+      "2023": 0.0292,
+      "2024": 0.0937,
+      "2025": 0.3884,
+      "2026": 0.175
+     },
+     "exits": {
+      "signal": 20,
+      "stop": 66,
+      "resistance": 72,
+      "open_at_end": 1
+     },
+     "vs_reference": {
+      "return": -0.3938,
+      "max_drawdown": 0.1761,
+      "years_better": 3
+     }
+    },
+    {
+     "name": "resistencia 20 d, tolerancia 0%, reentrada tras 5 dias",
+     "params": {
+      "resistance_lookback": 20,
+      "resistance_tol": 0.0,
+      "resistance_reentry": "cooldown",
+      "reentry_cooldown_days": 5
+     },
+     "initial_cash": 10000.0,
+     "final_equity": 18328.48,
+     "total_return": 0.8328,
+     "cagr": 0.224,
+     "sharpe": 0.98,
+     "max_drawdown": -0.2257,
+     "trades": 296,
+     "win_rate": 0.524,
+     "profit_factor": 1.25,
+     "avg_trade_return": 0.0049,
+     "by_year": {
+      "2023": 0.0292,
+      "2024": 0.4317,
+      "2025": 0.1516,
+      "2026": 0.0801
+     },
+     "exits": {
+      "signal": 21,
+      "stop": 127,
+      "resistance": 146,
+      "open_at_end": 2
+     },
+     "vs_reference": {
+      "return": -0.3972,
+      "max_drawdown": 0.0932,
+      "years_better": 2
+     }
+    },
+    {
+     "name": "resistencia 20 d, tolerancia 0%, reentrada al superar la resistencia",
+     "params": {
+      "resistance_lookback": 20,
+      "resistance_tol": 0.0,
+      "resistance_reentry": "breakout",
+      "reentry_cooldown_days": 0
+     },
+     "initial_cash": 10000.0,
+     "final_equity": 17797.25,
+     "total_return": 0.7797,
+     "cagr": 0.212,
+     "sharpe": 0.96,
+     "max_drawdown": -0.2024,
+     "trades": 305,
+     "win_rate": 0.502,
+     "profit_factor": 1.25,
+     "avg_trade_return": 0.0039,
+     "by_year": {
+      "2023": 0.0234,
+      "2024": 0.1701,
+      "2025": 0.2432,
+      "2026": 0.1955
+     },
+     "exits": {
+      "signal": 35,
+      "stop": 132,
+      "resistance": 135,
+      "open_at_end": 3
+     },
+     "vs_reference": {
+      "return": -0.4503,
+      "max_drawdown": 0.1165,
+      "years_better": 3
+     }
+    },
+    {
+     "name": "resistencia 20 d, tolerancia 1%, reentrada con cruce nuevo",
+     "params": {
+      "resistance_lookback": 20,
+      "resistance_tol": 0.01,
+      "resistance_reentry": "signal",
+      "reentry_cooldown_days": 0
+     },
+     "initial_cash": 10000.0,
+     "final_equity": 18152.99,
+     "total_return": 0.8153,
+     "cagr": 0.22,
+     "sharpe": 1.24,
+     "max_drawdown": -0.1292,
+     "trades": 150,
+     "win_rate": 0.553,
+     "profit_factor": 1.59,
+     "avg_trade_return": 0.0074,
+     "by_year": {
+      "2023": 0.0349,
+      "2024": 0.1618,
+      "2025": 0.3574,
+      "2026": 0.1122
+     },
+     "exits": {
+      "signal": 18,
+      "stop": 54,
+      "resistance": 77,
+      "open_at_end": 1
+     },
+     "vs_reference": {
+      "return": -0.4147,
+      "max_drawdown": 0.1897,
+      "years_better": 2
+     }
+    },
+    {
+     "name": "resistencia 20 d, tolerancia 1%, reentrada tras 5 dias",
+     "params": {
+      "resistance_lookback": 20,
+      "resistance_tol": 0.01,
+      "resistance_reentry": "cooldown",
+      "reentry_cooldown_days": 5
+     },
+     "initial_cash": 10000.0,
+     "final_equity": 13414.98,
+     "total_return": 0.3415,
+     "cagr": 0.103,
+     "sharpe": 0.54,
+     "max_drawdown": -0.2537,
+     "trades": 346,
+     "win_rate": 0.523,
+     "profit_factor": 1.1,
+     "avg_trade_return": 0.0028,
+     "by_year": {
+      "2023": 0.0136,
+      "2024": 0.3858,
+      "2025": -0.0579,
+      "2026": 0.0137
+     },
+     "exits": {
+      "signal": 37,
+      "stop": 135,
+      "resistance": 172,
+      "open_at_end": 2
+     },
+     "vs_reference": {
+      "return": -0.8885,
+      "max_drawdown": 0.0652,
+      "years_better": 2
+     }
+    },
+    {
+     "name": "resistencia 20 d, tolerancia 1%, reentrada al superar la resistencia",
+     "params": {
+      "resistance_lookback": 20,
+      "resistance_tol": 0.01,
+      "resistance_reentry": "breakout",
+      "reentry_cooldown_days": 0
+     },
+     "initial_cash": 10000.0,
+     "final_equity": 31624.53,
+     "total_return": 2.1625,
+     "cagr": 0.4682,
+     "sharpe": 1.52,
+     "max_drawdown": -0.2345,
+     "trades": 352,
+     "win_rate": 0.577,
+     "profit_factor": 1.53,
+     "avg_trade_return": 0.0064,
+     "by_year": {
+      "2023": 0.0361,
+      "2024": 0.1711,
+      "2025": 0.7335,
+      "2026": 0.5035
+     },
+     "exits": {
+      "signal": 35,
+      "stop": 129,
+      "resistance": 186,
+      "open_at_end": 2
+     },
+     "vs_reference": {
+      "return": 0.9325,
+      "max_drawdown": 0.0844,
+      "years_better": 3
+     }
+    },
+    {
+     "name": "resistencia 60 d, tolerancia 0%, reentrada con cruce nuevo",
+     "params": {
+      "resistance_lookback": 60,
+      "resistance_tol": 0.0,
+      "resistance_reentry": "signal",
+      "reentry_cooldown_days": 0
+     },
+     "initial_cash": 10000.0,
+     "final_equity": 13481.88,
+     "total_return": 0.3482,
+     "cagr": 0.1048,
+     "sharpe": 0.54,
+     "max_drawdown": -0.2629,
+     "trades": 185,
+     "win_rate": 0.416,
+     "profit_factor": 1.16,
+     "avg_trade_return": 0.005,
+     "by_year": {
+      "2023": -0.0156,
+      "2024": 0.2793,
+      "2025": 0.1682,
+      "2026": -0.0836
+     },
+     "exits": {
+      "signal": 24,
+      "stop": 101,
+      "resistance": 58,
+      "open_at_end": 2
+     },
+     "vs_reference": {
+      "return": -0.8818,
+      "max_drawdown": 0.056,
+      "years_better": 2
+     }
+    },
+    {
+     "name": "resistencia 60 d, tolerancia 0%, reentrada tras 5 dias",
+     "params": {
+      "resistance_lookback": 60,
+      "resistance_tol": 0.0,
+      "resistance_reentry": "cooldown",
+      "reentry_cooldown_days": 5
+     },
+     "initial_cash": 10000.0,
+     "final_equity": 11880.3,
+     "total_return": 0.188,
+     "cagr": 0.0592,
+     "sharpe": 0.38,
+     "max_drawdown": -0.3805,
+     "trades": 259,
+     "win_rate": 0.483,
+     "profit_factor": 1.07,
+     "avg_trade_return": 0.0024,
+     "by_year": {
+      "2023": -0.0156,
+      "2024": 0.3896,
+      "2025": 0.0209,
+      "2026": -0.1494
+     },
+     "exits": {
+      "signal": 27,
+      "stop": 120,
+      "resistance": 110,
+      "open_at_end": 2
+     },
+     "vs_reference": {
+      "return": -1.042,
+      "max_drawdown": -0.0616,
+      "years_better": 2
+     }
+    },
+    {
+     "name": "resistencia 60 d, tolerancia 0%, reentrada al superar la resistencia",
+     "params": {
+      "resistance_lookback": 60,
+      "resistance_tol": 0.0,
+      "resistance_reentry": "breakout",
+      "reentry_cooldown_days": 0
+     },
+     "initial_cash": 10000.0,
+     "final_equity": 20423.96,
+     "total_return": 1.0424,
+     "cagr": 0.269,
+     "sharpe": 1.13,
+     "max_drawdown": -0.1668,
+     "trades": 271,
+     "win_rate": 0.498,
+     "profit_factor": 1.33,
+     "avg_trade_return": 0.0055,
+     "by_year": {
+      "2023": -0.0156,
+      "2024": 0.2792,
+      "2025": 0.3968,
+      "2026": 0.1611
+     },
+     "exits": {
+      "signal": 32,
+      "stop": 123,
+      "resistance": 113,
+      "open_at_end": 3
+     },
+     "vs_reference": {
+      "return": -0.1876,
+      "max_drawdown": 0.1521,
+      "years_better": 2
+     }
+    },
+    {
+     "name": "resistencia 60 d, tolerancia 1%, reentrada con cruce nuevo",
+     "params": {
+      "resistance_lookback": 60,
+      "resistance_tol": 0.01,
+      "resistance_reentry": "signal",
+      "reentry_cooldown_days": 0
+     },
+     "initial_cash": 10000.0,
+     "final_equity": 14191.27,
+     "total_return": 0.4191,
+     "cagr": 0.1239,
+     "sharpe": 0.65,
+     "max_drawdown": -0.2587,
+     "trades": 172,
+     "win_rate": 0.453,
+     "profit_factor": 1.22,
+     "avg_trade_return": 0.0045,
+     "by_year": {
+      "2023": -0.0156,
+      "2024": 0.1167,
+      "2025": 0.4001,
+      "2026": -0.078
+     },
+     "exits": {
+      "signal": 23,
+      "stop": 87,
+      "resistance": 61,
+      "open_at_end": 1
+     },
+     "vs_reference": {
+      "return": -0.8109,
+      "max_drawdown": 0.0602,
+      "years_better": 2
+     }
+    },
+    {
+     "name": "resistencia 60 d, tolerancia 1%, reentrada tras 5 dias",
+     "params": {
+      "resistance_lookback": 60,
+      "resistance_tol": 0.01,
+      "resistance_reentry": "cooldown",
+      "reentry_cooldown_days": 5
+     },
+     "initial_cash": 10000.0,
+     "final_equity": 21185.49,
+     "total_return": 1.1185,
+     "cagr": 0.2846,
+     "sharpe": 1.15,
+     "max_drawdown": -0.2663,
+     "trades": 302,
+     "win_rate": 0.536,
+     "profit_factor": 1.34,
+     "avg_trade_return": 0.0062,
+     "by_year": {
+      "2023": -0.0156,
+      "2024": 0.3681,
+      "2025": 0.4046,
+      "2026": 0.1199
+     },
+     "exits": {
+      "signal": 31,
+      "stop": 122,
+      "resistance": 148,
+      "open_at_end": 1
+     },
+     "vs_reference": {
+      "return": -0.1115,
+      "max_drawdown": 0.0526,
+      "years_better": 2
+     }
+    },
+    {
+     "name": "resistencia 60 d, tolerancia 1%, reentrada al superar la resistencia",
+     "params": {
+      "resistance_lookback": 60,
+      "resistance_tol": 0.01,
+      "resistance_reentry": "breakout",
+      "reentry_cooldown_days": 0
+     },
+     "initial_cash": 10000.0,
+     "final_equity": 20196.37,
+     "total_return": 1.0196,
+     "cagr": 0.2642,
+     "sharpe": 1.03,
+     "max_drawdown": -0.2449,
+     "trades": 307,
+     "win_rate": 0.528,
+     "profit_factor": 1.32,
+     "avg_trade_return": 0.0048,
+     "by_year": {
+      "2023": -0.0156,
+      "2024": 0.0944,
+      "2025": 0.462,
+      "2026": 0.2823
+     },
+     "exits": {
+      "signal": 35,
+      "stop": 134,
+      "resistance": 137,
+      "open_at_end": 1
+     },
+     "vs_reference": {
+      "return": -0.2104,
+      "max_drawdown": 0.074,
+      "years_better": 3
+     }
+    },
+    {
+     "name": "resistencia 120 d, tolerancia 0%, reentrada con cruce nuevo",
+     "params": {
+      "resistance_lookback": 120,
+      "resistance_tol": 0.0,
+      "resistance_reentry": "signal",
+      "reentry_cooldown_days": 0
+     },
+     "initial_cash": 10000.0,
+     "final_equity": 7936.81,
+     "total_return": -0.2063,
+     "cagr": -0.0742,
+     "sharpe": -0.19,
+     "max_drawdown": -0.4126,
+     "trades": 157,
+     "win_rate": 0.338,
+     "profit_factor": 0.87,
+     "avg_trade_return": -0.0014,
+     "by_year": {
+      "2023": -0.0175,
+      "2024": -0.0297,
+      "2025": -0.0091,
+      "2026": -0.1598
+     },
+     "exits": {
+      "signal": 27,
+      "stop": 96,
+      "resistance": 32,
+      "open_at_end": 2
+     },
+     "vs_reference": {
+      "return": -1.4363,
+      "max_drawdown": -0.0937,
+      "years_better": 0
+     }
+    },
+    {
+     "name": "resistencia 120 d, tolerancia 0%, reentrada tras 5 dias",
+     "params": {
+      "resistance_lookback": 120,
+      "resistance_tol": 0.0,
+      "resistance_reentry": "cooldown",
+      "reentry_cooldown_days": 5
+     },
+     "initial_cash": 10000.0,
+     "final_equity": 10029.25,
+     "total_return": 0.0029,
+     "cagr": 0.001,
+     "sharpe": 0.12,
+     "max_drawdown": -0.3403,
+     "trades": 203,
+     "win_rate": 0.414,
+     "profit_factor": 1.0,
+     "avg_trade_return": 0.0003,
+     "by_year": {
+      "2023": -0.0175,
+      "2024": 0.1819,
+      "2025": -0.0141,
+      "2026": -0.124
+     },
+     "exits": {
+      "signal": 20,
+      "stop": 111,
+      "resistance": 70,
+      "open_at_end": 2
+     },
+     "vs_reference": {
+      "return": -1.2271,
+      "max_drawdown": -0.0214,
+      "years_better": 1
+     }
+    },
+    {
+     "name": "resistencia 120 d, tolerancia 0%, reentrada al superar la resistencia",
+     "params": {
+      "resistance_lookback": 120,
+      "resistance_tol": 0.0,
+      "resistance_reentry": "breakout",
+      "reentry_cooldown_days": 0
+     },
+     "initial_cash": 10000.0,
+     "final_equity": 17224.41,
+     "total_return": 0.7224,
+     "cagr": 0.1989,
+     "sharpe": 0.88,
+     "max_drawdown": -0.2789,
+     "trades": 197,
+     "win_rate": 0.482,
+     "profit_factor": 1.35,
+     "avg_trade_return": 0.0056,
+     "by_year": {
+      "2023": -0.0175,
+      "2024": 0.1854,
+      "2025": 0.155,
+      "2026": 0.2805
+     },
+     "exits": {
+      "signal": 30,
+      "stop": 91,
+      "resistance": 73,
+      "open_at_end": 3
+     },
+     "vs_reference": {
+      "return": -0.5076,
+      "max_drawdown": 0.04,
+      "years_better": 2
+     }
+    },
+    {
+     "name": "resistencia 120 d, tolerancia 1%, reentrada con cruce nuevo",
+     "params": {
+      "resistance_lookback": 120,
+      "resistance_tol": 0.01,
+      "resistance_reentry": "signal",
+      "reentry_cooldown_days": 0
+     },
+     "initial_cash": 10000.0,
+     "final_equity": 8879.63,
+     "total_return": -0.112,
+     "cagr": -0.0389,
+     "sharpe": -0.05,
+     "max_drawdown": -0.3673,
+     "trades": 162,
+     "win_rate": 0.327,
+     "profit_factor": 0.94,
+     "avg_trade_return": -0.0002,
+     "by_year": {
+      "2023": -0.0175,
+      "2024": -0.0254,
+      "2025": 0.2369,
+      "2026": -0.2503
+     },
+     "exits": {
+      "signal": 27,
+      "stop": 98,
+      "resistance": 35,
+      "open_at_end": 2
+     },
+     "vs_reference": {
+      "return": -1.342,
+      "max_drawdown": -0.0484,
+      "years_better": 0
+     }
+    },
+    {
+     "name": "resistencia 120 d, tolerancia 1%, reentrada tras 5 dias",
+     "params": {
+      "resistance_lookback": 120,
+      "resistance_tol": 0.01,
+      "resistance_reentry": "cooldown",
+      "reentry_cooldown_days": 5
+     },
+     "initial_cash": 10000.0,
+     "final_equity": 14211.31,
+     "total_return": 0.4211,
+     "cagr": 0.1244,
+     "sharpe": 0.64,
+     "max_drawdown": -0.3339,
+     "trades": 229,
+     "win_rate": 0.48,
+     "profit_factor": 1.16,
+     "avg_trade_return": 0.0024,
+     "by_year": {
+      "2023": -0.0175,
+      "2024": 0.402,
+      "2025": 0.3052,
+      "2026": -0.2095
+     },
+     "exits": {
+      "signal": 22,
+      "stop": 105,
+      "resistance": 100,
+      "open_at_end": 2
+     },
+     "vs_reference": {
+      "return": -0.8089,
+      "max_drawdown": -0.015,
+      "years_better": 1
+     }
+    },
+    {
+     "name": "resistencia 120 d, tolerancia 1%, reentrada al superar la resistencia",
+     "params": {
+      "resistance_lookback": 120,
+      "resistance_tol": 0.01,
+      "resistance_reentry": "breakout",
+      "reentry_cooldown_days": 0
+     },
+     "initial_cash": 10000.0,
+     "final_equity": 15832.74,
+     "total_return": 0.5833,
+     "cagr": 0.1656,
+     "sharpe": 0.73,
+     "max_drawdown": -0.289,
+     "trades": 247,
+     "win_rate": 0.494,
+     "profit_factor": 1.23,
+     "avg_trade_return": 0.0045,
+     "by_year": {
+      "2023": -0.0175,
+      "2024": 0.1099,
+      "2025": 0.2189,
+      "2026": 0.1912
+     },
+     "exits": {
+      "signal": 33,
+      "stop": 113,
+      "resistance": 99,
+      "open_at_end": 2
+     },
+     "vs_reference": {
+      "return": -0.6467,
+      "max_drawdown": 0.0299,
+      "years_better": 2
+     }
+    }
+   ],
+   "better_return_and_drawdown": [
+    "resistencia 20 d, tolerancia 1%, reentrada al superar la resistencia"
+   ]
+  },
+  "alpaca_paper": {
+   "label": "Cuenta paper Alpaca (13 ETF y acciones, 100.000 USD, stop 5 %)",
+   "symbols": [
+    "AAPL",
+    "CORN",
+    "DBA",
+    "GLD",
+    "MSFT",
+    "NVDA",
+    "PALL",
+    "PPLT",
+    "QQQ",
+    "SLV",
+    "SPY",
+    "USO",
+    "WEAT"
+   ],
+   "period": [
+    "2024-09-19",
+    "2026-09-17"
+   ],
+   "reference": {
+    "name": "referencia",
+    "params": {},
+    "initial_cash": 100000.0,
+    "final_equity": 142749.88,
+    "total_return": 0.4275,
+    "cagr": 0.1955,
+    "sharpe": 1.15,
+    "max_drawdown": -0.1306,
+    "trades": 80,
+    "win_rate": 0.425,
+    "profit_factor": 2.69,
+    "avg_trade_return": 0.0478,
+    "by_year": {
+     "2024": -0.0121,
+     "2025": 0.2513,
+     "2026": 0.1548
+    },
+    "exits": {
+     "stop": 25,
+     "signal": 48,
+     "open_at_end": 7
+    }
+   },
+   "variants": [
+    {
+     "name": "resistencia 20 d, tolerancia 0%, reentrada con cruce nuevo",
+     "params": {
+      "resistance_lookback": 20,
+      "resistance_tol": 0.0,
+      "resistance_reentry": "signal",
+      "reentry_cooldown_days": 0
+     },
+     "initial_cash": 100000.0,
+     "final_equity": 128730.77,
+     "total_return": 0.2873,
+     "cagr": 0.1351,
+     "sharpe": 2.07,
+     "max_drawdown": -0.0448,
+     "trades": 79,
+     "win_rate": 0.722,
+     "profit_factor": 2.71,
+     "avg_trade_return": 0.0133,
+     "by_year": {
+      "2024": 0.0144,
+      "2025": 0.0765,
+      "2026": 0.1789
+     },
+     "exits": {
+      "resistance": 56,
+      "stop": 10,
+      "signal": 11,
+      "open_at_end": 2
+     },
+     "vs_reference": {
+      "return": -0.1402,
+      "max_drawdown": 0.0858,
+      "years_better": 2
+     }
+    },
+    {
+     "name": "resistencia 20 d, tolerancia 0%, reentrada tras 5 dias",
+     "params": {
+      "resistance_lookback": 20,
+      "resistance_tol": 0.0,
+      "resistance_reentry": "cooldown",
+      "reentry_cooldown_days": 5
+     },
+     "initial_cash": 100000.0,
+     "final_equity": 137615.61,
+     "total_return": 0.3762,
+     "cagr": 0.1737,
+     "sharpe": 1.32,
+     "max_drawdown": -0.1044,
+     "trades": 320,
+     "win_rate": 0.656,
+     "profit_factor": 1.44,
+     "avg_trade_return": 0.0082,
+     "by_year": {
+      "2024": -0.029,
+      "2025": 0.249,
+      "2026": 0.1347
+     },
+     "exits": {
+      "resistance": 209,
+      "stop": 65,
+      "signal": 37,
+      "open_at_end": 9
+     },
+     "vs_reference": {
+      "return": -0.0513,
+      "max_drawdown": 0.0262,
+      "years_better": 0
+     }
+    },
+    {
+     "name": "resistencia 20 d, tolerancia 0%, reentrada al superar la resistencia",
+     "params": {
+      "resistance_lookback": 20,
+      "resistance_tol": 0.0,
+      "resistance_reentry": "breakout",
+      "reentry_cooldown_days": 0
+     },
+     "initial_cash": 100000.0,
+     "final_equity": 137175.93,
+     "total_return": 0.3718,
+     "cagr": 0.1719,
+     "sharpe": 1.19,
+     "max_drawdown": -0.0978,
+     "trades": 375,
+     "win_rate": 0.629,
+     "profit_factor": 1.36,
+     "avg_trade_return": 0.0045,
+     "by_year": {
+      "2024": -0.0028,
+      "2025": 0.1902,
+      "2026": 0.1558
+     },
+     "exits": {
+      "resistance": 260,
+      "stop": 79,
+      "signal": 30,
+      "open_at_end": 6
+     },
+     "vs_reference": {
+      "return": -0.0557,
+      "max_drawdown": 0.0328,
+      "years_better": 2
+     }
+    },
+    {
+     "name": "resistencia 20 d, tolerancia 1%, reentrada con cruce nuevo",
+     "params": {
+      "resistance_lookback": 20,
+      "resistance_tol": 0.01,
+      "resistance_reentry": "signal",
+      "reentry_cooldown_days": 0
+     },
+     "initial_cash": 100000.0,
+     "final_equity": 122597.09,
+     "total_return": 0.226,
+     "cagr": 0.1076,
+     "sharpe": 1.88,
+     "max_drawdown": -0.0602,
+     "trades": 78,
+     "win_rate": 0.705,
+     "profit_factor": 2.61,
+     "avg_trade_return": 0.0106,
+     "by_year": {
+      "2024": 0.0077,
+      "2025": 0.0579,
+      "2026": 0.1501
+     },
+     "exits": {
+      "resistance": 58,
+      "stop": 8,
+      "signal": 10,
+      "open_at_end": 2
+     },
+     "vs_reference": {
+      "return": -0.2015,
+      "max_drawdown": 0.0704,
+      "years_better": 1
+     }
+    },
+    {
+     "name": "resistencia 20 d, tolerancia 1%, reentrada tras 5 dias",
+     "params": {
+      "resistance_lookback": 20,
+      "resistance_tol": 0.01,
+      "resistance_reentry": "cooldown",
+      "reentry_cooldown_days": 5
+     },
+     "initial_cash": 100000.0,
+     "final_equity": 114581.72,
+     "total_return": 0.1458,
+     "cagr": 0.0707,
+     "sharpe": 0.62,
+     "max_drawdown": -0.1392,
+     "trades": 385,
+     "win_rate": 0.649,
+     "profit_factor": 1.16,
+     "avg_trade_return": 0.0035,
+     "by_year": {
+      "2024": -0.0278,
+      "2025": 0.0965,
+      "2026": 0.0748
+     },
+     "exits": {
+      "resistance": 262,
+      "stop": 77,
+      "signal": 39,
+      "open_at_end": 7
+     },
+     "vs_reference": {
+      "return": -0.2817,
+      "max_drawdown": -0.0086,
+      "years_better": 0
+     }
+    },
+    {
+     "name": "resistencia 20 d, tolerancia 1%, reentrada al superar la resistencia",
+     "params": {
+      "resistance_lookback": 20,
+      "resistance_tol": 0.01,
+      "resistance_reentry": "breakout",
+      "reentry_cooldown_days": 0
+     },
+     "initial_cash": 100000.0,
+     "final_equity": 148163.75,
+     "total_return": 0.4816,
+     "cagr": 0.218,
+     "sharpe": 1.54,
+     "max_drawdown": -0.1033,
+     "trades": 385,
+     "win_rate": 0.649,
+     "profit_factor": 1.5,
+     "avg_trade_return": 0.0055,
+     "by_year": {
+      "2024": -0.0065,
+      "2025": 0.2681,
+      "2026": 0.1761
+     },
+     "exits": {
+      "resistance": 294,
+      "stop": 62,
+      "signal": 24,
+      "open_at_end": 5
+     },
+     "vs_reference": {
+      "return": 0.0541,
+      "max_drawdown": 0.0273,
+      "years_better": 3
+     }
+    },
+    {
+     "name": "resistencia 60 d, tolerancia 0%, reentrada con cruce nuevo",
+     "params": {
+      "resistance_lookback": 60,
+      "resistance_tol": 0.0,
+      "resistance_reentry": "signal",
+      "reentry_cooldown_days": 0
+     },
+     "initial_cash": 100000.0,
+     "final_equity": 134905.78,
+     "total_return": 0.3491,
+     "cagr": 0.1621,
+     "sharpe": 1.99,
+     "max_drawdown": -0.0483,
+     "trades": 86,
+     "win_rate": 0.674,
+     "profit_factor": 2.33,
+     "avg_trade_return": 0.015,
+     "by_year": {
+      "2024": 0.0198,
+      "2025": 0.1576,
+      "2026": 0.1428
+     },
+     "exits": {
+      "resistance": 51,
+      "stop": 18,
+      "signal": 14,
+      "open_at_end": 3
+     },
+     "vs_reference": {
+      "return": -0.0784,
+      "max_drawdown": 0.0823,
+      "years_better": 1
+     }
+    },
+    {
+     "name": "resistencia 60 d, tolerancia 0%, reentrada tras 5 dias",
+     "params": {
+      "resistance_lookback": 60,
+      "resistance_tol": 0.0,
+      "resistance_reentry": "cooldown",
+      "reentry_cooldown_days": 5
+     },
+     "initial_cash": 100000.0,
+     "final_equity": 155707.55,
+     "total_return": 0.5571,
+     "cagr": 0.2488,
+     "sharpe": 1.79,
+     "max_drawdown": -0.1041,
+     "trades": 282,
+     "win_rate": 0.649,
+     "profit_factor": 1.69,
+     "avg_trade_return": 0.0111,
+     "by_year": {
+      "2024": 0.0149,
+      "2025": 0.3961,
+      "2026": 0.0989
+     },
+     "exits": {
+      "resistance": 171,
+      "stop": 61,
+      "signal": 42,
+      "open_at_end": 8
+     },
+     "vs_reference": {
+      "return": 0.1296,
+      "max_drawdown": 0.0265,
+      "years_better": 2
+     }
+    },
+    {
+     "name": "resistencia 60 d, tolerancia 0%, reentrada al superar la resistencia",
+     "params": {
+      "resistance_lookback": 60,
+      "resistance_tol": 0.0,
+      "resistance_reentry": "breakout",
+      "reentry_cooldown_days": 0
+     },
+     "initial_cash": 100000.0,
+     "final_equity": 120197.68,
+     "total_return": 0.202,
+     "cagr": 0.0967,
+     "sharpe": 0.71,
+     "max_drawdown": -0.128,
+     "trades": 331,
+     "win_rate": 0.622,
+     "profit_factor": 1.23,
+     "avg_trade_return": 0.0059,
+     "by_year": {
+      "2024": 0.015,
+      "2025": 0.0478,
+      "2026": 0.1302
+     },
+     "exits": {
+      "resistance": 213,
+      "stop": 77,
+      "signal": 34,
+      "open_at_end": 7
+     },
+     "vs_reference": {
+      "return": -0.2255,
+      "max_drawdown": 0.0026,
+      "years_better": 1
+     }
+    },
+    {
+     "name": "resistencia 60 d, tolerancia 1%, reentrada con cruce nuevo",
+     "params": {
+      "resistance_lookback": 60,
+      "resistance_tol": 0.01,
+      "resistance_reentry": "signal",
+      "reentry_cooldown_days": 0
+     },
+     "initial_cash": 100000.0,
+     "final_equity": 133152.47,
+     "total_return": 0.3315,
+     "cagr": 0.1545,
+     "sharpe": 1.99,
+     "max_drawdown": -0.0713,
+     "trades": 85,
+     "win_rate": 0.682,
+     "profit_factor": 2.52,
+     "avg_trade_return": 0.0131,
+     "by_year": {
+      "2024": 0.0206,
+      "2025": 0.1343,
+      "2026": 0.1501
+     },
+     "exits": {
+      "resistance": 54,
+      "stop": 16,
+      "signal": 12,
+      "open_at_end": 3
+     },
+     "vs_reference": {
+      "return": -0.096,
+      "max_drawdown": 0.0593,
+      "years_better": 1
+     }
+    },
+    {
+     "name": "resistencia 60 d, tolerancia 1%, reentrada tras 5 dias",
+     "params": {
+      "resistance_lookback": 60,
+      "resistance_tol": 0.01,
+      "resistance_reentry": "cooldown",
+      "reentry_cooldown_days": 5
+     },
+     "initial_cash": 100000.0,
+     "final_equity": 144107.72,
+     "total_return": 0.4411,
+     "cagr": 0.2012,
+     "sharpe": 1.53,
+     "max_drawdown": -0.1406,
+     "trades": 355,
+     "win_rate": 0.637,
+     "profit_factor": 1.45,
+     "avg_trade_return": 0.006,
+     "by_year": {
+      "2024": -0.0011,
+      "2025": 0.338,
+      "2026": 0.0782
+     },
+     "exits": {
+      "resistance": 229,
+      "stop": 76,
+      "signal": 41,
+      "open_at_end": 9
+     },
+     "vs_reference": {
+      "return": 0.0136,
+      "max_drawdown": -0.01,
+      "years_better": 2
+     }
+    },
+    {
+     "name": "resistencia 60 d, tolerancia 1%, reentrada al superar la resistencia",
+     "params": {
+      "resistance_lookback": 60,
+      "resistance_tol": 0.01,
+      "resistance_reentry": "breakout",
+      "reentry_cooldown_days": 0
+     },
+     "initial_cash": 100000.0,
+     "final_equity": 125502.45,
+     "total_return": 0.255,
+     "cagr": 0.1207,
+     "sharpe": 0.92,
+     "max_drawdown": -0.1216,
+     "trades": 351,
+     "win_rate": 0.624,
+     "profit_factor": 1.27,
+     "avg_trade_return": 0.005,
+     "by_year": {
+      "2024": 0.0208,
+      "2025": 0.2067,
+      "2026": 0.0189
+     },
+     "exits": {
+      "resistance": 247,
+      "stop": 70,
+      "signal": 28,
+      "open_at_end": 6
+     },
+     "vs_reference": {
+      "return": -0.1725,
+      "max_drawdown": 0.009,
+      "years_better": 1
+     }
+    },
+    {
+     "name": "resistencia 120 d, tolerancia 0%, reentrada con cruce nuevo",
+     "params": {
+      "resistance_lookback": 120,
+      "resistance_tol": 0.0,
+      "resistance_reentry": "signal",
+      "reentry_cooldown_days": 0
+     },
+     "initial_cash": 100000.0,
+     "final_equity": 120693.72,
+     "total_return": 0.2069,
+     "cagr": 0.099,
+     "sharpe": 1.01,
+     "max_drawdown": -0.1012,
+     "trades": 92,
+     "win_rate": 0.511,
+     "profit_factor": 1.6,
+     "avg_trade_return": 0.0077,
+     "by_year": {
+      "2024": -0.0121,
+      "2025": 0.1466,
+      "2026": 0.0656
+     },
+     "exits": {
+      "stop": 26,
+      "signal": 29,
+      "resistance": 30,
+      "open_at_end": 7
+     },
+     "vs_reference": {
+      "return": -0.2206,
+      "max_drawdown": 0.0294,
+      "years_better": 0
+     }
+    },
+    {
+     "name": "resistencia 120 d, tolerancia 0%, reentrada tras 5 dias",
+     "params": {
+      "resistance_lookback": 120,
+      "resistance_tol": 0.0,
+      "resistance_reentry": "cooldown",
+      "reentry_cooldown_days": 5
+     },
+     "initial_cash": 100000.0,
+     "final_equity": 143526.67,
+     "total_return": 0.4353,
+     "cagr": 0.1988,
+     "sharpe": 1.34,
+     "max_drawdown": -0.1258,
+     "trades": 241,
+     "win_rate": 0.593,
+     "profit_factor": 1.62,
+     "avg_trade_return": 0.0094,
+     "by_year": {
+      "2024": -0.0121,
+      "2025": 0.3565,
+      "2026": 0.071
+     },
+     "exits": {
+      "stop": 67,
+      "signal": 40,
+      "resistance": 124,
+      "open_at_end": 10
+     },
+     "vs_reference": {
+      "return": 0.0078,
+      "max_drawdown": 0.0048,
+      "years_better": 1
+     }
+    },
+    {
+     "name": "resistencia 120 d, tolerancia 0%, reentrada al superar la resistencia",
+     "params": {
+      "resistance_lookback": 120,
+      "resistance_tol": 0.0,
+      "resistance_reentry": "breakout",
+      "reentry_cooldown_days": 0
+     },
+     "initial_cash": 100000.0,
+     "final_equity": 125322.53,
+     "total_return": 0.2532,
+     "cagr": 0.1199,
+     "sharpe": 0.88,
+     "max_drawdown": -0.1075,
+     "trades": 274,
+     "win_rate": 0.577,
+     "profit_factor": 1.34,
+     "avg_trade_return": 0.006,
+     "by_year": {
+      "2024": -0.0121,
+      "2025": 0.124,
+      "2026": 0.1287
+     },
+     "exits": {
+      "stop": 63,
+      "signal": 41,
+      "resistance": 160,
+      "open_at_end": 10
+     },
+     "vs_reference": {
+      "return": -0.1743,
+      "max_drawdown": 0.0231,
+      "years_better": 0
+     }
+    },
+    {
+     "name": "resistencia 120 d, tolerancia 1%, reentrada con cruce nuevo",
+     "params": {
+      "resistance_lookback": 120,
+      "resistance_tol": 0.01,
+      "resistance_reentry": "signal",
+      "reentry_cooldown_days": 0
+     },
+     "initial_cash": 100000.0,
+     "final_equity": 123148.73,
+     "total_return": 0.2315,
+     "cagr": 0.1101,
+     "sharpe": 1.14,
+     "max_drawdown": -0.0986,
+     "trades": 90,
+     "win_rate": 0.544,
+     "profit_factor": 1.77,
+     "avg_trade_return": 0.0075,
+     "by_year": {
+      "2024": -0.0121,
+      "2025": 0.1449,
+      "2026": 0.0888
+     },
+     "exits": {
+      "stop": 24,
+      "signal": 26,
+      "resistance": 34,
+      "open_at_end": 6
+     },
+     "vs_reference": {
+      "return": -0.196,
+      "max_drawdown": 0.032,
+      "years_better": 0
+     }
+    },
+    {
+     "name": "resistencia 120 d, tolerancia 1%, reentrada tras 5 dias",
+     "params": {
+      "resistance_lookback": 120,
+      "resistance_tol": 0.01,
+      "resistance_reentry": "cooldown",
+      "reentry_cooldown_days": 5
+     },
+     "initial_cash": 100000.0,
+     "final_equity": 137994.68,
+     "total_return": 0.3799,
+     "cagr": 0.1754,
+     "sharpe": 1.35,
+     "max_drawdown": -0.1446,
+     "trades": 281,
+     "win_rate": 0.609,
+     "profit_factor": 1.47,
+     "avg_trade_return": 0.0063,
+     "by_year": {
+      "2024": -0.0121,
+      "2025": 0.1872,
+      "2026": 0.1766
+     },
+     "exits": {
+      "stop": 70,
+      "signal": 39,
+      "resistance": 162,
+      "open_at_end": 10
+     },
+     "vs_reference": {
+      "return": -0.0476,
+      "max_drawdown": -0.014,
+      "years_better": 1
+     }
+    },
+    {
+     "name": "resistencia 120 d, tolerancia 1%, reentrada al superar la resistencia",
+     "params": {
+      "resistance_lookback": 120,
+      "resistance_tol": 0.01,
+      "resistance_reentry": "breakout",
+      "reentry_cooldown_days": 0
+     },
+     "initial_cash": 100000.0,
+     "final_equity": 140943.51,
+     "total_return": 0.4094,
+     "cagr": 0.1879,
+     "sharpe": 1.33,
+     "max_drawdown": -0.1059,
+     "trades": 289,
+     "win_rate": 0.63,
+     "profit_factor": 1.52,
+     "avg_trade_return": 0.0076,
+     "by_year": {
+      "2024": -0.0121,
+      "2025": 0.2232,
+      "2026": 0.1664
+     },
+     "exits": {
+      "stop": 56,
+      "signal": 33,
+      "resistance": 194,
+      "open_at_end": 6
+     },
+     "vs_reference": {
+      "return": -0.0181,
+      "max_drawdown": 0.0247,
+      "years_better": 1
+     }
+    }
+   ],
+   "better_return_and_drawdown": [
+    "resistencia 20 d, tolerancia 1%, reentrada al superar la resistencia",
+    "resistencia 60 d, tolerancia 0%, reentrada tras 5 dias",
+    "resistencia 120 d, tolerancia 0%, reentrada tras 5 dias"
+   ]
+  }
+ }
+}

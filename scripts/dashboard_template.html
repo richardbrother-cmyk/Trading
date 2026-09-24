@@ -231,6 +231,11 @@ footer { color: var(--muted); font-size: 12.5px; }
       <div class="sec-head"><div><h2>Configuración activa</h2><p class="lede">Parámetros con los que opera el bot de CFDs, fijados en el workflow de GitHub Actions.</p></div></div>
       <div class="tbl-wrap"><table id="ct-settings"></table></div>
     </section>
+    <section id="ct-res-section" style="display:none">
+      <div class="sec-head"><div><h2>Investigación: cerrar en resistencias y reevaluar</h2><p class="lede" id="ct-res-lede"></p></div></div>
+      <div class="tbl-wrap"><table id="ct-res-table"></table></div>
+      <p class="note" id="ct-res-note" style="margin:10px 0 0"></p>
+    </section>
     <section id="ct-elbot-section" style="display:none">
       <div class="sec-head"><div><h2>Bot "ondas de Elliott" en oro (misma cuenta)</h2><p class="lede" id="ct-elbot-lede"></p></div></div>
       <div class="kpis" id="ct-elbot-kpis" style="margin-bottom:12px"></div>
@@ -679,6 +684,24 @@ function renderElliottBot(EB){
   }
 }
 renderElliottBot((D.ctrader||{}).elliott_bot);
+
+// ============================ SALIDA EN RESISTENCIAS (investigacion) ============================
+(function(){
+  const R = (D.ctrader||{}).resistance;
+  if (!R || !R.universes) return;
+  document.getElementById("ct-res-section").style.display = "";
+  const pfTxt = v => v==null ? "—" : Number(v).toFixed(2);
+  const unis = Object.entries(R.universes);
+  document.getElementById("ct-res-lede").textContent = `Misma estrategia tendencial (${R.strategy}) con una salida extra: cerrar el largo cuando el máximo del día alcanza el máximo de las N barras anteriores (solo si la posición gana) y reentrar más tarde según tres reglas. Probado en ${unis.map(([k,u])=>u.label).join(" y en ")}. Generado el ${R.generated_at}.`;
+  const rowsOf = (u) => {
+    const all = [u.reference, ...u.variants];
+    const ratio = r => r.max_drawdown < 0 ? r.total_return / -r.max_drawdown : null;
+    const top = [...u.variants].sort((a,b)=>(ratio(b)||0)-(ratio(a)||0)).slice(0,6);
+    return [u.reference, ...top].map((r,i) => `<tr class="${i===0?"active":""}"><td style="font-size:12.5px">${esc(r.name)}</td><td class="num">${r.trades}</td><td class="num ${r.total_return>=0?"pos":"neg"}">${pct(r.total_return)}</td><td class="num">${pct(r.max_drawdown)}</td><td class="num">${ratio(r)!=null?ratio(r).toFixed(1):"—"}</td><td class="num">${pfTxt(r.profit_factor)}</td><td style="font-size:12px;white-space:nowrap">${Object.entries(r.by_year||{}).map(([y,v])=>`<span class="${v>=0?"pos":"neg"}">${y.slice(2)}: ${pct(v,0)}</span>`).join(" · ")}</td></tr>`).join("");
+  };
+  document.getElementById("ct-res-table").innerHTML = unis.map(([k,u]) => `<thead><tr><th colspan="7" style="text-transform:none;font-size:13px;color:var(--ink)">${esc(u.label)} · ${esc(u.period[0])} a ${esc(u.period[1])}</th></tr><tr><th>Variante (referencia y las 6 mejores por retorno/drawdown)</th><th class="num">Ops.</th><th class="num">Retorno</th><th class="num">Drawdown</th><th class="num">Ret./DD</th><th class="num">PF</th><th>Por año</th></tr></thead><tbody>${rowsOf(u)}</tbody>`).join("");
+  document.getElementById("ct-res-note").textContent = "Lectura: cerrar en la resistencia y esperar un cruce alcista nuevo recorta el drawdown a la mitad o menos en los dos universos, a cambio de un tercio del retorno; las reentradas rápidas (tras 5 días o al superar el nivel) multiplican por cuatro las operaciones y sus resultados cambian de signo según la ventana y el universo, así que no son robustas. El backtest de CFDs no incluye spread ni swap: con 300 operaciones el coste real sería mayor. No se ha cambiado ningún bot.";
+})();
 
 // ============================ FUSION / SWING y AGRESIVA ============================
 function renderSwingTab(prefix, SW, badgeId, base0, research){

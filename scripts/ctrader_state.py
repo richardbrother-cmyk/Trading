@@ -80,7 +80,8 @@ def last_cycle(state_dir: str, swing: bool = False, label: str = SWING_LABEL) ->
         if swing:
             if rec.get("kind") == "swing" and rec.get("label", SWING_LABEL) == label:
                 return rec
-        elif rec.get("broker", "").startswith("ctrader") and rec.get("kind") not in ("preopen", "swing"):
+        elif rec.get("broker", "").startswith("ctrader") and rec.get("kind") in (None, "run"):
+            # solo los ciclos del bot tendencial: los de swing, asia o elliott llevan su propio "kind"
             return rec
     return None
 

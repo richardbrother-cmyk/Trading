@@ -40,6 +40,7 @@ SWING_WALKFORWARD = "docs/swing_walkforward.json"
 KRONOS_REPORT = "docs/kronos_report.json"
 ELLIOTT_STUDY = "docs/elliott_study.json"
 ELLIOTT_STATE = "docs/elliott_state.json"
+RESISTANCE_STUDY = "docs/resistance_exit.json"
 ELLIOTT_DEPLOYED_KEY = "XAUUSD_H4_zz2_w2_ruptura_t1.618_inicio_l"  # variante del estudio que opera el bot de Elliott
 ALPACA_VARIANTS = "docs/alpaca_variants.json"
 
@@ -152,6 +153,9 @@ def collect(no_live: bool) -> dict:
     if os.path.exists(ELLIOTT_STATE):
         with open(ELLIOTT_STATE, encoding="utf-8") as fh:
             ctrader["elliott_bot"] = json.load(fh)
+    if os.path.exists(RESISTANCE_STUDY):
+        with open(RESISTANCE_STUDY, encoding="utf-8") as fh:
+            ctrader["resistance"] = json.load(fh)
     if os.path.exists(KRONOS_REPORT):
         with open(KRONOS_REPORT, encoding="utf-8") as fh:
             swing["kronos"] = json.load(fh)

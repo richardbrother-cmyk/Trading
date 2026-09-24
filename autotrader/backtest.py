@@ -83,6 +83,10 @@ def run_backtest(
     drop_exit_only_in_profit: bool = False,
     regime_exit: bool = False,
     reentry_cooldown_days: int = 0,
+    resistance_lookback: int = 0,
+    resistance_tol: float = 0.0,
+    resistance_reentry: str = "signal",
+    resistance_only_in_profit: bool = True,
 ) -> BacktestResult:
     """Simula la estrategia sobre varias series alineadas por fecha.
 
@@ -98,6 +102,11 @@ def run_backtest(
       cierre anterior (regla de proteccion de beneficios); con `drop_exit_only_in_profit` solo si la posicion gana.
     - `reentry_cooldown_days`: tras una salida por caida diaria o por stop, no se reentra en ese simbolo hasta pasados
       N dias de calendario salvo que haya un cruce alcista nuevo (evento BUY).
+    - `resistance_lookback`: salida "en resistencia": si el maximo del dia alcanza el maximo de las `lookback` barras
+      anteriores (menos `resistance_tol`, en fraccion) se cierra el largo en la apertura siguiente (solo si la posicion
+      gana, salvo `resistance_only_in_profit=False`). Reentrada segun `resistance_reentry`: "signal" (solo con un cruce
+      alcista nuevo), "cooldown" (pasados `reentry_cooldown_days` si la tendencia sigue) o "breakout" (cuando un cierre
+      supera la resistencia que provoco la salida).
     """
     signals = {s: generate_signals(df, strategy) for s, df in data.items() if len(df) >= strategy.min_bars()}
     if not signals:
@@ -111,6 +120,8 @@ def run_backtest(
     equity_curve: list[tuple[pd.Timestamp, float]] = []
     trades: list[Trade] = []
     cooldown_until: dict[str, pd.Timestamp] = {}
+    wait_signal: set[str] = set()  # tras salir en resistencia con reentry="signal": solo reentra un cruce nuevo
+    breakout_level: dict[str, float] = {}  # tras salir en resistencia con reentry="breakout": nivel a superar
 
     for date in calendar:
         # 1) Ejecutar ordenes pendientes a la apertura
@@ -131,6 +142,11 @@ def run_backtest(
                 trades.append(trade)
                 if trade.reason == "drop" and reentry_cooldown_days > 0:
                     cooldown_until[symbol] = date + pd.Timedelta(days=reentry_cooldown_days)
+                if trade.reason == "resistance":
+                    if resistance_reentry == "signal":
+                        wait_signal.add(symbol)
+                    elif resistance_reentry == "cooldown" and reentry_cooldown_days > 0:
+                        cooldown_until[symbol] = date + pd.Timedelta(days=reentry_cooldown_days)
             elif action == "BUY" and symbol not in positions and len(positions) < risk.max_positions:
                 px = open_px * (1 + slip)
                 qty = size_fn(symbol, date, equity_open, cash, px) if size_fn else position_size(equity_open, cash, px, risk)
@@ -164,15 +180,39 @@ def run_backtest(
             if event == "BUY" and symbol not in positions:
                 if allowed:
                     pending[symbol] = "BUY"
+                    wait_signal.discard(symbol); breakout_level.pop(symbol, None)
             elif event == "SELL" and symbol in positions:
                 pending[symbol] = "SELL"
             elif symbol not in positions and int(df.at[date, "signal"]) == 1 and symbol not in pending:
                 # La tendencia sigue vigente pero no tenemos posicion (p.ej. por stop): reentrar
-                if allowed and date >= cooldown_until.get(symbol, date):
+                if symbol in wait_signal:
+                    pass  # salida en resistencia: espera un cruce alcista nuevo
+                elif symbol in breakout_level:
+                    if float(df.at[date, "close"]) > breakout_level[symbol] and allowed:
+                        pending[symbol] = "BUY"; breakout_level.pop(symbol, None)
+                elif allowed and date >= cooldown_until.get(symbol, date):
                     pending[symbol] = "BUY"
+            if event == "SELL":
+                wait_signal.discard(symbol); breakout_level.pop(symbol, None)
             if symbol in positions and pending.get(symbol) != "SELL":
                 if regime_exit and not allowed:
                     pending[symbol] = "SELL:regime"
+                elif resistance_lookback > 0:
+                    i = df.index.get_loc(date)
+                    if i > resistance_lookback:
+                        res = float(df["high"].iloc[i - resistance_lookback:i].max())
+                        in_profit = float(df.at[date, "close"]) > positions[symbol].entry_price
+                        if float(df.at[date, "high"]) >= res * (1 - resistance_tol) and (in_profit or not resistance_only_in_profit):
+                            pending[symbol] = "SELL:resistance"
+                            if resistance_reentry == "breakout":
+                                breakout_level[symbol] = max(res, float(df.at[date, "high"]))
+                    if pending.get(symbol) != "SELL:resistance" and drop_exit_pct > 0:
+                        i2 = i
+                        if i2 > 0:
+                            close, prev_close = float(df.at[date, "close"]), float(df["close"].iloc[i2 - 1])
+                            in_profit = close > positions[symbol].entry_price
+                            if close < prev_close * (1 - drop_exit_pct) and (in_profit or not drop_exit_only_in_profit):
+                                pending[symbol] = "SELL:drop"
                 elif drop_exit_pct > 0:
                     i = df.index.get_loc(date)
                     if i > 0:
