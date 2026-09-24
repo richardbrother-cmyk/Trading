@@ -233,9 +233,10 @@ def pending_setup(high: np.ndarray, low: np.ndarray, close: np.ndarray, atr_valu
     return out
 
 
-def backtest_symbol(df15: pd.DataFrame, sym: str, p: ElliottParams, initial: float = 10_000.0) -> list[ITrade]:
+def backtest_symbol(df15: pd.DataFrame, sym: str, p: ElliottParams, initial: float = 10_000.0, bars: pd.DataFrame | None = None) -> list[ITrade]:
+    """`bars`: barras ya en el marco temporal de `p` (p.ej. diarias de Yahoo); si no se dan, se agregan desde `df15`."""
     spec = SPECS[sym]
-    d = resample(df15, p.timeframe)
+    d = bars if bars is not None else resample(df15, p.timeframe)
     a = atr(d, p.atr_period).to_numpy()
     o, h, l, c = d["open"].to_numpy(), d["high"].to_numpy(), d["low"].to_numpy(), d["close"].to_numpy()
     idx = d.index

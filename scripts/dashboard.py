@@ -41,6 +41,7 @@ KRONOS_REPORT = "docs/kronos_report.json"
 ELLIOTT_STUDY = "docs/elliott_study.json"
 ELLIOTT_STATE = "docs/elliott_state.json"
 RESISTANCE_STUDY = "docs/resistance_exit.json"
+ELLIOTT_LONG = "docs/elliott_daily_indices.json"
 ELLIOTT_DEPLOYED_KEY = "XAUUSD_H4_zz2_w2_ruptura_t1.618_inicio_l"  # variante del estudio que opera el bot de Elliott
 ALPACA_VARIANTS = "docs/alpaca_variants.json"
 
@@ -183,6 +184,11 @@ def collect(no_live: bool) -> dict:
                                               for tf in ("H4", "D1")}}
         es["cross_symbol"] = (es.get("cross_symbol") or [])[:10]
         es.pop("variants", None)
+        if os.path.exists(ELLIOTT_LONG):
+            with open(ELLIOTT_LONG, encoding="utf-8") as fh:
+                lg = json.load(fh)
+            lg.pop("rows", None)  # al panel solo va el resumen por variante
+            es["long_indices"] = lg
         swing["elliott"] = es
         if "elliott_bot" in ctrader and es.get("deployed_variant"):
             ctrader["elliott_bot"]["study"] = es["deployed_variant"]

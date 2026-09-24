@@ -305,6 +305,11 @@ footer { color: var(--muted); font-size: 12.5px; }
       <div class="tbl-wrap"><table id="sw-el-cross"></table></div>
       <div class="eyebrow" style="margin:14px 0 8px">Walk-forward por activo y marco temporal</div>
       <div class="tbl-wrap"><table id="sw-el-wf"></table></div>
+      <div id="sw-el-long-block" style="display:none">
+        <div class="eyebrow" style="margin:14px 0 8px">Familia diaria en índices con historia desde 2000</div>
+        <p class="lede" id="sw-el-long-lede" style="margin:0 0 8px"></p>
+        <div class="tbl-wrap"><table id="sw-el-long"></table></div>
+      </div>
       <p class="note" id="sw-el-note" style="margin:10px 0 0"></p>
     </section>
     <section id="sw-asia-section" style="display:none">
@@ -797,8 +802,17 @@ function renderSwingTab(prefix, SW, badgeId, base0, research){
     $("sw-el-cross").innerHTML = cross.length ? `<thead><tr><th>Combinación</th><th>Marco</th>${syms.map(s=>`<th class="num">${esc(symName(s))}</th>`).join("")}<th class="num">Bate al azar en</th></tr></thead><tbody>${crossRows}</tbody>` : "";
     const wfRows = syms.flatMap(sym => ["H4","D1"].map(tf => { const w = wfOf(sym, tf); if (!w || !w.folds) return ""; return (w.folds||[]).map(f=>`<tr><td class="mono">${esc(symName(sym))}</td><td class="mono">${tfName(tf)}</td><td class="mono" style="font-size:12px">${esc(f.test_window[0])} → ${esc(f.test_window[1])}</td><td style="font-size:12px">${esc(f.chosen.replace(/^(H4|D1) · /, ""))}</td><td class="num">${f.train.trades||0}</td><td class="num">${pfTxt(f.train.profit_factor)}</td><td class="num">${f.test.trades||0}</td><td class="num ${(f.test.profit_factor||0)>=1?"pos":"neg"}">${pfTxt(f.test.profit_factor)}</td><td class="num ${(f.test.return||0)>=0?"pos":"neg"}">${pct(f.test.return||0)}</td></tr>`).join("") + `<tr class="active"><td class="mono">${esc(symName(sym))}</td><td class="mono">${tfName(tf)}</td><td colspan="2"><b>Fuera de muestra encadenado</b> (${w.windows.train_months} meses de entrenamiento, ${w.windows.test_months} de prueba)</td><td class="num"></td><td class="num"></td><td class="num">${w.oos.trades||0}</td><td class="num ${(w.oos.profit_factor||0)>=1?"pos":"neg"}">${pfTxt(w.oos.profit_factor)}</td><td class="num ${(w.oos.return||0)>=0?"pos":"neg"}">${pct(w.oos.return||0)}</td></tr>`; })).join("");
     $("sw-el-wf").innerHTML = `<thead><tr><th>Activo</th><th>Marco</th><th>Tramo de prueba</th><th>Variante elegida en el entrenamiento</th><th class="num">Ops. entren.</th><th class="num">PF entren.</th><th class="num">Ops. prueba</th><th class="num">PF prueba</th><th class="num">Ret. prueba</th></tr></thead><tbody>${wfRows}</tbody>`;
+    const LG = EL.long_indices;
+    if (LG && LG.variants) {
+      $("sw-el-long-block").style.display = "";
+      const names = Object.keys(LG.indices||{});
+      $("sw-el-long-lede").textContent = `Las tres combinaciones que repetían en US500 y NAS100 (marcadas con ★) y sus vecinas, probadas sobre ${names.length} índices de contado (${names.join(", ")}) con datos diarios de Yahoo desde 2000. "Antes de 2023" es el tramo anterior al ${LG.split} que el estudio corto no vio; la referencia de azar se calcula en ese tramo. Generado el ${LG.generated_at}.`;
+      const rows = LG.variants.map(v => { const pp = v.pooled_pre2023||{}; const per = v.per_symbol||{}; const cells = names.map(n => { const x = per[n]; if (!x) return `<td class="num">—</td>`; const ok = x.pre_p_random!=null && x.pre_p_random<=0.05 && x.pre_n>=10; return `<td class="num ${ok?"pos":(x.pre_mean_r||0)<0?"neg":""}" style="font-size:12px">${x.pre_n} · ${(x.pre_mean_r>0?"+":"")+Number(x.pre_mean_r||0).toFixed(2)} · p ${x.pre_p_random!=null?Number(x.pre_p_random).toFixed(2):"—"}</td>`; }).join("");
+        return `<tr class="${v.family?"active":""}"><td style="font-size:12.5px">${v.family?"★ ":""}${esc(v.label)}</td>${cells}<td class="num ${(pp.mean_r||0)>=0?"pos":"neg"}">${pp.n||0} · ${(pp.mean_r>0?"+":"")+Number(pp.mean_r||0).toFixed(2)} [${pp.ci95?Number(pp.ci95[0]).toFixed(2):"—"}, ${pp.ci95?Number(pp.ci95[1]).toFixed(2):"—"}] · q ${pp.q_value!=null?Number(pp.q_value).toFixed(2):"—"}</td><td class="num">${v.blocks_positive}/${v.blocks_total}</td><td class="num">${(v.indices_positive_post||[]).length}/${names.length}</td></tr>`; }).join("");
+      $("sw-el-long").innerHTML = `<thead><tr><th>Variante (diario, entrada pivote, stop onda)</th>${names.map(n=>`<th class="num">${esc(n)} antes de 2023<br><span style="font-weight:400;text-transform:none">ops · R medio · p azar</span></th>`).join("")}<th class="num">Agrupado antes de 2023<br><span style="font-weight:400;text-transform:none">ops · R medio [IC 95 %] · q</span></th><th class="num">Bloques de 5 años positivos</th><th class="num">Índices positivos desde 2023</th></tr></thead><tbody>${rows}</tbody>`;
+    }
     const byTf = syms.map(s => { const b = (ps[s]||{}).beat_random_by_tf || {}; return `${symName(s)} ${b.H4||0} en 4 h y ${b.D1||0} en diario`; }).join("; ");
-    $("sw-el-note").textContent = `Lectura: ${EL.verdict}. La columna "p azar ≥ real" es la fracción de sorteos aleatorios que igualan o superan el R medio de la variante: por debajo de 0,05 el recuento aporta algo más que la tendencia. Lo consiguen ${byTf}. Que una combinación bata al azar en varios activos es la prueba de que el borde es del método y no del activo; la tabla de arriba lo mide. Nada de esto se despliega sin pasar por demo.`;
+    $("sw-el-note").textContent = `Lectura: ${EL.verdict}. La columna "p azar ≥ real" es la fracción de sorteos aleatorios que igualan o superan el R medio de la variante: por debajo de 0,05 el recuento aporta algo más que la tendencia. Lo consiguen ${byTf}. Que una combinación bata al azar en varios activos es la prueba de que el borde es del método y no del activo; la tabla de arriba lo mide.${LG && LG.verdict ? " Historia larga en índices: " + esc(LG.verdict) + "." : ""} Nada de esto se despliega sin pasar por demo.`;
   } else if (research) {
     $("sw-el-section").style.display = "none";
   }
