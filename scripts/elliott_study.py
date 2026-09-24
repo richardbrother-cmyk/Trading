@@ -12,7 +12,10 @@ objetivo, stop, lado) y para cada variante se calcula:
 Ademas, un walk-forward por marco temporal: se elige la variante en la ventana de entrenamiento y se mide en la
 siguiente; los tramos de prueba encadenados forman el resultado fuera de muestra.
 
-Uso: python scripts/elliott_study.py [--symbol XAUUSD] [--out docs/elliott_study.json] [--random 100]
+Con varios simbolos (oro e indices) se anade la comparacion entre activos: para cada combinacion de parametros se mira
+en cuantos activos bate al azar; si el borde es del metodo y no del activo, deberia repetirse.
+
+Uso: python scripts/elliott_study.py [--symbols XAUUSD,US500,NAS100] [--out docs/elliott_study.json] [--random 100]
 """
 
 from __future__ import annotations
@@ -52,14 +55,19 @@ def grid(tf: str) -> list[ElliottParams]:
     return out
 
 
-def label(p: ElliottParams) -> str:
+def label(p: ElliottParams, sym: str = "") -> str:
     waves = "onda 2" if p.waves == (2,) else "onda 4" if p.waves == (4,) else "ondas 2 y 4"
-    return (f"{p.timeframe} · ZigZag {p.zz_atr:g} ATR · {waves} · entrada {p.entry} · objetivo {p.target_ext:g}×onda 1 · "
+    return ((f"{sym} · " if sym else "") + f"{p.timeframe} · ZigZag {p.zz_atr:g} ATR · {waves} · entrada {p.entry} · objetivo {p.target_ext:g}×onda 1 · "
             f"stop {p.stop} · {'largos y cortos' if p.allow_short else 'solo largos'}")
 
 
-def key(p: ElliottParams) -> str:
+def param_key(p: ElliottParams) -> str:
+    """Clave de la combinacion de parametros, sin el simbolo (sirve para comparar activos)."""
     return f"{p.timeframe}_zz{p.zz_atr:g}_w{''.join(map(str, p.waves))}_{p.entry}_t{p.target_ext:g}_{p.stop}_{'ls' if p.allow_short else 'l'}"
+
+
+def key(p: ElliottParams, sym: str = "") -> str:
+    return (f"{sym}_" if sym else "") + param_key(p)
 
 
 def clean(m: dict) -> dict:
@@ -178,8 +186,8 @@ def walkforward(df15: pd.DataFrame, sym: str, tf: str, configs: list[ElliottPara
         oos += tr
         tm = clean(metrics(tr, equity, max((c - b).days, 1)))
         results.append({"fold": k, "train_window": [str(a.date()), str(b.date())], "test_window": [str(b.date()), str(c.date())],
-                        "chosen": label(best), "chosen_key": key(best), "train": best_m, "test": tm})
-        print(f"  {tf} tramo {k}: {label(best)} | entrena PF {best_m.get('profit_factor')} ops {best_m.get('trades')} | "
+                        "chosen": label(best), "chosen_key": param_key(best), "train": best_m, "test": tm})
+        print(f"  {sym} {tf} tramo {k}: {label(best)} | entrena PF {best_m.get('profit_factor')} ops {best_m.get('trades')} | "
               f"prueba PF {tm.get('profit_factor')} ops {tm.get('trades')} ret {tm.get('return')}")
     oos.sort(key=lambda t: t.entry_time)
     oos_days = (folds[-1][2] - folds[0][1]).days if folds else 1
@@ -189,69 +197,110 @@ def walkforward(df15: pd.DataFrame, sym: str, tf: str, configs: list[ElliottPara
             "oos": om, "oos_stats": stats, "chosen_stable": len({r["chosen_key"] for r in results}) <= 1}
 
 
+def study_symbol(df15: pd.DataFrame, sym: str, equity: float, draws: int) -> tuple[list[dict], dict]:
+    days = (df15.index[-1] - df15.index[0]).days
+    rows, wf = [], {}
+    for tf in ("H4", "D1"):
+        configs = grid(tf)
+        print(f"{sym} {tf}: {len(configs)} variantes, {len(resample(df15, tf))} barras")
+        for p in configs:
+            tr = backtest_symbol(df15, sym, p, equity)
+            m = clean(metrics(tr, equity, days))
+            R = [t.r for t in tr]
+            rows.append({"key": key(p, sym), "param_key": param_key(p), "symbol": sym, "timeframe": tf, "label": label(p, sym),
+                         "params": {k: (list(v) if isinstance(v, tuple) else v) for k, v in asdict(p).items()},
+                         "metrics": m, "stats": summarize_variant(R), "by_year": by_year(tr, equity),
+                         "long_share": round(float(np.mean([t.side == 1 for t in tr])), 2) if tr else None,
+                         "exits": {r: sum(t.reason == r for t in tr) for r in ("objetivo", "stop", "tiempo maximo")} if tr else {},
+                         "random": random_reference(df15, sym, p, tr, equity, draws)})
+        wf[tf] = walkforward(df15, sym, tf, configs, equity)
+    return rows, wf
+
+
+def beats_random(r: dict, min_trades: int = 10) -> bool:
+    return bool(r.get("random")) and r["stats"].get("n", 0) >= min_trades and r["random"]["share_random_avg_r_at_least_real"] <= 0.05
+
+
+def cross_symbol(rows: list[dict], symbols: list[str]) -> list[dict]:
+    """Para cada combinacion de parametros: en cuantos activos bate al azar (con >= 10 operaciones) y resumen por activo."""
+    by_pk: dict[str, dict] = {}
+    for r in rows:
+        by_pk.setdefault(r["param_key"], {})[r["symbol"]] = r
+    out = []
+    for pk, per in by_pk.items():
+        beats = [s for s in symbols if s in per and beats_random(per[s])]
+        positive = [s for s in symbols if s in per and per[s]["stats"].get("n", 0) >= 10 and per[s]["stats"]["mean_r"] > 0]
+        sample = next(iter(per.values()))
+        out.append({"param_key": pk, "timeframe": sample["timeframe"], "label": sample["label"].split(" · ", 1)[1],
+                    "beats_random_in": beats, "positive_in": positive, "n_beats": len(beats),
+                    "per_symbol": {s: {"n": per[s]["stats"].get("n", 0), "mean_r": per[s]["stats"].get("mean_r"),
+                                       "profit_factor": per[s]["metrics"].get("profit_factor"),
+                                       "p_random": (per[s].get("random") or {}).get("share_random_avg_r_at_least_real")}
+                                   for s in symbols if s in per}})
+    out.sort(key=lambda x: (-x["n_beats"], -len(x["positive_in"]), -min((v["n"] for v in x["per_symbol"].values()), default=0)))
+    return out
+
+
 def main() -> int:
     ap = argparse.ArgumentParser()
-    ap.add_argument("--symbol", default="XAUUSD")
+    ap.add_argument("--symbols", default="XAUUSD,US500,NAS100")
     ap.add_argument("--data", default="data/intraday")
     ap.add_argument("--out", default="docs/elliott_study.json")
     ap.add_argument("--equity", type=float, default=10_000)
     ap.add_argument("--random", type=int, default=100, help="repeticiones de la referencia de azar por variante")
     ap.add_argument("--q", type=float, default=0.10)
     args = ap.parse_args()
-    df15 = load_bars(os.path.join(args.data, f"{args.symbol}_M15.csv"))
-    days = (df15.index[-1] - df15.index[0]).days
-    rows, wf = [], {}
-    for tf in ("H4", "D1"):
-        configs = grid(tf)
-        print(f"{tf}: {len(configs)} variantes, {len(resample(df15, tf))} barras")
-        for p in configs:
-            tr = backtest_symbol(df15, args.symbol, p, args.equity)
-            m = clean(metrics(tr, args.equity, days))
-            R = [t.r for t in tr]
-            row = {"key": key(p), "timeframe": tf, "label": label(p), "params": {k: (list(v) if isinstance(v, tuple) else v) for k, v in asdict(p).items()},
-                   "metrics": m, "stats": summarize_variant(R), "by_year": by_year(tr, args.equity),
-                   "long_share": round(float(np.mean([t.side == 1 for t in tr])), 2) if tr else None,
-                   "exits": {r: sum(t.reason == r for t in tr) for r in ("objetivo", "stop", "tiempo maximo")} if tr else {},
-                   "random": random_reference(df15, args.symbol, p, tr, args.equity, args.random)}
-            rows.append(row)
-        wf[tf] = walkforward(df15, args.symbol, tf, configs, args.equity)
-    # q-valores por marco temporal y en el conjunto
-    for tf in ("H4", "D1"):
-        idx = [i for i, r in enumerate(rows) if r["timeframe"] == tf and r["stats"].get("n", 0) > 1]
-        for i, qv in zip(idx, benjamini_hochberg([rows[i]["stats"]["p_value"] for i in idx])):
-            rows[i]["q_family"] = round(qv, 4)
+    symbols = [x.strip().upper() for x in args.symbols.split(",") if x.strip()]
+    rows, wf, periods = [], {}, {}
+    for sym in symbols:
+        df15 = load_bars(os.path.join(args.data, f"{sym}_M15.csv"))
+        periods[sym] = [str(df15.index[0].date()), str(df15.index[-1].date())]
+        r, w = study_symbol(df15, sym, args.equity, args.random)
+        rows += r
+        wf[sym] = w
+    # q-valores por familia (activo y marco temporal) y en el conjunto de todo lo probado
+    for sym in symbols:
+        for tf in ("H4", "D1"):
+            idx = [i for i, r in enumerate(rows) if r["symbol"] == sym and r["timeframe"] == tf and r["stats"].get("n", 0) > 1]
+            for i, qv in zip(idx, benjamini_hochberg([rows[i]["stats"]["p_value"] for i in idx])):
+                rows[i]["q_family"] = round(qv, 4)
     idx = [i for i, r in enumerate(rows) if r["stats"].get("n", 0) > 1]
     for i, qv in zip(idx, benjamini_hochberg([rows[i]["stats"]["p_value"] for i in idx])):
         rows[i]["q_all"] = round(qv, 4)
         rows[i]["significant_all"] = bool(qv <= args.q)
         rows[i]["significant_family"] = bool(rows[i].get("q_family", 1.0) <= args.q)
     rows.sort(key=lambda r: (r["stats"].get("p_value", 1.0), -r["stats"].get("n", 0)))
-    tested = len(idx)
-    sig = [r for r in rows if r.get("significant_all")]
-    beat_random = [r for r in rows if r.get("random") and r["random"]["share_random_avg_r_at_least_real"] <= 0.05 and r["stats"].get("n", 0) >= 10]
-    years_pos = [r for r in rows if r["by_year"] and all(v["sum_r"] > 0 for v in r["by_year"].values()) and r["stats"].get("n", 0) >= 10]
-    verdict = []
-    verdict.append(f"{tested} variantes probadas; {len(sig)} superan la correccion por multiples pruebas (q <= {args.q:g})")
-    verdict.append(f"{len(beat_random)} baten a las entradas al azar con la misma estructura de salida (p <= 0,05)")
-    verdict.append(f"{len(years_pos)} son positivas todos los anos con al menos 10 operaciones")
-    for tf in ("H4", "D1"):
-        o = wf[tf]["oos"]
-        verdict.append(f"walk-forward {tf}: {o.get('trades', 0)} operaciones fuera de muestra, PF {o.get('profit_factor')}, retorno {o.get('return')}"
-                       + ("" if wf[tf]["chosen_stable"] else ", parametros elegidos cambian entre tramos"))
-    out = {"generated_at": datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC"), "symbol": args.symbol, "equity": args.equity,
-           "risk_pct": 0.01, "period": [str(df15.index[0].date()), str(df15.index[-1].date())], "grid_size": {tf: len(grid(tf)) for tf in ("H4", "D1")},
-           "q_level": args.q, "tests": tested, "random_draws": args.random,
+    cross = cross_symbol(rows, symbols)
+    per_symbol = {}
+    verdict = [f"{len(idx)} variantes probadas en {', '.join(symbols)}"]
+    for sym in symbols:
+        rs = [r for r in rows if r["symbol"] == sym]
+        beat = [r for r in rs if beats_random(r)]
+        per_symbol[sym] = {"tested": sum(1 for r in rs if r["stats"].get("n", 0) > 1), "significant": sum(1 for r in rs if r.get("significant_all")),
+                           "with_10_trades": sum(1 for r in rs if r["stats"].get("n", 0) >= 10), "beat_random": len(beat),
+                           "beat_random_by_tf": {tf: sum(1 for r in beat if r["timeframe"] == tf) for tf in ("H4", "D1")},
+                           "walkforward": {tf: {"trades": wf[sym][tf]["oos"].get("trades", 0), "profit_factor": wf[sym][tf]["oos"].get("profit_factor"),
+                                                "return": wf[sym][tf]["oos"].get("return"), "chosen_stable": wf[sym][tf]["chosen_stable"]} for tf in ("H4", "D1")}}
+        verdict.append(f"{sym}: {len(beat)} baten al azar (H4 {per_symbol[sym]['beat_random_by_tf']['H4']}, D1 {per_symbol[sym]['beat_random_by_tf']['D1']}); "
+                       f"walk-forward H4 {wf[sym]['H4']['oos'].get('trades', 0)} ops PF {wf[sym]['H4']['oos'].get('profit_factor')}")
+    multi = [c for c in cross if c["n_beats"] >= 2]
+    verdict.append(f"{len(multi)} combinaciones de parametros baten al azar en al menos dos activos")
+    out = {"generated_at": datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC"), "symbols": symbols, "symbol": symbols[0], "equity": args.equity,
+           "risk_pct": 0.01, "period": periods[symbols[0]], "periods": periods, "grid_size": {tf: len(grid(tf)) for tf in ("H4", "D1")},
+           "q_level": args.q, "tests": len(idx), "random_draws": args.random,
            "method": "media de R por operacion; IC 95 % bootstrap; p unilateral bootstrap centrado; q Benjamini-Hochberg; referencia de azar con misma estructura de salida",
-           "variants": rows, "walkforward": wf, "verdict": "; ".join(verdict)}
+           "variants": rows, "walkforward": wf, "per_symbol": per_symbol, "cross_symbol": cross[:40], "verdict": "; ".join(verdict)}
     os.makedirs(os.path.dirname(args.out) or ".", exist_ok=True)
     with open(args.out, "w", encoding="utf-8") as fh:
         json.dump(out, fh, ensure_ascii=False, indent=1, default=str)
-    print(f"{'variante':95s} {'n':>4s} {'R medio':>8s} {'p':>7s} {'q todo':>7s} {'PF':>6s} {'azar>=real':>10s}")
-    for r in rows[:25]:
+    print(f"{'variante':100s} {'n':>4s} {'R medio':>8s} {'PF':>6s} {'azar>=real':>10s}")
+    for r in sorted(rows, key=lambda r: ((r.get('random') or {}).get('share_random_avg_r_at_least_real', 1.0), -r['stats'].get('n', 0)))[:30]:
         s, rd = r["stats"], r.get("random") or {}
-        print(f"{r['label'][:95]:95s} {s.get('n', 0):4d} {s.get('mean_r', 0):+8.3f} {s.get('p_value', 1):7.4f} {r.get('q_all', 1):7.3f} "
-              f"{str(r['metrics'].get('profit_factor')):>6s} {str(rd.get('share_random_avg_r_at_least_real', '—')):>10s}"
-              + ("  *" if r.get("significant_all") else ""))
+        print(f"{r['label'][:100]:100s} {s.get('n', 0):4d} {s.get('mean_r', 0):+8.3f} {str(r['metrics'].get('profit_factor')):>6s} "
+              f"{str(rd.get('share_random_avg_r_at_least_real', '—')):>10s}" + ("  *" if beats_random(r) else ""))
+    print("-- combinaciones que baten al azar en mas de un activo --")
+    for c in multi[:15]:
+        print(f"  {c['label'][:90]:90s} {', '.join(c['beats_random_in'])} | " + " ".join(f"{s}: n{v['n']} R{v['mean_r']:+.2f} p{v['p_random']}" for s, v in c["per_symbol"].items()))
     print("->", args.out, "|", out["verdict"])
     return 0
 

@@ -40,7 +40,7 @@ SWING_WALKFORWARD = "docs/swing_walkforward.json"
 KRONOS_REPORT = "docs/kronos_report.json"
 ELLIOTT_STUDY = "docs/elliott_study.json"
 ELLIOTT_STATE = "docs/elliott_state.json"
-ELLIOTT_DEPLOYED_KEY = "H4_zz2_w2_ruptura_t1.618_inicio_l"  # variante del estudio que opera el bot de Elliott
+ELLIOTT_DEPLOYED_KEY = "XAUUSD_H4_zz2_w2_ruptura_t1.618_inicio_l"  # variante del estudio que opera el bot de Elliott
 ALPACA_VARIANTS = "docs/alpaca_variants.json"
 
 
@@ -168,7 +168,7 @@ def collect(no_live: bool) -> dict:
         # al panel solo van las variantes con al menos 10 operaciones, ordenadas por lo que baten al azar
         rows = [r for r in es.get("variants", []) if r.get("stats", {}).get("n", 0) >= 10 and r.get("random")]
         rows.sort(key=lambda r: (r["random"]["share_random_avg_r_at_least_real"], -r["stats"]["mean_r"]))
-        es["top"] = [{k: r[k] for k in ("key", "timeframe", "label", "metrics", "stats", "by_year", "random", "exits", "q_all", "significant_all")} for r in rows[:12]]
+        es["top"] = [{k: r.get(k) for k in ("key", "symbol", "timeframe", "label", "metrics", "stats", "by_year", "random", "exits", "q_all", "significant_all")} for r in rows[:15]]
         dep = next((r for r in es.get("variants", []) if r.get("key") == ELLIOTT_DEPLOYED_KEY), None)
         if dep:
             es["deployed_variant"] = {k: dep[k] for k in ("key", "timeframe", "label", "metrics", "stats", "by_year", "random")}
@@ -177,6 +177,7 @@ def collect(no_live: bool) -> dict:
                         "with_10_trades": len(rows),
                         "beat_random_by_tf": {tf: sum(1 for r in rows if r["timeframe"] == tf and r["random"]["share_random_avg_r_at_least_real"] <= 0.05)
                                               for tf in ("H4", "D1")}}
+        es["cross_symbol"] = (es.get("cross_symbol") or [])[:10]
         es.pop("variants", None)
         swing["elliott"] = es
         if "elliott_bot" in ctrader and es.get("deployed_variant"):
