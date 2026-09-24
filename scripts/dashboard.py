@@ -38,6 +38,7 @@ AGGR_SIMULATION = "docs/aggr_simulation.json"
 ASIA_STATE = "docs/asia_state.json"
 SWING_WALKFORWARD = "docs/swing_walkforward.json"
 KRONOS_REPORT = "docs/kronos_report.json"
+ELLIOTT_STUDY = "docs/elliott_study.json"
 ALPACA_VARIANTS = "docs/alpaca_variants.json"
 
 
@@ -156,6 +157,20 @@ def collect(no_live: bool) -> dict:
             top = (h3.get("variants") or {}).get("kronos_tercil_superior", {})
             swing["kronos"]["horizon3"] = {"ic_spearman": (h3.get("information") or {}).get("ic_spearman"), "top_tercile_pf": top.get("profit_factor"),
                                           "top_tercile_return": top.get("return"), "verdict": h3.get("verdict")}
+    if os.path.exists(ELLIOTT_STUDY):
+        with open(ELLIOTT_STUDY, encoding="utf-8") as fh:
+            es = json.load(fh)
+        # al panel solo van las variantes con al menos 10 operaciones, ordenadas por lo que baten al azar
+        rows = [r for r in es.get("variants", []) if r.get("stats", {}).get("n", 0) >= 10 and r.get("random")]
+        rows.sort(key=lambda r: (r["random"]["share_random_avg_r_at_least_real"], -r["stats"]["mean_r"]))
+        es["top"] = [{k: r[k] for k in ("key", "timeframe", "label", "metrics", "stats", "by_year", "random", "exits", "q_all", "significant_all")} for r in rows[:12]]
+        es["counts"] = {"tested": es.get("tests"), "significant": sum(1 for r in es.get("variants", []) if r.get("significant_all")),
+                        "beat_random": sum(1 for r in rows if r["random"]["share_random_avg_r_at_least_real"] <= 0.05),
+                        "with_10_trades": len(rows),
+                        "beat_random_by_tf": {tf: sum(1 for r in rows if r["timeframe"] == tf and r["random"]["share_random_avg_r_at_least_real"] <= 0.05)
+                                              for tf in ("H4", "D1")}}
+        es.pop("variants", None)
+        swing["elliott"] = es
     last_run = None
     cycles = []
     log = os.path.join(s.state_dir, "run_log.jsonl")
