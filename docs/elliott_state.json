@@ -1,0 +1,71 @@
+{
+ "traded_signals": {},
+ "at": "2026-09-24T17:23Z",
+ "equity": 672.25,
+ "label": "autotrader-elliott",
+ "strategy": "ZigZag 2 ATR, fin de la onda 2, entrada por ruptura del extremo de la onda anterior, stop en el nivel de invalidacion menos 0.25 ATR, objetivo 1.618 x onda 1, solo largos, salida a los 10 dias",
+ "last_decision": {
+  "symbol": "XAUUSD",
+  "bar": "2026-09-24 13:00",
+  "bar_age_h": 0.4,
+  "close": 4273.18,
+  "atr": 32.64,
+  "action": "HOLD",
+  "phase": "sin patron",
+  "pivots": [
+   {
+    "bar": "2026-09-16 17:00",
+    "price": 4366.22,
+    "kind": "max",
+    "confirmed": "2026-09-16 17:00"
+   },
+   {
+    "bar": "2026-09-16 17:00",
+    "price": 4235.08,
+    "kind": "min",
+    "confirmed": "2026-09-17 05:00"
+   },
+   {
+    "bar": "2026-09-18 05:00",
+    "price": 4399.63,
+    "kind": "max",
+    "confirmed": "2026-09-21 13:00"
+   },
+   {
+    "bar": "2026-09-22 05:00",
+    "price": 4291.37,
+    "kind": "min",
+    "confirmed": "2026-09-22 17:00"
+   },
+   {
+    "bar": "2026-09-22 17:00",
+    "price": 4371.2,
+    "kind": "max",
+    "confirmed": "2026-09-23 09:00"
+   }
+  ]
+ },
+ "open_positions": [],
+ "last_orders": [],
+ "trades": [],
+ "guard": {
+  "mode": "off",
+  "reason": "",
+  "peak": 700.52,
+  "drawdown": -0.0404
+ },
+ "params": {
+  "zz_atr": 2.0,
+  "waves": [
+   2
+  ],
+  "entry": "ruptura",
+  "target_ext": 1.618,
+  "stop": "inicio",
+  "stop_buffer_atr": 0.25,
+  "max_hold_days": 10.0,
+  "risk_pct": 0.06,
+  "max_risk_pct": 0.09,
+  "max_signal_age_hours": 2.0
+ }
+}
