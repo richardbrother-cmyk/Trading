@@ -1,0 +1,109 @@
+name: ctrader-elliott
+
+# Bot "ondas de Elliott" sobre el oro (XAUUSD) en barras de 4 h, en la MISMA cuenta demo agresiva de cTrader (500 USD):
+# ZigZag de 2 ATR, entrada al final de la onda 2 cuando un cierre de 4 h supera el maximo de la onda 1, stop bajo el
+# inicio de la onda 1 (invalidacion) menos 0,25 ATR, objetivo 1,618 x onda 1, solo largos, salida a los 10 dias.
+# Es la variante con mas operaciones entre las que baten a las entradas al azar en docs/elliott_study.json (47 ops en
+# 3 anos, PF 3,5, +18 %, acierto 81 %); walk-forward debil y con pocas operaciones: se evalua en demo.
+# Corre cada hora y solo entra si la barra de 4 h que dispara la senal cerro hace menos de 2 h.
+# Secrets: los mismos que ctrader-aggr.
+on:
+  schedule:
+    - cron: "17 * * * 0-5"
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "Solo decidir, sin enviar ordenes"
+        type: boolean
+        default: false
+
+# Un solo run a la vez: si un ciclo se retrasa y se solapa con el siguiente, el nuevo espera en cola.
+concurrency:
+  group: ${{ github.workflow }}
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+env:
+  SCHEDULE_ENABLED: "true"
+
+jobs:
+  gate:
+    runs-on: ubuntu-latest
+    outputs:
+      enabled: ${{ steps.check.outputs.enabled }}
+    steps:
+      - id: check
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ] || [ "$SCHEDULE_ENABLED" = "true" ]; then echo "enabled=true" >> "$GITHUB_OUTPUT"; else echo "enabled=false" >> "$GITHUB_OUTPUT"; fi
+
+  elliott:
+    needs: gate
+    if: ${{ needs.gate.outputs.enabled == 'true' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      BROKER: ctrader
+      DATA_PROVIDER: ctrader
+      CTRADER_DEMO: "true"
+      CTRADER_CLIENT_ID: ${{ secrets.CTRADER_CLIENT_ID }}
+      CTRADER_CLIENT_SECRET: ${{ secrets.CTRADER_CLIENT_SECRET }}
+      CTRADER_ACCOUNT_LOGIN: ${{ secrets.CTRADER_AGGR_ACCOUNT_LOGIN }}
+      CTRADER_ACCESS_TOKEN: ${{ secrets.CTRADER_ACCESS_TOKEN }}
+      # Freno compartido con el bot agresivo (misma cuenta): interruptor manual y drawdown desde el maximo
+      BOT_HALT: ${{ vars.AGGR_BOT_HALT || vars.BOT_HALT || 'off' }}
+      MAX_DRAWDOWN_PCT: "0.50"
+      SYMBOLS: "XAUUSD"
+      # 6 % de riesgo por operacion, como el resto de bots de la cuenta agresiva; lote minimo aceptado hasta 9 %
+      RISK_PER_TRADE: "0.06"
+      ELLIOTT_ZZ_ATR: "2.0"
+      ELLIOTT_WAVES: "2"
+      ELLIOTT_ENTRY: "ruptura"
+      ELLIOTT_MAX_WAIT_BARS: "20"
+      ELLIOTT_TARGET_EXT: "1.618"
+      ELLIOTT_STOP: "inicio"
+      ELLIOTT_STOP_BUFFER_ATR: "0.25"
+      ELLIOTT_MAX_HOLD_DAYS: "10"
+      ELLIOTT_ALLOW_SHORT: "false"
+      ELLIOTT_MAX_SIGNAL_AGE_HOURS: "2"
+      ELLIOTT_LABEL: "autotrader-elliott"
+      ELLIOTT_STATE_PATH: "docs/elliott_state.json"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install -r requirements.txt
+      - name: Tests
+        run: python -m pytest -q tests/test_elliott.py tests/test_elliottbot.py tests/test_guard.py
+      - name: Ciclo Elliott
+        run: python -m autotrader.cli --env /dev/null elliott-run ${{ inputs.dry_run && '--dry-run' || '' }} | tee /tmp/elliott.json
+      - name: Estado de la cuenta y panel
+        if: ${{ !inputs.dry_run }}
+        run: |
+          python scripts/ctrader_state.py --swing --initial 500 --label autotrader-aggr,autotrader-asia,autotrader-elliott --out docs/aggr_state.json
+          python scripts/dashboard.py --no-live --out reports/dashboard.html
+          cp reports/dashboard.html docs/index.html
+          cp reports/dashboard.html docs/dashboard.html
+      - name: Publicar panel
+        if: ${{ !inputs.dry_run }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add docs/elliott_state.json docs/aggr_state.json docs/index.html docs/dashboard.html
+          if git diff --cached --quiet; then echo "sin cambios"; exit 0; fi
+          git commit -m "Panel: actualización automática (elliott)"
+          ok=0
+          for i in 1 2 3 4; do
+            if git pull --rebase -X theirs -q origin "${GITHUB_REF_NAME}" && git push; then ok=1; break; fi
+            git rebase --abort 2>/dev/null || true
+            sleep $((i * 5))
+          done
+          [ "$ok" = "1" ] || { echo "::error::no se pudo publicar el panel tras 4 intentos"; exit 1; }
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: elliott-log-${{ github.run_id }}
+          path: state/run_log.jsonl
+          if-no-files-found: ignore

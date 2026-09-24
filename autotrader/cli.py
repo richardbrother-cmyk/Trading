@@ -161,6 +161,31 @@ def cmd_asia_run(args) -> int:
     return 0
 
 
+def cmd_elliott_run(args) -> int:
+    """Ciclo del bot de ondas de Elliott (XAUUSD, 4 h) en la cuenta demo agresiva de cTrader."""
+    from .ctrader import CTraderSession
+    from .ctrader_auth import load_access_token
+    from .elliottbot import DEFAULT_MAX_SIGNAL_AGE_HOURS, ELLIOTT_LABEL, params_from_env, run_elliott_cycle
+
+    s = _settings(args)
+    s.broker = "ctrader"
+    s.validate()
+    token = load_access_token(os.path.join(s.state_dir, "ctrader_tokens.json"), s.ctrader_client_id,
+                              s.ctrader_client_secret, s.ctrader_access_token, s.ctrader_refresh_token)
+    session = CTraderSession(s.ctrader_client_id, s.ctrader_client_secret, token, s.ctrader_account_login or None, demo=s.ctrader_demo)
+    try:
+        session.load_symbols(s.symbols)
+        max_risk = float(os.getenv("ELLIOTT_MAX_RISK_PCT", "0")) or None
+        summary = run_elliott_cycle(s, session, p=params_from_env(s, max_risk), dry_run=args.dry_run, label=os.getenv("ELLIOTT_LABEL", ELLIOTT_LABEL),
+                                    state_path=os.getenv("ELLIOTT_STATE_PATH", "docs/elliott_state.json"),
+                                    equity_cap=float(os.getenv("EQUITY_CAP", "0")) or None,
+                                    max_signal_age_hours=float(os.getenv("ELLIOTT_MAX_SIGNAL_AGE_HOURS", str(DEFAULT_MAX_SIGNAL_AGE_HOURS))))
+    finally:
+        session.close()
+    print(json.dumps(summary, indent=2, default=str, ensure_ascii=False))
+    return 0
+
+
 def cmd_ctrader_check(args) -> int:
     """Verifica autorizacion, cuenta y simbolos de cTrader sin operar."""
     s = _settings(args)
@@ -230,6 +255,9 @@ def main(argv: list[str] | None = None) -> int:
     asb = sub.add_parser("asia-run", help="ciclo del bot intradia 'retest de Asia' (XAUUSD) en cTrader")
     asb.add_argument("--dry-run", action="store_true")
     asb.set_defaults(func=cmd_asia_run)
+    el = sub.add_parser("elliott-run", help="ciclo del bot de ondas de Elliott (XAUUSD, 4 h) en cTrader")
+    el.add_argument("--dry-run", action="store_true")
+    el.set_defaults(func=cmd_elliott_run)
 
     cc = sub.add_parser("ctrader-check", help="verifica autorizacion, cuenta y simbolos de cTrader")
     cc.set_defaults(func=cmd_ctrader_check)

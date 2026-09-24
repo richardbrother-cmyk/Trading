@@ -39,6 +39,8 @@ ASIA_STATE = "docs/asia_state.json"
 SWING_WALKFORWARD = "docs/swing_walkforward.json"
 KRONOS_REPORT = "docs/kronos_report.json"
 ELLIOTT_STUDY = "docs/elliott_study.json"
+ELLIOTT_STATE = "docs/elliott_state.json"
+ELLIOTT_DEPLOYED_KEY = "H4_zz2_w2_ruptura_t1.618_inicio_l"  # variante del estudio que opera el bot de Elliott
 ALPACA_VARIANTS = "docs/alpaca_variants.json"
 
 
@@ -147,6 +149,9 @@ def collect(no_live: bool) -> dict:
     if os.path.exists(ASIA_STATE):
         with open(ASIA_STATE, encoding="utf-8") as fh:
             aggr["asia"] = json.load(fh)
+    if os.path.exists(ELLIOTT_STATE):
+        with open(ELLIOTT_STATE, encoding="utf-8") as fh:
+            aggr["elliott_bot"] = json.load(fh)
     if os.path.exists(KRONOS_REPORT):
         with open(KRONOS_REPORT, encoding="utf-8") as fh:
             swing["kronos"] = json.load(fh)
@@ -164,6 +169,9 @@ def collect(no_live: bool) -> dict:
         rows = [r for r in es.get("variants", []) if r.get("stats", {}).get("n", 0) >= 10 and r.get("random")]
         rows.sort(key=lambda r: (r["random"]["share_random_avg_r_at_least_real"], -r["stats"]["mean_r"]))
         es["top"] = [{k: r[k] for k in ("key", "timeframe", "label", "metrics", "stats", "by_year", "random", "exits", "q_all", "significant_all")} for r in rows[:12]]
+        dep = next((r for r in es.get("variants", []) if r.get("key") == ELLIOTT_DEPLOYED_KEY), None)
+        if dep:
+            es["deployed_variant"] = {k: dep[k] for k in ("key", "timeframe", "label", "metrics", "stats", "by_year", "random")}
         es["counts"] = {"tested": es.get("tests"), "significant": sum(1 for r in es.get("variants", []) if r.get("significant_all")),
                         "beat_random": sum(1 for r in rows if r["random"]["share_random_avg_r_at_least_real"] <= 0.05),
                         "with_10_trades": len(rows),
@@ -171,6 +179,8 @@ def collect(no_live: bool) -> dict:
                                               for tf in ("H4", "D1")}}
         es.pop("variants", None)
         swing["elliott"] = es
+        if "elliott_bot" in aggr and es.get("deployed_variant"):
+            aggr["elliott_bot"]["study"] = es["deployed_variant"]
     last_run = None
     cycles = []
     log = os.path.join(s.state_dir, "run_log.jsonl")

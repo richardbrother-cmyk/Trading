@@ -97,7 +97,7 @@ jobs:
       - name: Estado de la cuenta y panel
         if: ${{ !inputs.dry_run }}
         run: |
-          python scripts/ctrader_state.py --swing --initial 500 --label autotrader-aggr,autotrader-asia --out docs/aggr_state.json
+          python scripts/ctrader_state.py --swing --initial 500 --label autotrader-aggr,autotrader-asia,autotrader-elliott --out docs/aggr_state.json
           python scripts/dashboard.py --no-live --out reports/dashboard.html
           cp reports/dashboard.html docs/index.html
           cp reports/dashboard.html docs/dashboard.html

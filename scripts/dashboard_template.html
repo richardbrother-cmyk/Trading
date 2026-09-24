@@ -285,6 +285,21 @@ footer { color: var(--muted); font-size: 12.5px; }
       <div class="tbl-wrap"><table id="sw-el-wf"></table></div>
       <p class="note" id="sw-el-note" style="margin:10px 0 0"></p>
     </section>
+    <section id="sw-elbot-section" style="display:none">
+      <div class="sec-head"><div><h2>Bot "ondas de Elliott" en oro (misma cuenta)</h2><p class="lede" id="sw-elbot-lede"></p></div></div>
+      <div class="kpis" id="sw-elbot-kpis" style="margin-bottom:12px"></div>
+      <div class="two">
+        <div>
+          <div class="eyebrow" style="margin-bottom:8px">Últimos pivotes del ZigZag (barras de 4 h)</div>
+          <div class="tbl-wrap"><table id="sw-elbot-pivots"></table></div>
+        </div>
+        <div>
+          <div class="eyebrow" style="margin-bottom:8px">Operaciones cerradas</div>
+          <div class="tbl-wrap"><table id="sw-elbot-trades"></table></div>
+        </div>
+      </div>
+      <p class="note" id="sw-elbot-note" style="margin:10px 0 0"></p>
+    </section>
     <section id="sw-asia-section" style="display:none">
       <div class="sec-head"><div><h2>Bot "retest de Asia" en oro (misma cuenta)</h2><p class="lede" id="sw-asia-lede"></p></div></div>
       <div class="kpis" id="sw-asia-kpis" style="margin-bottom:12px"></div>
@@ -722,6 +737,29 @@ function renderSwingTab(prefix, SW, badgeId, base0, research){
     $("sw-el-note").textContent = `Lectura: ${EL.verdict}. La columna "p azar ≥ real" es la fracción de sorteos aleatorios que igualan o superan el R medio de la variante: por debajo de 0,05 el recuento aporta algo más que la tendencia. Lo consiguen ${(cn.beat_random_by_tf||{}).H4||0} variantes en 4 h y ${(cn.beat_random_by_tf||{}).D1||0} en diario. Nada de esto se despliega sin pasar por demo.`;
   } else if (research) {
     $("sw-el-section").style.display = "none";
+  }
+  const EB = SW.elliott_bot;
+  if (EB && EB.last_decision) {
+    $("sw-elbot-section").style.display = "";
+    const ep = EB.params || {}, ld = EB.last_decision || {}, st = EB.stats || {}, gd = EB.guard || {};
+    const phases = {"sin patron":"sin patrón 1-2 válido en los últimos pivotes", waiting_break:"onda 2 confirmada, esperando el cierre sobre el máximo de la onda 1", ready:"ruptura en la última barra: entrada", broke_earlier:"la ruptura fue en una barra anterior (no se persigue)", expired:"patrón caducado o invalidado"};
+    const opn = EB.open_positions || [];
+    $("sw-elbot-lede").textContent = `${esc(EB.strategy||"")}. ${(ep.risk_pct*100).toFixed(0)} % de riesgo por operación, etiqueta ${esc(EB.label||"")}; solo entra si la barra de 4 h que dispara la señal cerró hace menos de ${ep.max_signal_age_hours} h. Último ciclo ${esc((EB.at||"").replace("T"," ").replace("Z"," UTC"))}.`;
+    const tiles = [
+      {label:"Recuento ahora", value: ld.phase==="ready" ? "Entrada" : ld.phase==="waiting_break" ? "Esperando" : ld.phase==="sin patron" ? "Sin patrón" : ld.phase==="expired" ? "Caducado" : ld.phase==="broke_earlier" ? "Ruptura pasada" : esc(ld.phase||"—"), sub: esc(phases[ld.phase]||"") + (ld.bar ? ` · barra ${esc(ld.bar)}` : "") + (ld.trigger ? ` · ruptura sobre ${fxPrice(ld.trigger,"XAUUSD")}, invalidación ${fxPrice(ld.invalidation,"XAUUSD")}, retroceso ${(ld.retrace*100).toFixed(0)} %` : "") + (ld.reason ? ` · ${esc(ld.reason)}` : "")},
+      {label:"Posición abierta", value: opn.length ? `${opn[0].units} ${esc(opn[0].symbol)}` : "ninguna", sub: opn.length ? `entrada ${fxPrice(opn[0].entry,"XAUUSD")} · stop ${fxPrice(opn[0].stop,"XAUUSD")} · objetivo ${fxPrice(opn[0].target,"XAUUSD")} · desde ${esc((opn[0].opened_at||"").replace("T"," ").replace("Z",""))}` : "el broker vigila stop y objetivo"},
+      {label:"Operaciones cerradas", value: String(st.trades||0), sub: st.trades ? `${st.wins} ganadas · neto ${fmtUSD2(st.net_usd)}` : "todavía ninguna", cls: (st.net_usd||0)>=0?"good":"bad"},
+      {label:"Freno de la cuenta", value: gd.mode ? (gd.mode==="off" ? "libre" : gd.mode) : "—", sub: gd.mode==="off" ? `drawdown ${pct(gd.drawdown||0,1)} desde el máximo` : esc(gd.reason||""), cls: gd.mode && gd.mode!=="off" ? "bad" : ""},
+    ];
+    $("sw-elbot-kpis").innerHTML = tiles.map(k => `<div class="tile"><div class="label">${esc(k.label)}</div><div class="value">${esc(k.value)}</div><div class="sub ${k.cls||""}">${k.sub}</div></div>`).join("");
+    const pv = ld.pivots || [];
+    $("sw-elbot-pivots").innerHTML = pv.length ? `<thead><tr><th>Barra (UTC)</th><th>Tipo</th><th class="num">Precio</th><th>Confirmado en</th></tr></thead><tbody>` + pv.map(x=>`<tr><td class="mono" style="font-size:12px">${esc(x.bar)}</td><td>${x.kind==="max"?"máximo":"mínimo"}</td><td class="num">${fxPrice(x.price,"XAUUSD")}</td><td class="mono" style="font-size:12px">${esc(x.confirmed)}</td></tr>`).join("") + "</tbody>" : `<tbody><tr><td class="empty">Sin patrón: no hay pivotes que mostrar.</td></tr></tbody>`;
+    const tr = EB.trades || [];
+    $("sw-elbot-trades").innerHTML = tr.length ? `<thead><tr><th>Cierre (UTC)</th><th class="num">Unidades</th><th class="num">Entrada</th><th class="num">Salida</th><th class="num">Neto</th></tr></thead><tbody>` + [...tr].reverse().map(t=>`<tr><td class="mono" style="font-size:12px">${esc(t.at)}</td><td class="num">${t.units}</td><td class="num">${fxPrice(t.entry,"XAUUSD")}</td><td class="num">${fxPrice(t.exit,"XAUUSD")}</td><td class="num ${t.net>=0?"pos":"neg"}">${fmtUSD2(t.net)}</td></tr>`).join("") + "</tbody>" : `<tbody><tr><td class="empty">Sin operaciones cerradas todavía.</td></tr></tbody>`;
+    const sv = EB.study; const svm = sv ? sv.metrics : null, svs = sv ? sv.stats : null, svr = sv ? sv.random : null;
+    $("sw-elbot-note").textContent = sv
+      ? `Origen: variante con más operaciones entre las que baten a las entradas al azar en el estudio de Elliott (pestaña swing): ${svm.trades} operaciones en 3 años, acierto ${pct(svm.win_rate||0,0).replace("+","")}, PF ${pfTxt(svm.profit_factor)}, ${pct(svm.return||0)}, R medio ${Number(svs.mean_r).toFixed(2)} frente a ${Number(svr.avg_r_mean).toFixed(2)} del azar (p ${Number(svr.share_random_avg_r_at_least_real).toFixed(2)}). El walk-forward en 4 h es débil y con pocas operaciones, así que se evalúa en demo antes de creer en ella.`
+      : "Origen: estudio de ondas de Elliott (pestaña swing). Se evalúa en demo antes de creer en ella.";
   }
   const AS = SW.asia;
   if (AS && AS.plan) {

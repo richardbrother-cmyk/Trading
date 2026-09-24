@@ -164,23 +164,18 @@ def impulse_setup(piv: list[Pivot], p: ElliottParams) -> dict | None:
     return None
 
 
-def backtest_symbol(df15: pd.DataFrame, sym: str, p: ElliottParams, initial: float = 10_000.0) -> list[ITrade]:
-    spec = SPECS[sym]
-    d = resample(df15, p.timeframe)
-    a = atr(d, p.atr_period).to_numpy()
-    o, h, l, c = d["open"].to_numpy(), d["high"].to_numpy(), d["low"].to_numpy(), d["close"].to_numpy()
-    idx = d.index
-    n = len(d)
-    thr = a * p.zz_atr if p.zz_atr > 0 else c * p.zz_pct
-    pivots = zigzag(h, l, thr)
+def entry_signals(high: np.ndarray, low: np.ndarray, close: np.ndarray, atr_values: np.ndarray, p: ElliottParams) -> list[dict]:
+    """Senales de entrada evaluadas al cierre de cada barra, sin mirar al futuro y sin depender de si hay una posicion
+    abierta (eso lo decide quien las consume). Cada senal es el plan de `impulse_setup` mas `bar` (indice de la barra
+    cuyo cierre dispara la entrada; se ejecuta en la apertura de la siguiente) y `stop`/`target` en precio."""
+    n = len(close)
+    thr = atr_values * p.zz_atr if p.zz_atr > 0 else close * p.zz_pct
+    pivots = zigzag(high, low, thr)
     confirmed_at = np.array([pv.confirmed for pv in pivots])
-    sp = p.swing_like()
-    trades: list[ITrade] = []
-    equity = initial
-    used: set[int] = set()  # pivotes (barra) ya operados o caducados
+    out: list[dict] = []
+    used: set[int] = set()  # pivotes (barra) ya disparados o caducados
     pending: dict | None = None  # ruptura: plan a la espera del cierre por encima del nivel
-    i = p.atr_period + 1
-    while i < n - 1:
+    for i in range(p.atr_period + 1, n):
         k = int(np.searchsorted(confirmed_at, i, side="right"))  # pivotes conocidos al cierre de la barra i
         plan = None
         setup = impulse_setup(pivots[:k], p) if k else None
@@ -194,25 +189,72 @@ def backtest_symbol(df15: pd.DataFrame, sym: str, p: ElliottParams, initial: flo
                 pending = pending if (pending and pending["pivot"].idx == setup["pivot"].idx) else setup
         if pending is not None and plan is None:
             s = pending["side"]
-            if i - pending["pivot"].confirmed > p.max_wait_bars or s * (l[i] if s == 1 else h[i]) < s * pending["correction_low"]:
+            if i - pending["pivot"].confirmed > p.max_wait_bars or s * (low[i] if s == 1 else high[i]) < s * pending["correction_low"]:
                 used.add(pending["pivot"].idx); pending = None
-            elif s * (c[i] - pending["trigger"]) > 0:
+            elif s * (close[i] - pending["trigger"]) > 0:
                 plan = pending; pending = None
         if plan is None:
-            i += 1
             continue
         used.add(plan["pivot"].idx)
         s = plan["side"]
-        entry = o[i + 1] + s * spec.spread / 2
         stop_level = plan["correction_low"] if p.stop == "onda" else plan["invalidation"]
-        stop = stop_level - s * p.stop_buffer_atr * a[i]
-        tp = plan["correction_low"] + s * p.target_ext * plan["wave1"]
+        sig = dict(plan)
+        sig.update({"bar": i, "stop": stop_level - s * p.stop_buffer_atr * atr_values[i],
+                    "target": plan["correction_low"] + s * p.target_ext * plan["wave1"], "atr": float(atr_values[i]),
+                    "pivots": pivots[:k]})
+        out.append(sig)
+    return out
+
+
+def pending_setup(high: np.ndarray, low: np.ndarray, close: np.ndarray, atr_values: np.ndarray, p: ElliottParams) -> dict | None:
+    """Estado del recuento al cierre de la ultima barra, para el panel: el plan vigente (a la espera de la ruptura o
+    disparado en la ultima barra) con su fase, o None si no hay patron valido."""
+    n = len(close)
+    if n <= p.atr_period + 1:
+        return None
+    thr = atr_values * p.zz_atr if p.zz_atr > 0 else close * p.zz_pct
+    pivots = zigzag(high, low, thr)
+    setup = impulse_setup(pivots, p)
+    if setup is None:
+        return None
+    s, i = setup["side"], n - 1
+    conf = setup["pivot"].confirmed
+    if p.entry == "pivote":
+        phase = "ready" if conf == i else "expired"
+    else:
+        phase = "waiting_break"
+        for j in range(conf, n):
+            if j - conf > p.max_wait_bars or s * (low[j] if s == 1 else high[j]) < s * setup["correction_low"]:
+                phase = "expired"; break
+            if s * (close[j] - setup["trigger"]) > 0:
+                phase = "ready" if j == i else "broke_earlier"; break
+    out = {k: v for k, v in setup.items() if k != "pivot"}
+    out.update({"phase": phase, "pivot_bar": setup["pivot"].idx, "pivot_confirmed": conf, "pivots": pivots[-5:]})
+    return out
+
+
+def backtest_symbol(df15: pd.DataFrame, sym: str, p: ElliottParams, initial: float = 10_000.0) -> list[ITrade]:
+    spec = SPECS[sym]
+    d = resample(df15, p.timeframe)
+    a = atr(d, p.atr_period).to_numpy()
+    o, h, l, c = d["open"].to_numpy(), d["high"].to_numpy(), d["low"].to_numpy(), d["close"].to_numpy()
+    idx = d.index
+    n = len(d)
+    sp = p.swing_like()
+    trades: list[ITrade] = []
+    equity = initial
+    last_exit = -1  # una posicion a la vez: las senales que saltan con una operacion abierta se ignoran
+    for plan in entry_signals(h, l, c, a, p):
+        i = plan["bar"]
+        if i <= last_exit or i >= n - 1:
+            continue
+        s = plan["side"]
+        entry = o[i + 1] + s * spec.spread / 2
+        stop, tp = plan["stop"], plan["target"]
         if s * (entry - stop) <= 0 or s * (tp - entry) <= 0:
-            i += 1
             continue
         units = _size(equity, entry, stop, spec, sp)
         if units <= 0:
-            i += 1
             continue
         t = ITrade(sym, s, idx[i + 1], entry, stop, units)
         t.costs = entry * units * p.commission_side
@@ -236,5 +278,5 @@ def backtest_symbol(df15: pd.DataFrame, sym: str, p: ElliottParams, initial: flo
         equity += t.pnl
         if equity <= 0:
             break
-        i = j_exit + 1
+        last_exit = j_exit
     return trades
