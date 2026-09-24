@@ -151,7 +151,7 @@ def collect(no_live: bool) -> dict:
             aggr["asia"] = json.load(fh)
     if os.path.exists(ELLIOTT_STATE):
         with open(ELLIOTT_STATE, encoding="utf-8") as fh:
-            aggr["elliott_bot"] = json.load(fh)
+            ctrader["elliott_bot"] = json.load(fh)
     if os.path.exists(KRONOS_REPORT):
         with open(KRONOS_REPORT, encoding="utf-8") as fh:
             swing["kronos"] = json.load(fh)
@@ -179,8 +179,8 @@ def collect(no_live: bool) -> dict:
                                               for tf in ("H4", "D1")}}
         es.pop("variants", None)
         swing["elliott"] = es
-        if "elliott_bot" in aggr and es.get("deployed_variant"):
-            aggr["elliott_bot"]["study"] = es["deployed_variant"]
+        if "elliott_bot" in ctrader and es.get("deployed_variant"):
+            ctrader["elliott_bot"]["study"] = es["deployed_variant"]
     last_run = None
     cycles = []
     log = os.path.join(s.state_dir, "run_log.jsonl")

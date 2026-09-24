@@ -1,12 +1,14 @@
 name: ctrader-elliott
 
-# Bot "ondas de Elliott" sobre el oro (XAUUSD) en barras de 4 h, en la MISMA cuenta demo agresiva de cTrader (500 USD):
-# ZigZag de 2 ATR, entrada al final de la onda 2 cuando un cierre de 4 h supera el maximo de la onda 1, stop bajo el
-# inicio de la onda 1 (invalidacion) menos 0,25 ATR, objetivo 1,618 x onda 1, solo largos, salida a los 10 dias.
-# Es la variante con mas operaciones entre las que baten a las entradas al azar en docs/elliott_study.json (47 ops en
-# 3 anos, PF 3,5, +18 %, acierto 81 %); walk-forward debil y con pocas operaciones: se evalua en demo.
+# Bot "ondas de Elliott" sobre el oro (XAUUSD) en barras de 4 h, en la cuenta demo PRINCIPAL de cTrader (la del bot
+# tendencial, ~9.300 USD): ZigZag de 2 ATR, entrada al final de la onda 2 cuando un cierre de 4 h supera el maximo de
+# la onda 1, stop bajo el inicio de la onda 1 (invalidacion) menos 0,25 ATR, objetivo 1,618 x onda 1, solo largos,
+# salida a los 10 dias. Es la variante con mas operaciones entre las que baten a las entradas al azar en
+# docs/elliott_study.json (47 ops en 3 anos, PF 3,5, +18 %, acierto 81 %); walk-forward debil: se evalua en demo.
+# Va en esta cuenta porque el lote minimo de oro (1 oz) con stops de 150-200 USD no cabe en la cuenta agresiva de
+# 500 USD; aqui arriesga en torno al 2 % por operacion (tope 3 % para aceptar el lote minimo).
 # Corre cada hora y solo entra si la barra de 4 h que dispara la senal cerro hace menos de 2 h.
-# Secrets: los mismos que ctrader-aggr.
+# Secrets: los mismos que ctrader-demo.
 on:
   schedule:
     - cron: "17 * * * 0-5"
@@ -49,14 +51,16 @@ jobs:
       CTRADER_DEMO: "true"
       CTRADER_CLIENT_ID: ${{ secrets.CTRADER_CLIENT_ID }}
       CTRADER_CLIENT_SECRET: ${{ secrets.CTRADER_CLIENT_SECRET }}
-      CTRADER_ACCOUNT_LOGIN: ${{ secrets.CTRADER_AGGR_ACCOUNT_LOGIN }}
+      CTRADER_ACCOUNT_LOGIN: ${{ secrets.CTRADER_ACCOUNT_LOGIN }}
       CTRADER_ACCESS_TOKEN: ${{ secrets.CTRADER_ACCESS_TOKEN }}
-      # Freno compartido con el bot agresivo (misma cuenta): interruptor manual y drawdown desde el maximo
-      BOT_HALT: ${{ vars.AGGR_BOT_HALT || vars.BOT_HALT || 'off' }}
-      MAX_DRAWDOWN_PCT: "0.50"
+      # Freno compartido con el bot tendencial (misma cuenta): interruptor manual y drawdown desde el maximo
+      BOT_HALT: ${{ vars.BOT_HALT || 'off' }}
+      MAX_DRAWDOWN_PCT: ${{ vars.MAX_DRAWDOWN_PCT || '0.15' }}
+      EQUITY_HISTORY: "docs/ctrader_state.json"
       SYMBOLS: "XAUUSD"
-      # 6 % de riesgo por operacion, como el resto de bots de la cuenta agresiva; lote minimo aceptado hasta 9 %
-      RISK_PER_TRADE: "0.06"
+      # 2 % de riesgo por operacion, como el bot tendencial; el lote minimo (1 oz) se acepta si no arriesga mas del 3 %
+      RISK_PER_TRADE: "0.02"
+      ELLIOTT_MAX_RISK_PCT: "0.03"
       ELLIOTT_ZZ_ATR: "2.0"
       ELLIOTT_WAVES: "2"
       ELLIOTT_ENTRY: "ruptura"
@@ -82,7 +86,7 @@ jobs:
       - name: Estado de la cuenta y panel
         if: ${{ !inputs.dry_run }}
         run: |
-          python scripts/ctrader_state.py --swing --initial 500 --label autotrader-aggr,autotrader-asia,autotrader-elliott --out docs/aggr_state.json
+          python scripts/ctrader_state.py --out docs/ctrader_state.json
           python scripts/dashboard.py --no-live --out reports/dashboard.html
           cp reports/dashboard.html docs/index.html
           cp reports/dashboard.html docs/dashboard.html
@@ -91,7 +95,7 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add docs/elliott_state.json docs/aggr_state.json docs/index.html docs/dashboard.html
+          git add docs/elliott_state.json docs/ctrader_state.json docs/index.html docs/dashboard.html
           if git diff --cached --quiet; then echo "sin cambios"; exit 0; fi
           git commit -m "Panel: actualización automática (elliott)"
           ok=0

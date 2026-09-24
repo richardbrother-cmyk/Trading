@@ -1,4 +1,4 @@
-"""Bot "ondas de Elliott" sobre el oro (XAUUSD) en barras de 4 h, en la cuenta demo agresiva de cTrader.
+"""Bot "ondas de Elliott" sobre el oro (XAUUSD) en barras de 4 h, en la cuenta demo principal de cTrader (la del bot tendencial).
 
 Variante desplegada (la de mas operaciones entre las que baten al azar en scripts/elliott_study.py): ZigZag de 2 ATR,
 entrada al final de la onda 2 cuando un cierre de 4 h supera el maximo de la onda 1 ("ruptura"), stop bajo el inicio
@@ -11,8 +11,8 @@ Ciclo (cada hora; solo actua sobre la ultima barra H4 cerrada):
    la ultima barra cerrada es la que dispara la senal, cerro hace menos de `max_signal_age_hours` y esa senal no se
    opero ya (docs/elliott_state.json guarda la barra de la ultima senal operada). Stop y objetivo van con la orden.
 3. Tamano: `risk_pct` del equity con lote minimo; si el minimo arriesga mas de `max_risk_pct`, no se opera.
-Respeta BOT_HALT, el freno por drawdown de la cuenta (docs/aggr_state.json) y las ventanas de evento.
-Las posiciones llevan la etiqueta ELLIOTT_LABEL: no toca las del bot agresivo, las del bot de Asia ni las manuales.
+Respeta BOT_HALT, el freno por drawdown de la cuenta (EQUITY_HISTORY, por defecto docs/ctrader_state.json) y las ventanas de evento.
+Las posiciones llevan la etiqueta ELLIOTT_LABEL: no toca las del bot tendencial ni las manuales.
 """
 
 from __future__ import annotations
@@ -91,7 +91,7 @@ def run_elliott_cycle(settings, session: CTraderSession, p: ElliottParams | None
         events_now = active_events(all_events, now, settings.event_hours_before, settings.event_hours_after)
     if events_now:
         summary["event_window"] = [e.name for e in events_now]
-    guard = evaluate_guard(equity, settings.halt_mode, settings.max_drawdown_pct, settings.history_path("docs/aggr_state.json"), settings.state_dir)
+    guard = evaluate_guard(equity, settings.halt_mode, settings.max_drawdown_pct, settings.history_path("docs/ctrader_state.json"), settings.state_dir)
     summary["guard"] = guard.as_dict()
     if guard.blocks_entries:
         summary["skipped"].append(f"freno activo: {guard.reason}")

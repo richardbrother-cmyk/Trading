@@ -116,7 +116,8 @@ def swing_cycle(rec: dict) -> dict:
             "closed": rec.get("closed", []), "event_window": rec.get("event_window", []), "guard": rec.get("guard")}
 
 
-def collect(s: Settings, swing: bool = False, initial: float | None = None, label: str = SWING_LABEL, prev: dict | None = None) -> tuple[dict, dict | None]:
+def collect(s: Settings, swing: bool = False, initial: float | None = None, label: str = SWING_LABEL, prev: dict | None = None,
+            also_label: str = "") -> tuple[dict, dict | None]:
     exclusions = load_exclusions()
     cutoff = cutoff_for("ctrader", exclusions)
     token = load_access_token(os.path.join(s.state_dir, "ctrader_tokens.json"), s.ctrader_client_id, s.ctrader_client_secret,
@@ -130,6 +131,7 @@ def collect(s: Settings, swing: bool = False, initial: float | None = None, labe
         positions = []
         prices: dict[str, float] = {}
         labels = {x.strip() for x in str(label).split(",") if x.strip()}
+        bot_labels = {BOT_LABEL} | ({x.strip() for x in str(also_label).split(",") if x.strip()} if also_label else set())
         for p in session.positions(only_bot=False):
             if swing and p.label not in labels:
                 continue
@@ -147,7 +149,7 @@ def collect(s: Settings, swing: bool = False, initial: float | None = None, labe
                         prices[p.symbol] = p.price
                 px = prices[p.symbol]
                 pos_pnl = (px - p.price) * p.units * (1 if p.side == "buy" else -1)
-            is_own = (p.label in labels) if swing else (p.label == BOT_LABEL)
+            is_own = (p.label in labels) if swing else (p.label in bot_labels)
             positions.append({"symbol": p.symbol, "qty": p.units, "side": p.side, "avg": p.price, "price": round(px, 6), "stop": p.stop_loss,
                               "target": p.take_profit or None, "opened_at": p.opened_at.strftime("%Y-%m-%dT%H:%MZ") if p.opened_at else None,
                               "pnl": round(pos_pnl, 2), "position_id": p.position_id, "bot": is_own, "label": p.label,
@@ -156,7 +158,7 @@ def collect(s: Settings, swing: bool = False, initial: float | None = None, labe
         try:
             for d in session.deals(days=14):
                 if d["closes"]:
-                    is_bot = (d.get("label") in labels) if swing else (d.get("label") == BOT_LABEL)
+                    is_bot = (d.get("label") in labels) if swing else (d.get("label") in bot_labels)
                     trades.append({"symbol": d["symbol"], "at": d["at"].strftime("%Y-%m-%dT%H:%MZ"), "units": d["units"], "entry": d["entry_price"],
                                    "exit": d["price"], "gross": round(d["gross"], 2), "swap": round(d["swap"], 2),
                                    "commission": round(d["close_commission"], 2), "net": d["net"], "balance_after": d["balance_after"],
@@ -241,6 +243,7 @@ def main() -> int:
     ap.add_argument("--swing", action="store_true", help="cuenta del bot swing: solo posiciones con su etiqueta y su ultimo ciclo")
     ap.add_argument("--initial", type=float, default=None, help="capital inicial de la cuenta (10000 tendencial, 200 swing)")
     ap.add_argument("--label", default=os.getenv("SWING_LABEL", SWING_LABEL), help="etiqueta de las posiciones del bot swing/agresivo")
+    ap.add_argument("--also-label", default="autotrader-elliott", help="cuenta tendencial: otras etiquetas de bots propios (separadas por comas)")
     args = ap.parse_args()
     s = Settings.from_env("/dev/null")
     s.broker = "ctrader"
@@ -250,7 +253,7 @@ def main() -> int:
         with open(args.out, encoding="utf-8") as fh:
             prev = json.load(fh)
     initial = args.initial if args.initial is not None else (200.0 if args.swing else 10_000.0)
-    snapshot, cycle = collect(s, swing=args.swing, initial=initial, label=args.label, prev=prev)
+    snapshot, cycle = collect(s, swing=args.swing, initial=initial, label=args.label, prev=prev, also_label=args.also_label)
     if args.swing:
         snapshot["slippage"] = merge_slippage(prev, realized_slippage(cycle, snapshot["positions"]))
         snapshot["guard"] = (cycle or {}).get("guard")
