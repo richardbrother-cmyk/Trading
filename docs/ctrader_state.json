@@ -2,14 +2,14 @@
  "available": true,
  "broker": "Fusion Markets · cTrader demo",
  "account": 10136967,
- "at": "2026-09-25T22:14Z",
+ "at": "2026-09-25T23:58Z",
  "balance": 8546.13,
  "equity": 8711.53,
  "unrealized_pnl": 165.4,
  "leverage": 500.0,
  "positions": [
   {
-   "symbol": "XAGUSD",
+   "symbol": "42",
    "qty": 50.0,
    "side": "buy",
    "avg": 63.137,
@@ -24,7 +24,7 @@
    "origin": "excluded"
   },
   {
-   "symbol": "XPTUSD",
+   "symbol": "97",
    "qty": 3.0,
    "side": "buy",
    "avg": 1768.39,
@@ -54,7 +54,7 @@
    "origin": "bot"
   },
   {
-   "symbol": "COTTON",
+   "symbol": "161",
    "qty": 60.0,
    "side": "buy",
    "avg": 81.35,
@@ -69,7 +69,7 @@
    "origin": "bot"
   },
   {
-   "symbol": "WHEAT",
+   "symbol": "163",
    "qty": 7.0,
    "side": "buy",
    "avg": 677.11,
@@ -84,7 +84,7 @@
    "origin": "bot"
   },
   {
-   "symbol": "XNGUSD",
+   "symbol": "125",
    "qty": 1600.0,
    "side": "buy",
    "avg": 3.054,
@@ -100,19 +100,7 @@
   }
  ],
  "symbols": [
-  "XAUUSD",
-  "XAGUSD",
-  "XPTUSD",
-  "XTIUSD",
-  "XBRUSD",
-  "XNGUSD",
-  "COFARA",
-  "COTTON",
-  "WHEAT",
-  "CORN",
-  "SUGAR",
-  "US500",
-  "NAS100"
+  "XAUUSD"
  ],
  "trades": [
   {
@@ -477,12 +465,12 @@
   }
  ],
  "settings": {
-  "stop_loss_pct": 0.03,
-  "max_positions": 8,
+  "stop_loss_pct": 0.05,
+  "max_positions": 10,
   "max_position_pct": 0.12,
-  "exposure_leverage": 5.0,
+  "exposure_leverage": 1.0,
   "risk_per_trade": 0.02,
-  "resistance_lookback": 20,
+  "resistance_lookback": 0,
   "resistance_tol": 0.0,
   "resistance_reentry": "signal",
   "resistance_waiting": []
@@ -512,109 +500,6 @@
  "exclusions": {
   "reason": "Entradas del 14 de septiembre de 2026: el filtro de huecos comparaba el precio en vivo con la barra diaria parcial y dejo pasar compras que no debia. Se excluyen de las metricas del bot para medir la operativa corregida.",
   "entries_before": "2026-09-15T00:00Z"
- },
- "last_run": {
-  "at": "2026-09-25 22:13",
-  "equity": 8711.529999999999,
-  "positions": 6,
-  "buys": 0,
-  "sells": 0,
-  "errors": 0,
-  "note": "mercado cerrado (+1)",
-  "decisions": [
-   {
-    "symbol": "XAUUSD",
-    "action": "HOLD",
-    "rsi": 44.66108258706565,
-    "trend_up": true,
-    "close": 4285.139999999999
-   },
-   {
-    "symbol": "XAGUSD",
-    "action": "HOLD",
-    "rsi": 47.79510128436361,
-    "trend_up": true,
-    "close": 64.28999999999999
-   },
-   {
-    "symbol": "XPTUSD",
-    "action": "HOLD",
-    "rsi": 49.07401154464984,
-    "trend_up": true,
-    "close": 1774.08
-   },
-   {
-    "symbol": "XTIUSD",
-    "action": "BUY",
-    "rsi": 53.53028792898439,
-    "trend_up": true,
-    "close": 96.556
-   },
-   {
-    "symbol": "XBRUSD",
-    "action": "BUY",
-    "rsi": 54.43009519552018,
-    "trend_up": true,
-    "close": 102.413
-   },
-   {
-    "symbol": "XNGUSD",
-    "action": "HOLD",
-    "rsi": 62.06339415255195,
-    "trend_up": true,
-    "close": 3.099
-   },
-   {
-    "symbol": "COFARA",
-    "action": "HOLD",
-    "rsi": 35.98468536818039,
-    "trend_up": false,
-    "close": 292.42
-   },
-   {
-    "symbol": "COTTON",
-    "action": "HOLD",
-    "rsi": 42.399291570413695,
-    "trend_up": true,
-    "close": 81.36999999999999
-   },
-   {
-    "symbol": "WHEAT",
-    "action": "HOLD",
-    "rsi": 45.436256375388915,
-    "trend_up": true,
-    "close": 687.56
-   },
-   {
-    "symbol": "CORN",
-    "action": "BUY",
-    "rsi": 56.828113379132766,
-    "trend_up": true,
-    "close": 513.5699999999999
-   },
-   {
-    "symbol": "SUGAR",
-    "action": "BUY",
-    "rsi": 41.185351663487076,
-    "trend_up": true,
-    "close": 505.76
-   },
-   {
-    "symbol": "US500",
-    "action": "BUY",
-    "rsi": 56.820176489666686,
-    "trend_up": true,
-    "close": 7745.0
-   },
-   {
-    "symbol": "NAS100",
-    "action": "BUY",
-    "rsi": 65.72300666617058,
-    "trend_up": true,
-    "close": 30652.780000000002
-   }
-  ],
-  "protection": []
  },
  "history": [
   [
@@ -1055,6 +940,10 @@
   ],
   [
    "2026-09-25T22:14Z",
+   8711.53
+  ],
+  [
+   "2026-09-25T23:58Z",
    8711.53
   ]
  ],
