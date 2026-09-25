@@ -1,9 +1,9 @@
 {
- "at": "2026-09-25T12:27Z",
- "ny_time": "2026-09-25 08:27",
+ "at": "2026-09-25T13:15Z",
+ "ny_time": "2026-09-25 09:15",
  "equity": 659.41,
  "plan": {
-  "phase": "broke",
+  "phase": "failed",
   "side": 1,
   "level": 4295.86,
   "break_at": "08:00",
@@ -12,7 +12,7 @@
   "day": "2026-09-25",
   "asia_hi": 4295.86,
   "asia_lo": 4256.44,
-  "bars_seen": 1
+  "bars_seen": 5
  },
  "open_position": null,
  "last_orders": [
