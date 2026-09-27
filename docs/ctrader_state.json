@@ -2,10 +2,10 @@
  "available": true,
  "broker": "Fusion Markets · cTrader demo",
  "account": 10136967,
- "at": "2026-09-27T20:11Z",
- "balance": 8546.13,
- "equity": 8711.53,
- "unrealized_pnl": 165.4,
+ "at": "2026-09-27T22:26Z",
+ "balance": 8388.98,
+ "equity": 8432.94,
+ "unrealized_pnl": 43.96,
  "leverage": 500.0,
  "positions": [
   {
@@ -13,11 +13,11 @@
    "qty": 50.0,
    "side": "buy",
    "avg": 63.137,
-   "price": 64.1372,
+   "price": 63.7802,
    "stop": 61.203,
    "target": null,
    "opened_at": "2026-09-14T15:27Z",
-   "pnl": 50.01,
+   "pnl": 32.16,
    "position_id": 43025194,
    "bot": true,
    "label": "autotrader",
@@ -28,11 +28,11 @@
    "qty": 3.0,
    "side": "buy",
    "avg": 1768.39,
-   "price": 1768.63,
+   "price": 1761.35,
    "stop": 1714.67,
    "target": null,
    "opened_at": "2026-09-14T15:27Z",
-   "pnl": 0.72,
+   "pnl": -21.12,
    "position_id": 43025196,
    "bot": true,
    "label": "autotrader",
@@ -43,11 +43,11 @@
    "qty": 1.0,
    "side": "buy",
    "avg": 4292.57,
-   "price": 4276.58,
+   "price": 4261.68,
    "stop": 4163.61,
    "target": null,
    "opened_at": "2026-09-15T17:43Z",
-   "pnl": -15.99,
+   "pnl": -30.89,
    "position_id": 43068680,
    "bot": true,
    "label": "autotrader",
@@ -82,27 +82,27 @@
    "bot": true,
    "label": "autotrader",
    "origin": "bot"
-  },
-  {
-   "symbol": "125",
-   "qty": 1600.0,
-   "side": "buy",
-   "avg": 3.054,
-   "price": 3.095781,
-   "stop": 2.959,
-   "target": null,
-   "opened_at": "2026-09-25T15:27Z",
-   "pnl": 66.85,
-   "position_id": 43918048,
-   "bot": true,
-   "label": "autotrader",
-   "origin": "bot"
   }
  ],
  "symbols": [
   "XAUUSD"
  ],
  "trades": [
+  {
+   "symbol": "XNGUSD",
+   "at": "2026-09-27T22:02Z",
+   "units": 1600.0,
+   "entry": 3.054,
+   "exit": 2.959,
+   "gross": -152.0,
+   "swap": -5.15,
+   "commission": 0.0,
+   "net": -157.15,
+   "balance_after": 8388.98,
+   "label": "autotrader",
+   "opened_at": "2026-09-25T15:27Z",
+   "origin": "bot"
+  },
   {
    "symbol": "XTIUSD",
    "at": "2026-09-25T16:07Z",
@@ -480,22 +480,22 @@
  "bot_metrics": {
   "initial": 10000.0,
   "realized": {
-   "bot": -696.38,
+   "bot": -853.53,
    "manual": -356.61,
    "excluded": -400.88
   },
   "open": {
-   "bot": 114.67,
+   "bot": 32.92,
    "manual": 0.0,
-   "excluded": 50.73
+   "excluded": 11.04
   },
   "counts": {
-   "bot": 12,
+   "bot": 13,
    "manual": 4,
    "excluded": 8
   },
-  "adjusted_equity": 9418.29,
-  "adjusted_return": -0.0582
+  "adjusted_equity": 9179.39,
+  "adjusted_return": -0.0821
  },
  "exclusions": {
   "reason": "Entradas del 14 de septiembre de 2026: el filtro de huecos comparaba el precio en vivo con la barra diaria parcial y dejo pasar compras que no debia. Se excluyen de las metricas del bot para medir la operativa corregida.",
@@ -961,6 +961,10 @@
   [
    "2026-09-27T20:11Z",
    8711.53
+  ],
+  [
+   "2026-09-27T22:26Z",
+   8432.94
   ]
  ],
  "cycles": [
