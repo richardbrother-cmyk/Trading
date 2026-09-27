@@ -16,8 +16,14 @@ def _today() -> pd.Timestamp:
     return pd.Timestamp(datetime.now(timezone.utc).date())
 
 
+def _index(n: int) -> pd.DatetimeIndex:
+    """n-1 dias habiles y, como ultima barra, la de hoy (aunque hoy sea fin de semana): el bot toma "hoy" del reloj,
+    asi que la barra parcial del dia debe llevar la fecha real para que la prueba no dependa del calendario."""
+    return pd.bdate_range(end=_today() - pd.Timedelta(days=1), periods=n - 1).append(pd.DatetimeIndex([_today()]))
+
+
 def _uptrend(n: int = 80, today_high: float | None = None) -> pd.DataFrame:
-    idx = pd.bdate_range(end=_today(), periods=n)
+    idx = _index(n)
     close = np.linspace(100.0, 140.0, n) + np.where(np.arange(n) % 2 == 0, -2.0, 2.0)  # zigzag: RSI por debajo de 70
     df = pd.DataFrame({"open": close - 0.2, "high": close + 1.0, "low": close - 1.0, "close": close, "volume": 1e6}, index=idx)
     if today_high is not None:
@@ -27,7 +33,7 @@ def _uptrend(n: int = 80, today_high: float | None = None) -> pd.DataFrame:
 
 def _dip_then_recover(n: int = 80) -> pd.DataFrame:
     """Subida, caida fuerte (SMA rapida bajo la lenta) y recuperacion: al final la tendencia vuelve a estar arriba."""
-    idx = pd.bdate_range(end=_today(), periods=n)
+    idx = _index(n)
     close = np.concatenate([np.linspace(100, 130, 40), np.linspace(130, 95, 15), np.linspace(95, 150, 25)]) + np.where(np.arange(n) % 2 == 0, -6.0, 6.0)
     return pd.DataFrame({"open": close, "high": close + 1, "low": close - 1, "close": close, "volume": 1e6}, index=idx)
 
