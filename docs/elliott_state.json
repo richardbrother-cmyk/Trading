@@ -1,24 +1,18 @@
 {
  "traded_signals": {},
- "at": "2026-09-28T00:26Z",
- "equity": 8367.92,
+ "at": "2026-09-28T01:43Z",
+ "equity": 8245.12,
  "label": "autotrader-elliott",
  "strategy": "ZigZag 2 ATR, fin de la onda 2, entrada por ruptura del extremo de la onda anterior, stop en el nivel de invalidacion menos 0.25 ATR, objetivo 1.618 x onda 1, solo largos, salida a los 10 dias",
  "last_decision": {
   "symbol": "XAUUSD",
-  "bar": "2026-09-25 17:00",
-  "bar_age_h": 51.44,
-  "close": 4285.14,
-  "atr": 31.41,
+  "bar": "2026-09-27 21:00",
+  "bar_age_h": 0.73,
+  "close": 4230.84,
+  "atr": 33.58,
   "action": "HOLD",
   "phase": "sin patron",
   "pivots": [
-   {
-    "bar": "2026-09-16 17:00",
-    "price": 4235.08,
-    "kind": "min",
-    "confirmed": "2026-09-17 05:00"
-   },
    {
     "bar": "2026-09-18 05:00",
     "price": 4399.63,
@@ -42,6 +36,12 @@
     "price": 4244.21,
     "kind": "min",
     "confirmed": "2026-09-25 09:00"
+   },
+   {
+    "bar": "2026-09-25 09:00",
+    "price": 4315.82,
+    "kind": "max",
+    "confirmed": "2026-09-27 21:00"
    }
   ]
  },
@@ -50,9 +50,9 @@
  "trades": [],
  "guard": {
   "mode": "freeze",
-  "reason": "drawdown -18.6 % desde el maximo de 10,279.06 (limite 15 %)",
+  "reason": "drawdown -19.8 % desde el maximo de 10,279.06 (limite 15 %)",
   "peak": 10279.06,
-  "drawdown": -0.1859
+  "drawdown": -0.1979
  },
  "params": {
   "zz_atr": 2.0,
