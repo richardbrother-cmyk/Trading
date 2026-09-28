@@ -2,10 +2,10 @@
  "available": true,
  "broker": "Fusion Markets · cTrader demo",
  "account": 10136967,
- "at": "2026-09-28T01:44Z",
+ "at": "2026-09-28T03:27Z",
  "balance": 8388.98,
- "equity": 8244.5,
- "unrealized_pnl": -144.48,
+ "equity": 8147.62,
+ "unrealized_pnl": -241.36,
  "leverage": 500.0,
  "positions": [
   {
@@ -13,11 +13,11 @@
    "qty": 50.0,
    "side": "buy",
    "avg": 63.137,
-   "price": 62.4762,
+   "price": 61.7852,
    "stop": 61.203,
    "target": null,
    "opened_at": "2026-09-14T15:27Z",
-   "pnl": -33.04,
+   "pnl": -67.59,
    "position_id": 43025194,
    "bot": true,
    "label": "autotrader",
@@ -28,11 +28,11 @@
    "qty": 3.0,
    "side": "buy",
    "avg": 1768.39,
-   "price": 1732.12,
+   "price": 1726.27,
    "stop": 1714.67,
    "target": null,
    "opened_at": "2026-09-14T15:27Z",
-   "pnl": -108.81,
+   "pnl": -126.36,
    "position_id": 43025196,
    "bot": true,
    "label": "autotrader",
@@ -43,11 +43,11 @@
    "qty": 1.0,
    "side": "buy",
    "avg": 4292.57,
-   "price": 4204.17,
+   "price": 4187.4,
    "stop": 4163.61,
    "target": null,
    "opened_at": "2026-09-15T17:43Z",
-   "pnl": -88.4,
+   "pnl": -105.17,
    "position_id": 43068680,
    "bot": true,
    "label": "autotrader",
@@ -58,11 +58,11 @@
    "qty": 60.0,
    "side": "buy",
    "avg": 81.35,
-   "price": 81.955167,
+   "price": 81.795167,
    "stop": 78.888,
    "target": null,
    "opened_at": "2026-09-25T01:24Z",
-   "pnl": 36.31,
+   "pnl": 26.71,
    "position_id": 43498031,
    "bot": true,
    "label": "autotrader",
@@ -73,11 +73,11 @@
    "qty": 7.0,
    "side": "buy",
    "avg": 677.11,
-   "price": 684.175714,
+   "price": 681.545714,
    "stop": 656.44,
    "target": null,
    "opened_at": "2026-09-25T07:27Z",
-   "pnl": 49.46,
+   "pnl": 31.05,
    "position_id": 43615182,
    "bot": true,
    "label": "autotrader",
@@ -485,17 +485,17 @@
    "excluded": -400.88
   },
   "open": {
-   "bot": -2.63,
+   "bot": -47.41,
    "manual": 0.0,
-   "excluded": -141.85
+   "excluded": -193.95
   },
   "counts": {
    "bot": 13,
    "manual": 4,
    "excluded": 8
   },
-  "adjusted_equity": 9143.84,
-  "adjusted_return": -0.0856
+  "adjusted_equity": 9099.06,
+  "adjusted_return": -0.0901
  },
  "exclusions": {
   "reason": "Entradas del 14 de septiembre de 2026: el filtro de huecos comparaba el precio en vivo con la barra diaria parcial y dejo pasar compras que no debia. Se excluyen de las metricas del bot para medir la operativa corregida.",
@@ -989,6 +989,10 @@
   [
    "2026-09-28T01:44Z",
    8244.5
+  ],
+  [
+   "2026-09-28T03:27Z",
+   8147.62
   ]
  ],
  "cycles": [
