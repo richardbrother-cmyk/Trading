@@ -2,22 +2,22 @@
  "available": true,
  "broker": "Fusion Markets · cTrader demo",
  "account": 10136967,
- "at": "2026-09-29T16:27Z",
+ "at": "2026-09-29T18:27Z",
  "balance": 7813.12,
- "equity": 7794.55,
- "unrealized_pnl": -18.57,
+ "equity": 7806.8,
+ "unrealized_pnl": -6.32,
  "leverage": 500.0,
  "positions": [
   {
-   "symbol": "WHEAT",
+   "symbol": "163",
    "qty": 7.0,
    "side": "buy",
    "avg": 677.11,
-   "price": 674.457143,
+   "price": 676.207143,
    "stop": 656.44,
    "target": null,
    "opened_at": "2026-09-25T07:27Z",
-   "pnl": -18.57,
+   "pnl": -6.32,
    "position_id": 43615182,
    "bot": true,
    "label": "autotrader",
@@ -357,21 +357,6 @@
    "label": "",
    "opened_at": "2026-09-15T16:52Z",
    "origin": "manual"
-  },
-  {
-   "symbol": "XAUUSD",
-   "at": "2026-09-15T16:41Z",
-   "units": 10.0,
-   "entry": 4283.607,
-   "exit": 4294.1,
-   "gross": 104.93,
-   "swap": 0.0,
-   "commission": -1.03,
-   "net": 103.9,
-   "balance_after": 9783.22,
-   "label": "autotrader",
-   "opened_at": "2026-09-15T13:27Z",
-   "origin": "bot"
   }
  ],
  "settings": {
@@ -390,129 +375,26 @@
  "bot_metrics": {
   "initial": 10000.0,
   "realized": {
-   "bot": -1147.33,
+   "bot": -1251.23,
    "manual": -326.9,
    "excluded": -391.97
   },
   "open": {
-   "bot": -18.57,
+   "bot": -6.32,
    "manual": 0.0,
    "excluded": 0.0
   },
   "counts": {
-   "bot": 15,
+   "bot": 14,
    "manual": 1,
    "excluded": 7
   },
-  "adjusted_equity": 8834.1,
-  "adjusted_return": -0.1166
+  "adjusted_equity": 8742.45,
+  "adjusted_return": -0.1258
  },
  "exclusions": {
   "reason": "Entradas del 14 de septiembre de 2026: el filtro de huecos comparaba el precio en vivo con la barra diaria parcial y dejo pasar compras que no debia. Se excluyen de las metricas del bot para medir la operativa corregida.",
   "entries_before": "2026-09-15T00:00Z"
- },
- "last_run": {
-  "at": "2026-09-29 16:26",
-  "equity": 7794.55,
-  "positions": 1,
-  "buys": 0,
-  "sells": 0,
-  "errors": 0,
-  "note": "freno activo: drawdown -24.2 % desde el maximo de 10,279.06 ",
-  "decisions": [
-   {
-    "symbol": "XAUUSD",
-    "action": "BUY",
-    "rsi": 34.441411672687465,
-    "trend_up": true,
-    "close": 4114.99
-   },
-   {
-    "symbol": "XAGUSD",
-    "action": "BUY",
-    "rsi": 38.5690550120367,
-    "trend_up": true,
-    "close": 60.631
-   },
-   {
-    "symbol": "XPTUSD",
-    "action": "BUY",
-    "rsi": 42.549400301777425,
-    "trend_up": true,
-    "close": 1713.65
-   },
-   {
-    "symbol": "XTIUSD",
-    "action": "BUY",
-    "rsi": 54.06886614553732,
-    "trend_up": true,
-    "close": 96.91300000000001
-   },
-   {
-    "symbol": "XBRUSD",
-    "action": "BUY",
-    "rsi": 55.83225512331898,
-    "trend_up": true,
-    "close": 103.366
-   },
-   {
-    "symbol": "XNGUSD",
-    "action": "BUY",
-    "rsi": 54.56430244289183,
-    "trend_up": true,
-    "close": 2.994
-   },
-   {
-    "symbol": "COFARA",
-    "action": "HOLD",
-    "rsi": 46.15586838530079,
-    "trend_up": false,
-    "close": 302.06
-   },
-   {
-    "symbol": "COTTON",
-    "action": "BUY",
-    "rsi": 43.55464691140422,
-    "trend_up": true,
-    "close": 81.63000000000001
-   },
-   {
-    "symbol": "WHEAT",
-    "action": "HOLD",
-    "rsi": 40.406316688074845,
-    "trend_up": true,
-    "close": 671.66
-   },
-   {
-    "symbol": "CORN",
-    "action": "BUY",
-    "rsi": 52.03455757081,
-    "trend_up": true,
-    "close": 507.63
-   },
-   {
-    "symbol": "SUGAR",
-    "action": "BUY",
-    "rsi": 42.21284320264457,
-    "trend_up": true,
-    "close": 507.06
-   },
-   {
-    "symbol": "US500",
-    "action": "BUY",
-    "rsi": 51.325029804190685,
-    "trend_up": true,
-    "close": 7689.360000000001
-   },
-   {
-    "symbol": "NAS100",
-    "action": "BUY",
-    "rsi": 59.006812040352756,
-    "trend_up": true,
-    "close": 30310.120000000003
-   }
-  ],
-  "protection": []
  },
  "history": [
   [
@@ -1134,6 +1016,10 @@
   [
    "2026-09-29T16:27Z",
    7794.55
+  ],
+  [
+   "2026-09-29T18:27Z",
+   7806.8
   ]
  ],
  "cycles": [
