@@ -2,10 +2,10 @@
  "available": true,
  "broker": "Fusion Markets · cTrader demo",
  "account": 10136967,
- "at": "2026-09-30T02:11Z",
+ "at": "2026-09-30T03:27Z",
  "balance": 7813.12,
- "equity": 7807.93,
- "unrealized_pnl": -5.19,
+ "equity": 7811.43,
+ "unrealized_pnl": -1.69,
  "leverage": 500.0,
  "positions": [
   {
@@ -13,11 +13,11 @@
    "qty": 7.0,
    "side": "buy",
    "avg": 677.11,
-   "price": 676.368571,
+   "price": 676.868571,
    "stop": 656.44,
    "target": null,
    "opened_at": "2026-09-25T07:27Z",
-   "pnl": -5.19,
+   "pnl": -1.69,
    "position_id": 43615182,
    "bot": true,
    "label": "autotrader",
@@ -380,7 +380,7 @@
    "excluded": -391.97
   },
   "open": {
-   "bot": -5.19,
+   "bot": -1.69,
    "manual": 0.0,
    "excluded": 0.0
   },
@@ -389,8 +389,8 @@
    "manual": 1,
    "excluded": 7
   },
-  "adjusted_equity": 8743.58,
-  "adjusted_return": -0.1256
+  "adjusted_equity": 8747.08,
+  "adjusted_return": -0.1253
  },
  "exclusions": {
   "reason": "Entradas del 14 de septiembre de 2026: el filtro de huecos comparaba el precio en vivo con la barra diaria parcial y dejo pasar compras que no debia. Se excluyen de las metricas del bot para medir la operativa corregida.",
@@ -1056,6 +1056,10 @@
   [
    "2026-09-30T02:11Z",
    7807.93
+  ],
+  [
+   "2026-09-30T03:27Z",
+   7811.43
   ]
  ],
  "cycles": [
