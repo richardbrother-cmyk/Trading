@@ -1,18 +1,18 @@
 {
- "at": "2026-09-30T12:28Z",
- "ny_time": "2026-09-30 08:28",
+ "at": "2026-09-30T12:45Z",
+ "ny_time": "2026-09-30 08:45",
  "equity": 644.65,
  "plan": {
-  "phase": "waiting_break",
-  "side": 0,
-  "level": null,
-  "break_at": null,
+  "phase": "broke",
+  "side": 1,
+  "level": 4194.99,
+  "break_at": "08:30",
   "retest_at": null,
   "stop": 4180.32,
   "day": "2026-09-30",
   "asia_hi": 4194.99,
   "asia_lo": 4165.65,
-  "bars_seen": 1
+  "bars_seen": 3
  },
  "open_position": null,
  "last_orders": [
