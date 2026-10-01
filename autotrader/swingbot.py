@@ -97,8 +97,9 @@ def describe(p: SwingParams) -> str:
         tgt = f"siguiente resistencia (minimo {p.sr_min_rr:g} R)" if p.sr_target == "level" else f"{p.sr_rr:g} R"
         mode = {"bounce": "rebote", "retest": "ruptura con retest", "both": "rebote o ruptura con retest"}[p.sr_mode]
         trend = " sobre la EMA200" if p.sr_trend else ""
+        be_sr = f", stop a break even tras {p.breakeven_r:g} R" if p.breakeven_r > 0 else ""
         return (f"{mode} en soporte H4 (>= {p.sr_min_touches} toques, memoria {p.sr_lookback} barras){trend}; stop bajo el nivel, "
-                f"objetivo {tgt}, salida a los {p.max_hold_days:g} dias")
+                f"objetivo {tgt}{be_sr}, salida a los {p.max_hold_days:g} dias")
     tp = f"{p.tp_atr:g} ATR" if (p.pure_rr or p.strategy != "bands") else "media de las bandas"
     entry = {"bands": f"cierre bajo la banda inferior ({p.bb_period}/{p.bb_std:g}) con RSI < {p.bands_rsi:g}",
              "breakout": f"cierre sobre el maximo de {p.breakout_bars} barras y sobre la EMA200",

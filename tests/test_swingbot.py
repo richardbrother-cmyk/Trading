@@ -241,6 +241,7 @@ def test_breakeven_waits_until_gain_reaches_threshold(tmp_path, monkeypatch):
 
 def test_params_from_env_reads_breakeven(monkeypatch):
     from autotrader.swingbot import params_from_env, describe
+    monkeypatch.setenv("SWING_STRATEGY", "bands")  # hermetico: los workflows definen su propia estrategia en el entorno
     monkeypatch.setenv("SWING_BREAKEVEN_R", "1.5")
     monkeypatch.setenv("SWING_BREAKEVEN_LOCK_R", "0.1")
     s = Settings(broker="sim", symbols=["US500"], risk_per_trade=0.06)

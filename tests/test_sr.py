@@ -233,3 +233,8 @@ def test_sr_state_script_keeps_last_cycle_and_events(tmp_path):
     st2 = mod.build_state(st, dict(cycle, decisions=[{"symbol": "US500", "action": "HOLD"}], orders=[]))
     assert len(st2["events"]) == 1  # un ciclo sin senal ni orden no anade eventos
     assert mod.last_cycle(str(log), "otra") is None
+
+
+def test_sr_description_mentions_breakeven_when_active():
+    assert "break even" not in describe(_params())
+    assert "break even tras 1.5 R" in describe(_params(breakeven_r=1.5))
