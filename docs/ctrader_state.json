@@ -2,7 +2,7 @@
  "available": true,
  "broker": "Fusion Markets · cTrader demo",
  "account": 10136967,
- "at": "2026-10-01T07:13Z",
+ "at": "2026-10-01T08:27Z",
  "balance": 7487.56,
  "equity": 7487.56,
  "unrealized_pnl": 0,
@@ -1146,6 +1146,10 @@
   ],
   [
    "2026-10-01T07:13Z",
+   7487.56
+  ],
+  [
+   "2026-10-01T08:27Z",
    7487.56
   ]
  ],
