@@ -43,6 +43,22 @@ class SwingParams:
     breakeven_r: float = 0.0  # > 0: cuando el precio lleva ganados N R (N veces la distancia al stop) el stop sube a la entrada
     breakeven_lock_r: float = 0.0  # fraccion de R que se asegura por encima de la entrada al mover el stop (cubre spread/comision)
     allow_short: bool = True
+    # Estrategia "sr" (soportes y resistencias, ver autotrader/sr.py)
+    sr_mode: str = "bounce"  # bounce | retest | both
+    sr_pivot_k: int = 3  # barras a cada lado para confirmar un pivote
+    sr_lookback: int = 240  # barras H4 hacia atras con las que se construyen los niveles
+    sr_cluster_atr: float = 0.5  # ancho maximo de una zona, en ATR
+    sr_min_touches: int = 2  # pivotes minimos para que una zona sea nivel
+    sr_zone_atr: float = 0.3  # semiancho de la zona de reaccion, en ATR
+    sr_max_pierce_atr: float = 1.0  # cuanto puede pasar la mecha al otro lado del nivel, en ATR
+    sr_retest_bars: int = 6  # ventana (barras) para el retest tras una ruptura
+    sr_stop_buf_atr: float = 0.3  # colchon del stop mas alla del nivel / de la mecha, en ATR
+    sr_min_stop_atr: float = 0.4
+    sr_max_stop_atr: float = 3.0
+    sr_target: str = "rr"  # rr: multiplo del riesgo | level: siguiente zona contraria
+    sr_rr: float = 2.0
+    sr_min_rr: float = 1.5  # con objetivo "level": ganancia minima en multiplos del riesgo
+    sr_trend: bool = True  # largos solo sobre la EMA200, cortos solo bajo ella
     risk_pct: float = 0.01
     max_risk_pct: float = 0.03
     commission_side: float = 0.000025
@@ -79,6 +95,9 @@ def indicators(df: pd.DataFrame, p: SwingParams) -> pd.DataFrame:
     m = c.rolling(p.bb_period).mean()
     s = c.rolling(p.bb_period).std()
     d["bb_mid"], d["bb_up"], d["bb_lo"] = m, m + p.bb_std * s, m - p.bb_std * s
+    if p.strategy == "sr":
+        from .sr import sr_columns  # import local: sr.py no depende de este modulo
+        d = sr_columns(d, p)
     return d
 
 
@@ -87,6 +106,9 @@ def signal(d: pd.DataFrame, i: int, p: SwingParams) -> int:
     r = d.iloc[i]
     if np.isnan(r["ema200"]) or np.isnan(r["atr"]) or np.isnan(r["rsi"]):
         return 0
+    if p.strategy == "sr":
+        s = int(r["sr_signal"])
+        return s if (s == 1 or p.allow_short) else 0
     if p.strategy == "pullback":
         prev = d.iloc[i - 1]
         if r["ema50"] > r["ema200"] and prev["rsi"] < p.rsi_entry <= r["rsi"]:
@@ -137,8 +159,19 @@ def backtest_symbol(df15: pd.DataFrame, sym: str, p: SwingParams, initial: float
             continue
         atr = float(d["atr"].iloc[i])
         entry = o[i + 1] + side * spec.spread / 2
-        stop = entry - side * p.stop_atr * atr
-        tp = entry + side * p.tp_atr * atr if (p.strategy != "bands" or p.pure_rr) else float(d["bb_mid"].iloc[i])
+        if p.strategy == "sr":
+            stop = float(d["sr_stop"].iloc[i])
+            if (side == 1 and entry <= stop) or (side == -1 and entry >= stop):  # hueco: la apertura ya esta mas alla del stop
+                i += 1
+                continue
+            tp_col = float(d["sr_target"].iloc[i])
+            tp = tp_col if np.isfinite(tp_col) else entry + side * p.sr_rr * abs(entry - stop)
+            if side * (tp - entry) < 0.5 * abs(entry - stop):
+                i += 1
+                continue
+        else:
+            stop = entry - side * p.stop_atr * atr
+            tp = entry + side * p.tp_atr * atr if (p.strategy != "bands" or p.pure_rr) else float(d["bb_mid"].iloc[i])
         units = _size(equity, entry, stop, spec, p)
         if units <= 0:
             i += 1

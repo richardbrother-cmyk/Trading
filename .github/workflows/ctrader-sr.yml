@@ -1,0 +1,121 @@
+name: ctrader-sr
+
+# Bot de SOPORTES Y RESISTENCIAS (rebote en un soporte H4 con al menos 2 toques, solo largos, objetivo en la siguiente resistencia con
+# un minimo de 2 R, stop bajo el nivel, hasta 7 dias) en la MISMA cuenta demo agresiva de cTrader (500 USD, 1:500) que el bot de
+# rupturas y el de Asia. Mismo motor que el bot swing (estrategia "sr", ver autotrader/sr.py y scripts/sr_backtest.py).
+# Corre cada hora y solo entra si la ultima barra de 4 h cerro hace menos de 2 h. Etiqueta propia: autotrader-sr.
+# Secrets: los mismos que ctrader-aggr (CTRADER_CLIENT_ID, CTRADER_CLIENT_SECRET, CTRADER_ACCESS_TOKEN, CTRADER_AGGR_ACCOUNT_LOGIN).
+on:
+  schedule:
+    - cron: "14 * * * 0-5"
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "Solo decidir, sin enviar ordenes"
+        type: boolean
+        default: false
+
+# Un solo run a la vez por workflow: si un ciclo se retrasa y se solapa con el siguiente, el nuevo espera en cola
+# (no se cancela el que puede estar enviando ordenes). Evita ordenes duplicadas por ejecuciones solapadas.
+concurrency:
+  group: ${{ github.workflow }}
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+  issues: write
+
+env:
+  SCHEDULE_ENABLED: "true"
+
+jobs:
+  gate:
+    runs-on: ubuntu-latest
+    outputs:
+      enabled: ${{ steps.check.outputs.enabled }}
+    steps:
+      - id: check
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ] || [ "$SCHEDULE_ENABLED" = "true" ]; then echo "enabled=true" >> "$GITHUB_OUTPUT"; else echo "enabled=false" >> "$GITHUB_OUTPUT"; fi
+
+  sr:
+    needs: gate
+    if: ${{ needs.gate.outputs.enabled == 'true' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      BROKER: ctrader
+      DATA_PROVIDER: ctrader
+      CTRADER_DEMO: "true"
+      CTRADER_CLIENT_ID: ${{ secrets.CTRADER_CLIENT_ID }}
+      CTRADER_CLIENT_SECRET: ${{ secrets.CTRADER_CLIENT_SECRET }}
+      CTRADER_ACCOUNT_LOGIN: ${{ secrets.CTRADER_AGGR_ACCOUNT_LOGIN }}
+      CTRADER_ACCESS_TOKEN: ${{ secrets.CTRADER_ACCESS_TOKEN }}
+      # Freno global: BOT_HALT (variable del repositorio: off | freeze | close) y freno por drawdown desde el maximo
+      BOT_HALT: ${{ vars.AGGR_BOT_HALT || vars.BOT_HALT || 'off' }}
+      # Freno al 50 % desde el maximo (decidido con la simulacion a 3 anos: con 30 % saltaba a los dos meses en todos
+      # los recorridos). Valor fijo en el workflow: las variables del repositorio ya no lo cambian.
+      MAX_DRAWDOWN_PCT: "0.50"
+      # Indices y forex son operables con 200 USD; oro y petroleo se saltan solos si el lote minimo arriesga
+      # mas de SWING_MAX_RISK_PCT
+      SYMBOLS: "US500,NAS100,EURUSD,GBPUSD,XAUUSD,XTIUSD"
+      # Freno por drawdown con el historial REAL de la cuenta agresiva (el bot de Asia hace lo mismo)
+      EQUITY_HISTORY: "docs/aggr_state.json"
+      # Perfil: rebote en soporte H4 (solo largos). Parametros fijados con scripts/sr_backtest.py (3 anos, 6 simbolos, periodo de ajuste
+      # y periodo ciego): 2 toques, memoria de 300 barras, objetivo en la siguiente resistencia con minimo 2 R, sobre la EMA200.
+      SWING_STRATEGY: "sr"
+      SWING_SR_MODE: "bounce"
+      SWING_SR_LOOKBACK: "300"
+      SWING_SR_MIN_TOUCHES: "2"
+      SWING_SR_TARGET: "level"
+      SWING_SR_MIN_RR: "2.0"
+      SWING_SR_TREND: "true"
+      SWING_MAX_HOLD_DAYS: "7"
+      SWING_LABEL: "autotrader-sr"
+      SWING_MAX_POSITIONS: "2"
+      # Riesgo por operacion 3 %: la mitad que el bot de rupturas, porque la ventaja de esta estrategia es mas fina y menos probada.
+      # Con 3 % el lote minimo se acepta hasta 4,5 % (oro y petroleo se saltan solos si no caben en 500 USD).
+      RISK_PER_TRADE: "0.03"
+      SWING_MAX_RISK_PCT: ${{ vars.SR_MAX_RISK_PCT || '0' }}
+      SWING_MAX_SIGNAL_AGE_HOURS: "2"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install -r requirements.txt
+      - name: Tests
+        run: python -m pytest -q
+      - name: Ciclo de soportes y resistencias
+        run: python -m autotrader.cli --env /dev/null swing-run ${{ inputs.dry_run && '--dry-run' || '' }}
+      # El estado de la cuenta (posiciones, operaciones, equity) lo refresca cada hora el workflow ctrader-aggr, que ya reconoce
+      # la etiqueta autotrader-sr; aqui solo se publica el ultimo ciclo del bot, igual que hace el bot de Asia.
+      - name: Estado del bot y panel
+        if: ${{ !inputs.dry_run }}
+        run: |
+          python scripts/sr_state.py --label autotrader-sr --out docs/sr_state.json
+          python scripts/dashboard.py --no-live --out reports/dashboard.html
+          cp reports/dashboard.html docs/index.html
+          cp reports/dashboard.html docs/dashboard.html
+      - name: Publicar panel
+        if: ${{ !inputs.dry_run }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add docs/sr_state.json docs/index.html docs/dashboard.html
+          if git diff --cached --quiet; then echo "sin cambios"; exit 0; fi
+          git commit -m "Panel: actualización automática (soportes y resistencias)"
+          # Los ficheros del panel los regeneran varios workflows: ante conflicto gana la version recien generada.
+          ok=0
+          for i in 1 2 3 4; do
+            if git pull --rebase -X theirs -q origin "${GITHUB_REF_NAME}" && git push; then ok=1; break; fi
+            git rebase --abort 2>/dev/null || true
+            sleep $((i * 5))
+          done
+          [ "$ok" = "1" ] || { echo "::error::no se pudo publicar el panel tras 4 intentos"; exit 1; }
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: sr-log-${{ github.run_id }}
+          path: state/run_log.jsonl
+          if-no-files-found: ignore

@@ -32,6 +32,12 @@ BAR_HOURS = 4
 DEFAULT_MAX_SIGNAL_AGE_HOURS = 2.0
 
 
+def history_days(p: SwingParams) -> int:
+    """Dias de historial H4 que hay que pedir: la EMA200 necesita ~210 barras y la estrategia sr, ademas, `sr_lookback` mas margen."""
+    bars = max(210, p.sr_lookback + 60) if p.strategy == "sr" else 210
+    return max(60, int(bars / 4.2) + 10)  # ~4,2 barras H4 por dia natural en simbolos de 5 dias por semana
+
+
 def closed_h4_bars(session: CTraderSession, symbol: str, days: int = 60, now: datetime | None = None) -> pd.DataFrame:
     """Barras H4 cerradas (descarta la barra en formacion)."""
     now = now or datetime.now(timezone.utc)
@@ -79,10 +85,20 @@ def params_from_env(settings, max_risk_pct: float | None = None) -> SwingParams:
                        breakout_bars=int(os.getenv("SWING_BREAKOUT_BARS", "20")), bands_rsi=float(os.getenv("SWING_BANDS_RSI", "30")),
                        max_hold_days=float(os.getenv("SWING_MAX_HOLD_DAYS", "3")), risk_pct=settings.risk_per_trade,
                        max_risk_pct=max_risk_pct or default_max_risk_pct(settings.risk_per_trade),
-                       breakeven_r=float(os.getenv("SWING_BREAKEVEN_R", "0") or 0), breakeven_lock_r=float(os.getenv("SWING_BREAKEVEN_LOCK_R", "0") or 0))
+                       breakeven_r=float(os.getenv("SWING_BREAKEVEN_R", "0") or 0), breakeven_lock_r=float(os.getenv("SWING_BREAKEVEN_LOCK_R", "0") or 0),
+                       sr_mode=os.getenv("SWING_SR_MODE", "bounce").lower(), sr_lookback=int(os.getenv("SWING_SR_LOOKBACK", "300")),
+                       sr_min_touches=int(os.getenv("SWING_SR_MIN_TOUCHES", "2")), sr_target=os.getenv("SWING_SR_TARGET", "level").lower(),
+                       sr_min_rr=float(os.getenv("SWING_SR_MIN_RR", "2.0")), sr_rr=float(os.getenv("SWING_SR_RR", "2.0")),
+                       sr_trend=os.getenv("SWING_SR_TREND", "true").lower() in {"1", "true", "yes"})
 
 
 def describe(p: SwingParams) -> str:
+    if p.strategy == "sr":
+        tgt = f"siguiente resistencia (minimo {p.sr_min_rr:g} R)" if p.sr_target == "level" else f"{p.sr_rr:g} R"
+        mode = {"bounce": "rebote", "retest": "ruptura con retest", "both": "rebote o ruptura con retest"}[p.sr_mode]
+        trend = " sobre la EMA200" if p.sr_trend else ""
+        return (f"{mode} en soporte H4 (>= {p.sr_min_touches} toques, memoria {p.sr_lookback} barras){trend}; stop bajo el nivel, "
+                f"objetivo {tgt}, salida a los {p.max_hold_days:g} dias")
     tp = f"{p.tp_atr:g} ATR" if (p.pure_rr or p.strategy != "bands") else "media de las bandas"
     entry = {"bands": f"cierre bajo la banda inferior ({p.bb_period}/{p.bb_std:g}) con RSI < {p.bands_rsi:g}",
              "breakout": f"cierre sobre el maximo de {p.breakout_bars} barras y sobre la EMA200",
@@ -185,7 +201,7 @@ def run_swing_cycle(settings, session: CTraderSession, params: SwingParams | Non
     for symbol in settings.symbols:
         info = session.symbols[symbol]
         try:
-            bars = closed_h4_bars(session, symbol, now=now)
+            bars = closed_h4_bars(session, symbol, days=history_days(p), now=now)
         except Exception as exc:  # noqa: BLE001
             summary["skipped"].append(f"{symbol}: sin barras: {exc}")
             continue
@@ -198,6 +214,14 @@ def run_swing_cycle(settings, session: CTraderSession, params: SwingParams | Non
         dec = {"symbol": symbol, "close": round(float(last["close"]), info.digits), "bb_lo": round(float(last["bb_lo"]), info.digits),
                "bb_mid": round(float(last["bb_mid"]), info.digits), "rsi": round(float(last["rsi"]), 1), "atr": round(float(last["atr"]), info.digits),
                "bar": bars.index[-1].strftime("%Y-%m-%d %H:%M"), "action": "BUY" if signal else "HOLD"}
+        if p.strategy == "sr":
+            from .sr import last_levels
+            near = last_levels(d, p)
+            dec.update({"support": None if near["support"] is None else round(near["support"], info.digits),
+                        "resistance": None if near["resistance"] is None else round(near["resistance"], info.digits), "levels": near["levels"]})
+        if p.strategy == "sr" and signal:
+            dec.update({"sr_level": round(float(last["sr_level"]), info.digits), "sr_stop": round(float(last["sr_stop"]), info.digits),
+                        "sr_target": None if pd.isna(last["sr_target"]) else round(float(last["sr_target"]), info.digits), "sr_kind": str(last["sr_kind"])})
         bar_closed = bars.index[-1].to_pydatetime() + timedelta(hours=BAR_HOURS)
         age_h = (now - bar_closed).total_seconds() / 3600
         dec["bar_age_h"] = round(age_h, 2)
@@ -224,13 +248,19 @@ def run_swing_cycle(settings, session: CTraderSession, params: SwingParams | Non
             continue
         spec = spec_for(symbol, info)
         entry = float(last["close"])
-        stop_dist = p.stop_atr * float(last["atr"])
+        stop_dist = (entry - float(last["sr_stop"])) if p.strategy == "sr" else p.stop_atr * float(last["atr"])
+        if stop_dist <= 0:
+            summary["skipped"].append(f"{symbol}: stop no valido ({stop_dist})")
+            continue
         units = size_units(sizing_equity, entry, entry - stop_dist, spec, p.risk_pct, p.max_risk_pct)
         if units <= 0:
             summary["skipped"].append(f"{symbol}: el lote minimo arriesga mas del {p.max_risk_pct:.0%} de {sizing_equity:.0f} USD")
             continue
-        tp_dist = (p.tp_atr * float(last["atr"])) if (p.pure_rr or p.strategy != "bands") else (float(last["bb_mid"]) - entry)
-        if tp_dist <= 0:
+        if p.strategy == "sr":
+            tp_dist = (float(last["sr_target"]) - entry) if pd.notna(last["sr_target"]) else p.sr_rr * stop_dist
+        else:
+            tp_dist = (p.tp_atr * float(last["atr"])) if (p.pure_rr or p.strategy != "bands") else (float(last["bb_mid"]) - entry)
+        if tp_dist <= 0 or (p.strategy == "sr" and tp_dist < 0.5 * stop_dist):
             summary["skipped"].append(f"{symbol}: objetivo no valido")
             continue
         volume = round_volume(units, info.min_volume, info.step_volume, info.max_volume)

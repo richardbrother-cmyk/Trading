@@ -318,6 +318,15 @@ footer { color: var(--muted); font-size: 12.5px; }
       <div class="tbl-wrap"><table id="sw-asia-trades"></table></div>
       <p class="note" id="sw-asia-note" style="margin:10px 0 0"></p>
     </section>
+    <section id="sw-sr-section" style="display:none">
+      <div class="sec-head"><div><h2>Bot de soportes y resistencias (misma cuenta)</h2><p class="lede" id="sw-sr-lede"></p></div></div>
+      <div class="kpis" id="sw-sr-kpis" style="margin-bottom:12px"></div>
+      <div class="eyebrow" style="margin:6px 0 8px">Niveles vigilados en el último ciclo (barras de 4 h)</div>
+      <div class="tbl-wrap"><table id="sw-sr-levels"></table></div>
+      <div class="eyebrow" style="margin:14px 0 8px">Operaciones cerradas del bot</div>
+      <div class="tbl-wrap"><table id="sw-sr-trades"></table></div>
+      <p class="note" id="sw-sr-note" style="margin:10px 0 0"></p>
+    </section>
     <section id="sw-sim-section" style="display:none">
       <div class="sec-head"><div><h2>Simulación: qué puede pasar con los parámetros actuales</h2><p class="lede" id="sw-sim-lede"></p></div></div>
       <div class="kpis" id="sw-sim-kpis" style="margin-bottom:12px"></div>
@@ -832,6 +841,28 @@ function renderSwingTab(prefix, SW, badgeId, base0, research){
     const tr = AS.trades || [];
     $("sw-asia-trades").innerHTML = tr.length ? `<thead><tr><th>Cierre (UTC)</th><th class="num">Unidades</th><th class="num">Entrada</th><th class="num">Salida</th><th class="num">Neto</th></tr></thead><tbody>` + [...tr].reverse().map(t=>`<tr><td class="mono" style="font-size:12px">${esc(t.at)}</td><td class="num">${t.units}</td><td class="num">${fx(t.entry,"XAUUSD")}</td><td class="num">${fx(t.exit,"XAUUSD")}</td><td class="num ${t.net>=0?"pos":"neg"}">${fmtUSD2(t.net)}</td></tr>`).join("") + "</tbody>" : `<tbody><tr><td class="empty">Sin operaciones cerradas todavía.</td></tr></tbody>`;
     $("sw-asia-note").textContent = "Origen: única variante consistente del estudio del rango de Londres (docs/london_range_gold.json): 238 operaciones en 3 años, acierto 50 %, PF 1,19, positiva los cuatro años. Sigue siendo una sola variante entre veinte, así que se evalúa en demo antes de creer en ella.";
+  }
+  const SRB = SW.sr;
+  if (SRB && SRB.decisions) {
+    $("sw-sr-section").style.display = "";
+    const dcs = SRB.decisions || [];
+    const mine = (SW.trades || []).filter(x => x.label === "autotrader-sr");
+    const wins = mine.filter(x => x.net > 0).length, net = mine.reduce((a, x) => a + (x.net || 0), 0);
+    const open = Object.keys(SRB.positions || {}).length;
+    $("sw-sr-lede").textContent = `Rebote en un soporte de 4 h (nivel con al menos 2 toques, memoria de 300 barras) sobre la EMA200, solo largos; stop bajo el nivel y objetivo en la siguiente resistencia con un mínimo de 2 R; salida a los 7 días. Máximo 2 posiciones, 3 % de riesgo por operación, etiqueta ${esc(SRB.label || "")}. Último ciclo ${esc((SRB.at || "").replace("T", " ").replace("Z", " UTC"))}${SRB.dry_run ? " (simulacro)" : ""}.`;
+    const tiles = [
+      {label:"Posiciones abiertas", value: String(open), sub: open ? Object.entries(SRB.positions).map(([k, v]) => esc(k) + " " + v).join(", ") : "ninguna ahora"},
+      {label:"Señales en el último ciclo", value: String(dcs.filter(x => x.action === "BUY").length), sub: (SRB.orders || []).length ? "órdenes: " + SRB.orders.map(o => esc(o.symbol) + " " + esc(String(o.status))).join(", ") : "sin órdenes"},
+      {label:"Operaciones cerradas", value: String(mine.length), sub: mine.length ? `${wins} ganadoras · neto ${fmtUSD2(net)}` : "todavía ninguna", cls: net >= 0 ? "good" : "bad"},
+    ];
+    if (SRB.guard && SRB.guard.mode && SRB.guard.mode !== "off") tiles.push({label:"Freno", value:"activo", sub: esc(SRB.guard.reason || ""), cls:"bad"});
+    $("sw-sr-kpis").innerHTML = tiles.map(k => `<div class="tile"><div class="label">${esc(k.label)}</div><div class="value">${esc(k.value)}</div><div class="sub ${k.cls || ""}">${k.sub}</div></div>`).join("");
+    const rowState = d => d.action === "BUY" ? `<span class="pos">señal de compra</span>` : esc(d.reason || "sin señal");
+    $("sw-sr-levels").innerHTML = dcs.length ? `<thead><tr><th>Símbolo</th><th class="num">Cierre H4</th><th class="num">Soporte</th><th class="num">Resistencia</th><th>Estado</th></tr></thead><tbody>` +
+      dcs.map(d => `<tr><td>${esc(d.symbol)}</td><td class="num">${d.close != null ? fx(d.close, d.symbol) : "—"}</td><td class="num">${d.support != null ? fx(d.support, d.symbol) : "—"}</td><td class="num">${d.resistance != null ? fx(d.resistance, d.symbol) : "—"}</td><td>${rowState(d)}</td></tr>`).join("") + "</tbody>" : `<tbody><tr><td class="empty">Sin ciclo registrado todavía.</td></tr></tbody>`;
+    $("sw-sr-trades").innerHTML = mine.length ? `<thead><tr><th>Cierre (UTC)</th><th>Símbolo</th><th class="num">Unidades</th><th class="num">Entrada</th><th class="num">Salida</th><th class="num">Neto</th></tr></thead><tbody>` +
+      [...mine].reverse().map(x => `<tr><td class="mono" style="font-size:12px">${esc(x.at)}</td><td>${esc(x.symbol)}</td><td class="num">${x.units}</td><td class="num">${fx(x.entry, x.symbol)}</td><td class="num">${fx(x.exit, x.symbol)}</td><td class="num ${x.net >= 0 ? "pos" : "neg"}">${fmtUSD2(x.net)}</td></tr>`).join("") + "</tbody>" : `<tbody><tr><td class="empty">Sin operaciones cerradas todavía.</td></tr></tbody>`;
+    $("sw-sr-note").textContent = "Origen: scripts/sr_backtest.py (docs/sr_backtest.json), 3 años de barras de 4 h en 6 símbolos con costes. La familia elegida fue positiva en el periodo de ajuste y en el ciego, pero con pocas operaciones (94 en 3 años, R medio 0,3, intervalo 95 % de −0,04 a +0,70) y concentrada en GBPUSD; los cortos y los objetivos fijos de 2R/3R perdían. No es estadísticamente significativa: p 0,05 sin corregir y q 0,46 tras corregir por las 73 variantes probadas. Es un experimento en demo, no una ventaja demostrada.";
   }
   const SIM = SW.simulation;
   if (SIM && SIM.scenarios) {

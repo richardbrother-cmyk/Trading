@@ -1,0 +1,9636 @@
+{
+ "generated_at": "2026-10-01 22:13 UTC",
+ "split": "2025-09-15",
+ "symbols": [
+  "US500",
+  "NAS100",
+  "EURUSD",
+  "GBPUSD",
+  "XAUUSD",
+  "XTIUSD"
+ ],
+ "period": [
+  "2023-09-15",
+  "2026-09-18"
+ ],
+ "grid": [
+  {
+   "name": "retest|level|libre|solo largos",
+   "params": {
+    "strategy": "sr",
+    "timeframe": "H4",
+    "max_hold_days": 7.0,
+    "breakeven_r": 0.0,
+    "sr_mode": "retest",
+    "sr_trend": false,
+    "allow_short": false,
+    "sr_target": "level",
+    "sr_min_rr": 1.5
+   },
+   "all": {
+    "trades": 150,
+    "win_rate": 0.387,
+    "avg_r": 0.129,
+    "sum_r": 19.4,
+    "profit_factor": 1.2,
+    "median_r": -1.02,
+    "worst_r": -1.27
+   },
+   "fit": {
+    "trades": 99,
+    "win_rate": 0.424,
+    "avg_r": 0.238,
+    "sum_r": 23.6,
+    "profit_factor": 1.4,
+    "median_r": -1.02,
+    "worst_r": -1.14
+   },
+   "blind": {
+    "trades": 51,
+    "win_rate": 0.314,
+    "avg_r": -0.083,
+    "sum_r": -4.2,
+    "profit_factor": 0.88,
+    "median_r": -1.02,
+    "worst_r": -1.27
+   },
+   "test": {
+    "n": 150,
+    "mean_r": 0.129,
+    "ci95": [
+     -0.117,
+     0.371
+    ],
+    "p_value": 0.1522,
+    "win_rate": 0.387,
+    "profit_factor": 1.2,
+    "sum_r": 19.4
+   },
+   "by_symbol": {
+    "US500": {
+     "trades": 15,
+     "win_rate": 0.2,
+     "avg_r": -0.455,
+     "sum_r": -6.8,
+     "profit_factor": 0.45,
+     "median_r": -1.03,
+     "worst_r": -1.07
+    },
+    "NAS100": {
+     "trades": 15,
+     "win_rate": 0.0,
+     "avg_r": -1.031,
+     "sum_r": -15.5,
+     "profit_factor": 0.0,
+     "median_r": -1.03,
+     "worst_r": -1.11
+    },
+    "EURUSD": {
+     "trades": 27,
+     "win_rate": 0.444,
+     "avg_r": 0.244,
+     "sum_r": 6.6,
+     "profit_factor": 1.41,
+     "median_r": -1.03,
+     "worst_r": -1.27
+    },
+    "GBPUSD": {
+     "trades": 41,
+     "win_rate": 0.561,
+     "avg_r": 0.575,
+     "sum_r": 23.6,
+     "profit_factor": 2.23,
+     "median_r": 1.45,
+     "worst_r": -1.14
+    },
+    "XAUUSD": {
+     "trades": 26,
+     "win_rate": 0.346,
+     "avg_r": 0.129,
+     "sum_r": 3.4,
+     "profit_factor": 1.19,
+     "median_r": -1.01,
+     "worst_r": -1.09
+    },
+    "XTIUSD": {
+     "trades": 26,
+     "win_rate": 0.423,
+     "avg_r": 0.313,
+     "sum_r": 8.1,
+     "profit_factor": 1.56,
+     "median_r": -1.01,
+     "worst_r": -1.04
+    }
+   },
+   "by_side": {
+    "long": {
+     "trades": 150,
+     "win_rate": 0.387,
+     "avg_r": 0.129,
+     "sum_r": 19.4,
+     "profit_factor": 1.2,
+     "median_r": -1.02,
+     "worst_r": -1.27
+    },
+    "short": {
+     "trades": 0
+    }
+   },
+   "exits": {
+    "stop": 91,
+    "objetivo": 56,
+    "tiempo maximo": 3
+   }
+  },
+  {
+   "name": "retest|level|tendencia|solo largos",
+   "params": {
+    "strategy": "sr",
+    "timeframe": "H4",
+    "max_hold_days": 7.0,
+    "breakeven_r": 0.0,
+    "sr_mode": "retest",
+    "sr_trend": true,
+    "allow_short": false,
+    "sr_target": "level",
+    "sr_min_rr": 1.5
+   },
+   "all": {
+    "trades": 91,
+    "win_rate": 0.385,
+    "avg_r": 0.148,
+    "sum_r": 13.5,
+    "profit_factor": 1.24,
+    "median_r": -1.02,
+    "worst_r": -1.19
+   },
+   "fit": {
+    "trades": 65,
+    "win_rate": 0.4,
+    "avg_r": 0.202,
+    "sum_r": 13.1,
+    "profit_factor": 1.32,
+    "median_r": -1.02,
+    "worst_r": -1.11
+   },
+   "blind": {
+    "trades": 26,
+    "win_rate": 0.346,
+    "avg_r": 0.014,
+    "sum_r": 0.4,
+    "profit_factor": 1.02,
+    "median_r": -1.02,
+    "worst_r": -1.19
+   },
+   "test": {
+    "n": 91,
+    "mean_r": 0.148,
+    "ci95": [
+     -0.174,
+     0.468
+    ],
+    "p_value": 0.1844,
+    "win_rate": 0.385,
+    "profit_factor": 1.24,
+    "sum_r": 13.5
+   },
+   "by_symbol": {
+    "US500": {
+     "trades": 11,
+     "win_rate": 0.091,
+     "avg_r": -0.794,
+     "sum_r": -8.7,
+     "profit_factor": 0.15,
+     "median_r": -1.03,
+     "worst_r": -1.07
+    },
+    "NAS100": {
+     "trades": 13,
+     "win_rate": 0.0,
+     "avg_r": -1.034,
+     "sum_r": -13.4,
+     "profit_factor": 0.0,
+     "median_r": -1.03,
+     "worst_r": -1.11
+    },
+    "EURUSD": {
+     "trades": 12,
+     "win_rate": 0.5,
+     "avg_r": 0.438,
+     "sum_r": 5.3,
+     "profit_factor": 1.82,
+     "median_r": 0.18,
+     "worst_r": -1.19
+    },
+    "GBPUSD": {
+     "trades": 25,
+     "win_rate": 0.6,
+     "avg_r": 0.749,
+     "sum_r": 18.7,
+     "profit_factor": 2.76,
+     "median_r": 1.54,
+     "worst_r": -1.11
+    },
+    "XAUUSD": {
+     "trades": 18,
+     "win_rate": 0.444,
+     "avg_r": 0.47,
+     "sum_r": 8.5,
+     "profit_factor": 1.82,
+     "median_r": -1.01,
+     "worst_r": -1.09
+    },
+    "XTIUSD": {
+     "trades": 12,
+     "win_rate": 0.417,
+     "avg_r": 0.269,
+     "sum_r": 3.2,
+     "profit_factor": 1.52,
+     "median_r": -0.53,
+     "worst_r": -1.04
+    }
+   },
+   "by_side": {
+    "long": {
+     "trades": 91,
+     "win_rate": 0.385,
+     "avg_r": 0.148,
+     "sum_r": 13.5,
+     "profit_factor": 1.24,
+     "median_r": -1.02,
+     "worst_r": -1.19
+    },
+    "short": {
+     "trades": 0
+    }
+   },
+   "exits": {
+    "stop": 55,
+    "objetivo": 33,
+    "tiempo maximo": 3
+   }
+  },
+  {
+   "name": "bounce|level|libre|solo largos",
+   "params": {
+    "strategy": "sr",
+    "timeframe": "H4",
+    "max_hold_days": 7.0,
+    "breakeven_r": 0.0,
+    "sr_mode": "bounce",
+    "sr_trend": false,
+    "allow_short": false,
+    "sr_target": "level",
+    "sr_min_rr": 1.5
+   },
+   "all": {
+    "trades": 342,
+    "win_rate": 0.392,
+    "avg_r": 0.146,
+    "sum_r": 50.0,
+    "profit_factor": 1.23,
+    "median_r": -1.02,
+    "worst_r": -1.42
+   },
+   "fit": {
+    "trades": 218,
+    "win_rate": 0.399,
+    "avg_r": 0.161,
+    "sum_r": 35.1,
+    "profit_factor": 1.26,
+    "median_r": -1.02,
+    "worst_r": -1.42
+   },
+   "blind": {
+    "trades": 124,
+    "win_rate": 0.379,
+    "avg_r": 0.12,
+    "sum_r": 14.9,
+    "profit_factor": 1.19,
+    "median_r": -1.01,
+    "worst_r": -1.27
+   },
+   "test": {
+    "n": 342,
+    "mean_r": 0.146,
+    "ci95": [
+     -0.019,
+     0.315
+    ],
+    "p_value": 0.0419,
+    "win_rate": 0.392,
+    "profit_factor": 1.23,
+    "sum_r": 50.0
+   },
+   "by_symbol": {
+    "US500": {
+     "trades": 38,
+     "win_rate": 0.263,
+     "avg_r": -0.244,
+     "sum_r": -9.3,
+     "profit_factor": 0.68,
+     "median_r": -1.03,
+     "worst_r": -1.07
+    },
+    "NAS100": {
+     "trades": 43,
+     "win_rate": 0.233,
+     "avg_r": -0.367,
+     "sum_r": -15.8,
+     "profit_factor": 0.53,
+     "median_r": -1.02,
+     "worst_r": -1.11
+    },
+    "EURUSD": {
+     "trades": 64,
+     "win_rate": 0.422,
+     "avg_r": 0.17,
+     "sum_r": 10.9,
+     "profit_factor": 1.27,
+     "median_r": -1.04,
+     "worst_r": -1.27
+    },
+    "GBPUSD": {
+     "trades": 72,
+     "win_rate": 0.542,
+     "avg_r": 0.576,
+     "sum_r": 41.4,
+     "profit_factor": 2.16,
+     "median_r": 1.44,
+     "worst_r": -1.42
+    },
+    "XAUUSD": {
+     "trades": 63,
+     "win_rate": 0.333,
+     "avg_r": 0.014,
+     "sum_r": 0.9,
+     "profit_factor": 1.02,
+     "median_r": -1.01,
+     "worst_r": -1.13
+    },
+    "XTIUSD": {
+     "trades": 62,
+     "win_rate": 0.435,
+     "avg_r": 0.352,
+     "sum_r": 21.8,
+     "profit_factor": 1.61,
+     "median_r": -1.01,
+     "worst_r": -1.07
+    }
+   },
+   "by_side": {
+    "long": {
+     "trades": 342,
+     "win_rate": 0.392,
+     "avg_r": 0.146,
+     "sum_r": 50.0,
+     "profit_factor": 1.23,
+     "median_r": -1.02,
+     "worst_r": -1.42
+    },
+    "short": {
+     "trades": 0
+    }
+   },
+   "exits": {
+    "stop": 208,
+    "objetivo": 129,
+    "tiempo maximo": 5
+   }
+  },
+  {
+   "name": "both|level|libre|solo largos",
+   "params": {
+    "strategy": "sr",
+    "timeframe": "H4",
+    "max_hold_days": 7.0,
+    "breakeven_r": 0.0,
+    "sr_mode": "both",
+    "sr_trend": false,
+    "allow_short": false,
+    "sr_target": "level",
+    "sr_min_rr": 1.5
+   },
+   "all": {
+    "trades": 342,
+    "win_rate": 0.392,
+    "avg_r": 0.146,
+    "sum_r": 50.0,
+    "profit_factor": 1.23,
+    "median_r": -1.02,
+    "worst_r": -1.42
+   },
+   "fit": {
+    "trades": 218,
+    "win_rate": 0.399,
+    "avg_r": 0.161,
+    "sum_r": 35.1,
+    "profit_factor": 1.26,
+    "median_r": -1.02,
+    "worst_r": -1.42
+   },
+   "blind": {
+    "trades": 124,
+    "win_rate": 0.379,
+    "avg_r": 0.12,
+    "sum_r": 14.9,
+    "profit_factor": 1.19,
+    "median_r": -1.01,
+    "worst_r": -1.27
+   },
+   "test": {
+    "n": 342,
+    "mean_r": 0.146,
+    "ci95": [
+     -0.019,
+     0.315
+    ],
+    "p_value": 0.0419,
+    "win_rate": 0.392,
+    "profit_factor": 1.23,
+    "sum_r": 50.0
+   },
+   "by_symbol": {
+    "US500": {
+     "trades": 38,
+     "win_rate": 0.263,
+     "avg_r": -0.244,
+     "sum_r": -9.3,
+     "profit_factor": 0.68,
+     "median_r": -1.03,
+     "worst_r": -1.07
+    },
+    "NAS100": {
+     "trades": 43,
+     "win_rate": 0.233,
+     "avg_r": -0.367,
+     "sum_r": -15.8,
+     "profit_factor": 0.53,
+     "median_r": -1.02,
+     "worst_r": -1.11
+    },
+    "EURUSD": {
+     "trades": 64,
+     "win_rate": 0.422,
+     "avg_r": 0.17,
+     "sum_r": 10.9,
+     "profit_factor": 1.27,
+     "median_r": -1.04,
+     "worst_r": -1.27
+    },
+    "GBPUSD": {
+     "trades": 72,
+     "win_rate": 0.542,
+     "avg_r": 0.576,
+     "sum_r": 41.4,
+     "profit_factor": 2.16,
+     "median_r": 1.44,
+     "worst_r": -1.42
+    },
+    "XAUUSD": {
+     "trades": 63,
+     "win_rate": 0.333,
+     "avg_r": 0.014,
+     "sum_r": 0.9,
+     "profit_factor": 1.02,
+     "median_r": -1.01,
+     "worst_r": -1.13
+    },
+    "XTIUSD": {
+     "trades": 62,
+     "win_rate": 0.435,
+     "avg_r": 0.352,
+     "sum_r": 21.8,
+     "profit_factor": 1.61,
+     "median_r": -1.01,
+     "worst_r": -1.07
+    }
+   },
+   "by_side": {
+    "long": {
+     "trades": 342,
+     "win_rate": 0.392,
+     "avg_r": 0.146,
+     "sum_r": 50.0,
+     "profit_factor": 1.23,
+     "median_r": -1.02,
+     "worst_r": -1.42
+    },
+    "short": {
+     "trades": 0
+    }
+   },
+   "exits": {
+    "stop": 208,
+    "objetivo": 129,
+    "tiempo maximo": 5
+   }
+  },
+  {
+   "name": "retest|rr3|libre|solo largos",
+   "params": {
+    "strategy": "sr",
+    "timeframe": "H4",
+    "max_hold_days": 7.0,
+    "breakeven_r": 0.0,
+    "sr_mode": "retest",
+    "sr_trend": false,
+    "allow_short": false,
+    "sr_target": "rr",
+    "sr_rr": 3.0
+   },
+   "all": {
+    "trades": 998,
+    "win_rate": 0.308,
+    "avg_r": 0.066,
+    "sum_r": 65.8,
+    "profit_factor": 1.09,
+    "median_r": -1.02,
+    "worst_r": -1.39
+   },
+   "fit": {
+    "trades": 645,
+    "win_rate": 0.329,
+    "avg_r": 0.151,
+    "sum_r": 97.5,
+    "profit_factor": 1.22,
+    "median_r": -1.02,
+    "worst_r": -1.34
+   },
+   "blind": {
+    "trades": 353,
+    "win_rate": 0.269,
+    "avg_r": -0.09,
+    "sum_r": -31.7,
+    "profit_factor": 0.88,
+    "median_r": -1.02,
+    "worst_r": -1.39
+   },
+   "test": {
+    "n": 998,
+    "mean_r": 0.066,
+    "ci95": [
+     -0.04,
+     0.173
+    ],
+    "p_value": 0.1121,
+    "win_rate": 0.308,
+    "profit_factor": 1.09,
+    "sum_r": 65.8
+   },
+   "by_symbol": {
+    "US500": {
+     "trades": 154,
+     "win_rate": 0.318,
+     "avg_r": 0.146,
+     "sum_r": 22.5,
+     "profit_factor": 1.21,
+     "median_r": -1.02,
+     "worst_r": -1.18
+    },
+    "NAS100": {
+     "trades": 174,
+     "win_rate": 0.247,
+     "avg_r": -0.154,
+     "sum_r": -26.8,
+     "profit_factor": 0.8,
+     "median_r": -1.02,
+     "worst_r": -1.21
+    },
+    "EURUSD": {
+     "trades": 175,
+     "win_rate": 0.314,
+     "avg_r": 0.073,
+     "sum_r": 12.8,
+     "profit_factor": 1.1,
+     "median_r": -1.04,
+     "worst_r": -1.39
+    },
+    "GBPUSD": {
+     "trades": 187,
+     "win_rate": 0.289,
+     "avg_r": -0.031,
+     "sum_r": -5.7,
+     "profit_factor": 0.96,
+     "median_r": -1.05,
+     "worst_r": -1.34
+    },
+    "XAUUSD": {
+     "trades": 161,
+     "win_rate": 0.373,
+     "avg_r": 0.294,
+     "sum_r": 47.4,
+     "profit_factor": 1.46,
+     "median_r": -1.01,
+     "worst_r": -1.19
+    },
+    "XTIUSD": {
+     "trades": 147,
+     "win_rate": 0.313,
+     "avg_r": 0.106,
+     "sum_r": 15.6,
+     "profit_factor": 1.15,
+     "median_r": -1.02,
+     "worst_r": -1.1
+    }
+   },
+   "by_side": {
+    "long": {
+     "trades": 998,
+     "win_rate": 0.308,
+     "avg_r": 0.066,
+     "sum_r": 65.8,
+     "profit_factor": 1.09,
+     "median_r": -1.02,
+     "worst_r": -1.39
+    },
+    "short": {
+     "trades": 0
+    }
+   },
+   "exits": {
+    "stop": 680,
+    "objetivo": 244,
+    "tiempo maximo": 74
+   }
+  },
+  {
+   "name": "retest|rr3|tendencia|solo largos",
+   "params": {
+    "strategy": "sr",
+    "timeframe": "H4",
+    "max_hold_days": 7.0,
+    "breakeven_r": 0.0,
+    "sr_mode": "retest",
+    "sr_trend": true,
+    "allow_short": false,
+    "sr_target": "rr",
+    "sr_rr": 3.0
+   },
+   "all": {
+    "trades": 692,
+    "win_rate": 0.321,
+    "avg_r": 0.097,
+    "sum_r": 67.1,
+    "profit_factor": 1.14,
+    "median_r": -1.02,
+    "worst_r": -1.39
+   },
+   "fit": {
+    "trades": 477,
+    "win_rate": 0.327,
+    "avg_r": 0.14,
+    "sum_r": 66.8,
+    "profit_factor": 1.2,
+    "median_r": -1.02,
+    "worst_r": -1.25
+   },
+   "blind": {
+    "trades": 215,
+    "win_rate": 0.307,
+    "avg_r": 0.001,
+    "sum_r": 0.3,
+    "profit_factor": 1.0,
+    "median_r": -1.02,
+    "worst_r": -1.39
+   },
+   "test": {
+    "n": 692,
+    "mean_r": 0.097,
+    "ci95": [
+     -0.027,
+     0.227
+    ],
+    "p_value": 0.0686,
+    "win_rate": 0.321,
+    "profit_factor": 1.14,
+    "sum_r": 67.1
+   },
+   "by_symbol": {
+    "US500": {
+     "trades": 130,
+     "win_rate": 0.362,
+     "avg_r": 0.287,
+     "sum_r": 37.3,
+     "profit_factor": 1.43,
+     "median_r": -1.02,
+     "worst_r": -1.28
+    },
+    "NAS100": {
+     "trades": 139,
+     "win_rate": 0.23,
+     "avg_r": -0.215,
+     "sum_r": -29.9,
+     "profit_factor": 0.73,
+     "median_r": -1.02,
+     "worst_r": -1.21
+    },
+    "EURUSD": {
+     "trades": 105,
+     "win_rate": 0.333,
+     "avg_r": 0.079,
+     "sum_r": 8.3,
+     "profit_factor": 1.11,
+     "median_r": -1.04,
+     "worst_r": -1.25
+    },
+    "GBPUSD": {
+     "trades": 121,
+     "win_rate": 0.289,
+     "avg_r": -0.007,
+     "sum_r": -0.8,
+     "profit_factor": 0.99,
+     "median_r": -1.04,
+     "worst_r": -1.39
+    },
+    "XAUUSD": {
+     "trades": 126,
+     "win_rate": 0.357,
+     "avg_r": 0.235,
+     "sum_r": 29.6,
+     "profit_factor": 1.35,
+     "median_r": -1.01,
+     "worst_r": -1.15
+    },
+    "XTIUSD": {
+     "trades": 71,
+     "win_rate": 0.394,
+     "avg_r": 0.319,
+     "sum_r": 22.6,
+     "profit_factor": 1.51,
+     "median_r": -1.02,
+     "worst_r": -1.08
+    }
+   },
+   "by_side": {
+    "long": {
+     "trades": 692,
+     "win_rate": 0.321,
+     "avg_r": 0.097,
+     "sum_r": 67.1,
+     "profit_factor": 1.14,
+     "median_r": -1.02,
+     "worst_r": -1.39
+    },
+    "short": {
+     "trades": 0
+    }
+   },
+   "exits": {
+    "stop": 463,
+    "objetivo": 170,
+    "tiempo maximo": 59
+   }
+  },
+  {
+   "name": "bounce|rr3|libre|solo largos",
+   "params": {
+    "strategy": "sr",
+    "timeframe": "H4",
+    "max_hold_days": 7.0,
+    "breakeven_r": 0.0,
+    "sr_mode": "bounce",
+    "sr_trend": false,
+    "allow_short": false,
+    "sr_target": "rr",
+    "sr_rr": 3.0
+   },
+   "all": {
+    "trades": 1393,
+    "win_rate": 0.297,
+    "avg_r": 0.009,
+    "sum_r": 12.8,
+    "profit_factor": 1.01,
+    "median_r": -1.02,
+    "worst_r": -1.42
+   },
+   "fit": {
+    "trades": 879,
+    "win_rate": 0.319,
+    "avg_r": 0.076,
+    "sum_r": 67.1,
+    "profit_factor": 1.11,
+    "median_r": -1.02,
+    "worst_r": -1.42
+   },
+   "blind": {
+    "trades": 514,
+    "win_rate": 0.261,
+    "avg_r": -0.106,
+    "sum_r": -54.3,
+    "profit_factor": 0.86,
+    "median_r": -1.02,
+    "worst_r": -1.35
+   },
+   "test": {
+    "n": 1393,
+    "mean_r": 0.009,
+    "ci95": [
+     -0.079,
+     0.097
+    ],
+    "p_value": 0.4224,
+    "win_rate": 0.297,
+    "profit_factor": 1.01,
+    "sum_r": 12.8
+   },
+   "by_symbol": {
+    "US500": {
+     "trades": 217,
+     "win_rate": 0.313,
+     "avg_r": 0.107,
+     "sum_r": 23.2,
+     "profit_factor": 1.15,
+     "median_r": -1.02,
+     "worst_r": -1.28
+    },
+    "NAS100": {
+     "trades": 218,
+     "win_rate": 0.28,
+     "avg_r": -0.027,
+     "sum_r": -5.9,
+     "profit_factor": 0.96,
+     "median_r": -1.02,
+     "worst_r": -1.13
+    },
+    "EURUSD": {
+     "trades": 243,
+     "win_rate": 0.28,
+     "avg_r": -0.115,
+     "sum_r": -27.9,
+     "profit_factor": 0.85,
+     "median_r": -1.05,
+     "worst_r": -1.42
+    },
+    "GBPUSD": {
+     "trades": 252,
+     "win_rate": 0.25,
+     "avg_r": -0.183,
+     "sum_r": -46.0,
+     "profit_factor": 0.77,
+     "median_r": -1.04,
+     "worst_r": -1.35
+    },
+    "XAUUSD": {
+     "trades": 228,
+     "win_rate": 0.368,
+     "avg_r": 0.28,
+     "sum_r": 63.8,
+     "profit_factor": 1.43,
+     "median_r": -1.01,
+     "worst_r": -1.15
+    },
+    "XTIUSD": {
+     "trades": 235,
+     "win_rate": 0.298,
+     "avg_r": 0.024,
+     "sum_r": 5.6,
+     "profit_factor": 1.03,
+     "median_r": -1.02,
+     "worst_r": -1.09
+    }
+   },
+   "by_side": {
+    "long": {
+     "trades": 1393,
+     "win_rate": 0.297,
+     "avg_r": 0.009,
+     "sum_r": 12.8,
+     "profit_factor": 1.01,
+     "median_r": -1.02,
+     "worst_r": -1.42
+    },
+    "short": {
+     "trades": 0
+    }
+   },
+   "exits": {
+    "stop": 962,
+    "objetivo": 315,
+    "tiempo maximo": 116
+   }
+  },
+  {
+   "name": "both|rr3|libre|solo largos",
+   "params": {
+    "strategy": "sr",
+    "timeframe": "H4",
+    "max_hold_days": 7.0,
+    "breakeven_r": 0.0,
+    "sr_mode": "both",
+    "sr_trend": false,
+    "allow_short": false,
+    "sr_target": "rr",
+    "sr_rr": 3.0
+   },
+   "all": {
+    "trades": 1390,
+    "win_rate": 0.297,
+    "avg_r": 0.009,
+    "sum_r": 11.9,
+    "profit_factor": 1.01,
+    "median_r": -1.02,
+    "worst_r": -1.42
+   },
+   "fit": {
+    "trades": 879,
+    "win_rate": 0.319,
+    "avg_r": 0.076,
+    "sum_r": 67.1,
+    "profit_factor": 1.11,
+    "median_r": -1.02,
+    "worst_r": -1.42
+   },
+   "blind": {
+    "trades": 511,
+    "win_rate": 0.26,
+    "avg_r": -0.108,
+    "sum_r": -55.2,
+    "profit_factor": 0.86,
+    "median_r": -1.02,
+    "worst_r": -1.35
+   },
+   "test": {
+    "n": 1390,
+    "mean_r": 0.009,
+    "ci95": [
+     -0.078,
+     0.098
+    ],
+    "p_value": 0.4197,
+    "win_rate": 0.297,
+    "profit_factor": 1.01,
+    "sum_r": 11.9
+   },
+   "by_symbol": {
+    "US500": {
+     "trades": 214,
+     "win_rate": 0.313,
+     "avg_r": 0.104,
+     "sum_r": 22.3,
+     "profit_factor": 1.15,
+     "median_r": -1.02,
+     "worst_r": -1.28
+    },
+    "NAS100": {
+     "trades": 218,
+     "win_rate": 0.28,
+     "avg_r": -0.027,
+     "sum_r": -5.9,
+     "profit_factor": 0.96,
+     "median_r": -1.02,
+     "worst_r": -1.13
+    },
+    "EURUSD": {
+     "trades": 243,
+     "win_rate": 0.28,
+     "avg_r": -0.115,
+     "sum_r": -27.9,
+     "profit_factor": 0.85,
+     "median_r": -1.05,
+     "worst_r": -1.42
+    },
+    "GBPUSD": {
+     "trades": 252,
+     "win_rate": 0.25,
+     "avg_r": -0.183,
+     "sum_r": -46.0,
+     "profit_factor": 0.77,
+     "median_r": -1.04,
+     "worst_r": -1.35
+    },
+    "XAUUSD": {
+     "trades": 228,
+     "win_rate": 0.368,
+     "avg_r": 0.28,
+     "sum_r": 63.8,
+     "profit_factor": 1.43,
+     "median_r": -1.01,
+     "worst_r": -1.15
+    },
+    "XTIUSD": {
+     "trades": 235,
+     "win_rate": 0.298,
+     "avg_r": 0.024,
+     "sum_r": 5.6,
+     "profit_factor": 1.03,
+     "median_r": -1.02,
+     "worst_r": -1.09
+    }
+   },
+   "by_side": {
+    "long": {
+     "trades": 1390,
+     "win_rate": 0.297,
+     "avg_r": 0.009,
+     "sum_r": 11.9,
+     "profit_factor": 1.01,
+     "median_r": -1.02,
+     "worst_r": -1.42
+    },
+    "short": {
+     "trades": 0
+    }
+   },
+   "exits": {
+    "stop": 960,
+    "objetivo": 314,
+    "tiempo maximo": 116
+   }
+  },
+  {
+   "name": "bounce|rr3|tendencia|solo largos",
+   "params": {
+    "strategy": "sr",
+    "timeframe": "H4",
+    "max_hold_days": 7.0,
+    "breakeven_r": 0.0,
+    "sr_mode": "bounce",
+    "sr_trend": true,
+    "allow_short": false,
+    "sr_target": "rr",
+    "sr_rr": 3.0
+   },
+   "all": {
+    "trades": 948,
+    "win_rate": 0.307,
+    "avg_r": 0.012,
+    "sum_r": 11.7,
+    "profit_factor": 1.02,
+    "median_r": -1.02,
+    "worst_r": -1.42
+   },
+   "fit": {
+    "trades": 625,
+    "win_rate": 0.32,
+    "avg_r": 0.071,
+    "sum_r": 44.2,
+    "profit_factor": 1.1,
+    "median_r": -1.02,
+    "worst_r": -1.42
+   },
+   "blind": {
+    "trades": 323,
+    "win_rate": 0.282,
+    "avg_r": -0.101,
+    "sum_r": -32.5,
+    "profit_factor": 0.87,
+    "median_r": -1.02,
+    "worst_r": -1.39
+   },
+   "test": {
+    "n": 948,
+    "mean_r": 0.012,
+    "ci95": [
+     -0.091,
+     0.12
+    ],
+    "p_value": 0.4111,
+    "win_rate": 0.307,
+    "profit_factor": 1.02,
+    "sum_r": 11.7
+   },
+   "by_symbol": {
+    "US500": {
+     "trades": 162,
+     "win_rate": 0.327,
+     "avg_r": 0.096,
+     "sum_r": 15.5,
+     "profit_factor": 1.14,
+     "median_r": -1.02,
+     "worst_r": -1.21
+    },
+    "NAS100": {
+     "trades": 165,
+     "win_rate": 0.321,
+     "avg_r": 0.054,
+     "sum_r": 9.0,
+     "profit_factor": 1.08,
+     "median_r": -1.01,
+     "worst_r": -1.13
+    },
+    "EURUSD": {
+     "trades": 149,
+     "win_rate": 0.262,
+     "avg_r": -0.184,
+     "sum_r": -27.4,
+     "profit_factor": 0.77,
+     "median_r": -1.05,
+     "worst_r": -1.42
+    },
+    "GBPUSD": {
+     "trades": 168,
+     "win_rate": 0.28,
+     "avg_r": -0.083,
+     "sum_r": -13.9,
+     "profit_factor": 0.89,
+     "median_r": -1.04,
+     "worst_r": -1.39
+    },
+    "XAUUSD": {
+     "trades": 189,
+     "win_rate": 0.349,
+     "avg_r": 0.203,
+     "sum_r": 38.3,
+     "profit_factor": 1.3,
+     "median_r": -1.02,
+     "worst_r": -1.15
+    },
+    "XTIUSD": {
+     "trades": 115,
+     "win_rate": 0.287,
+     "avg_r": -0.086,
+     "sum_r": -9.8,
+     "profit_factor": 0.88,
+     "median_r": -1.02,
+     "worst_r": -1.09
+    }
+   },
+   "by_side": {
+    "long": {
+     "trades": 948,
+     "win_rate": 0.307,
+     "avg_r": 0.012,
+     "sum_r": 11.7,
+     "profit_factor": 1.02,
+     "median_r": -1.02,
+     "worst_r": -1.42
+    },
+    "short": {
+     "trades": 0
+    }
+   },
+   "exits": {
+    "stop": 650,
+    "objetivo": 206,
+    "tiempo maximo": 92
+   }
+  },
+  {
+   "name": "both|rr3|tendencia|solo largos",
+   "params": {
+    "strategy": "sr",
+    "timeframe": "H4",
+    "max_hold_days": 7.0,
+    "breakeven_r": 0.0,
+    "sr_mode": "both",
+    "sr_trend": true,
+    "allow_short": false,
+    "sr_target": "rr",
+    "sr_rr": 3.0
+   },
+   "all": {
+    "trades": 945,
+    "win_rate": 0.307,
+    "avg_r": 0.011,
+    "sum_r": 10.8,
+    "profit_factor": 1.02,
+    "median_r": -1.02,
+    "worst_r": -1.42
+   },
+   "fit": {
+    "trades": 625,
+    "win_rate": 0.32,
+    "avg_r": 0.071,
+    "sum_r": 44.2,
+    "profit_factor": 1.1,
+    "median_r": -1.02,
+    "worst_r": -1.42
+   },
+   "blind": {
+    "trades": 320,
+    "win_rate": 0.281,
+    "avg_r": -0.104,
+    "sum_r": -33.3,
+    "profit_factor": 0.86,
+    "median_r": -1.02,
+    "worst_r": -1.39
+   },
+   "test": {
+    "n": 945,
+    "mean_r": 0.011,
+    "ci95": [
+     -0.094,
+     0.119
+    ],
+    "p_value": 0.42,
+    "win_rate": 0.307,
+    "profit_factor": 1.02,
+    "sum_r": 10.8
+   },
+   "by_symbol": {
+    "US500": {
+     "trades": 159,
+     "win_rate": 0.327,
+     "avg_r": 0.092,
+     "sum_r": 14.6,
+     "profit_factor": 1.13,
+     "median_r": -1.02,
+     "worst_r": -1.21
+    },
+    "NAS100": {
+     "trades": 165,
+     "win_rate": 0.321,
+     "avg_r": 0.054,
+     "sum_r": 9.0,
+     "profit_factor": 1.08,
+     "median_r": -1.01,
+     "worst_r": -1.13
+    },
+    "EURUSD": {
+     "trades": 149,
+     "win_rate": 0.262,
+     "avg_r": -0.184,
+     "sum_r": -27.4,
+     "profit_factor": 0.77,
+     "median_r": -1.05,
+     "worst_r": -1.42
+    },
+    "GBPUSD": {
+     "trades": 168,
+     "win_rate": 0.28,
+     "avg_r": -0.083,
+     "sum_r": -13.9,
+     "profit_factor": 0.89,
+     "median_r": -1.04,
+     "worst_r": -1.39
+    },
+    "XAUUSD": {
+     "trades": 189,
+     "win_rate": 0.349,
+     "avg_r": 0.203,
+     "sum_r": 38.3,
+     "profit_factor": 1.3,
+     "median_r": -1.02,
+     "worst_r": -1.15
+    },
+    "XTIUSD": {
+     "trades": 115,
+     "win_rate": 0.287,
+     "avg_r": -0.086,
+     "sum_r": -9.8,
+     "profit_factor": 0.88,
+     "median_r": -1.02,
+     "worst_r": -1.09
+    }
+   },
+   "by_side": {
+    "long": {
+     "trades": 945,
+     "win_rate": 0.307,
+     "avg_r": 0.011,
+     "sum_r": 10.8,
+     "profit_factor": 1.02,
+     "median_r": -1.02,
+     "worst_r": -1.42
+    },
+    "short": {
+     "trades": 0
+    }
+   },
+   "exits": {
+    "stop": 648,
+    "objetivo": 205,
+    "tiempo maximo": 92
+   }
+  },
+  {
+   "name": "bounce|rr2|libre|solo largos",
+   "params": {
+    "strategy": "sr",
+    "timeframe": "H4",
+    "max_hold_days": 7.0,
+    "breakeven_r": 0.0,
+    "sr_mode": "bounce",
+    "sr_trend": false,
+    "allow_short": false,
+    "sr_target": "rr",
+    "sr_rr": 2.0
+   },
+   "all": {
+    "trades": 1743,
+    "win_rate": 0.362,
+    "avg_r": 0.014,
+    "sum_r": 24.8,
+    "profit_factor": 1.02,
+    "median_r": -1.02,
+    "worst_r": -1.31
+   },
+   "fit": {
+    "trades": 1104,
+    "win_rate": 0.381,
+    "avg_r": 0.07,
+    "sum_r": 77.8,
+    "profit_factor": 1.11,
+    "median_r": -1.02,
+    "worst_r": -1.25
+   },
+   "blind": {
+    "trades": 639,
+    "win_rate": 0.329,
+    "avg_r": -0.083,
+    "sum_r": -53.0,
+    "profit_factor": 0.88,
+    "median_r": -1.02,
+    "worst_r": -1.31
+   },
+   "test": {
+    "n": 1743,
+    "mean_r": 0.014,
+    "ci95": [
+     -0.051,
+     0.08
+    ],
+    "p_value": 0.3346,
+    "win_rate": 0.362,
+    "profit_factor": 1.02,
+    "sum_r": 24.8
+   },
+   "by_symbol": {
+    "US500": {
+     "trades": 262,
+     "win_rate": 0.382,
+     "avg_r": 0.092,
+     "sum_r": 24.0,
+     "profit_factor": 1.14,
+     "median_r": -1.02,
+     "worst_r": -1.25
+    },
+    "NAS100": {
+     "trades": 282,
+     "win_rate": 0.351,
+     "avg_r": 0.001,
+     "sum_r": 0.2,
+     "profit_factor": 1.0,
+     "median_r": -1.01,
+     "worst_r": -1.13
+    },
+    "EURUSD": {
+     "trades": 283,
+     "win_rate": 0.346,
+     "avg_r": -0.079,
+     "sum_r": -22.4,
+     "profit_factor": 0.89,
+     "median_r": -1.04,
+     "worst_r": -1.3
+    },
+    "GBPUSD": {
+     "trades": 324,
+     "win_rate": 0.33,
+     "avg_r": -0.101,
+     "sum_r": -32.9,
+     "profit_factor": 0.86,
+     "median_r": -1.04,
+     "worst_r": -1.31
+    },
+    "XAUUSD": {
+     "trades": 284,
+     "win_rate": 0.412,
+     "avg_r": 0.158,
+     "sum_r": 44.9,
+     "profit_factor": 1.26,
+     "median_r": -1.01,
+     "worst_r": -1.15
+    },
+    "XTIUSD": {
+     "trades": 308,
+     "win_rate": 0.357,
+     "avg_r": 0.036,
+     "sum_r": 11.0,
+     "profit_factor": 1.05,
+     "median_r": -1.02,
+     "worst_r": -1.09
+    }
+   },
+   "by_side": {
+    "long": {
+     "trades": 1743,
+     "win_rate": 0.362,
+     "avg_r": 0.014,
+     "sum_r": 24.8,
+     "profit_factor": 1.02,
+     "median_r": -1.02,
+     "worst_r": -1.31
+    },
+    "short": {
+     "trades": 0
+    }
+   },
+   "exits": {
+    "stop": 1096,
+    "objetivo": 587,
+    "tiempo maximo": 60
+   }
+  },
+  {
+   "name": "both|rr2|libre|solo largos",
+   "params": {
+    "strategy": "sr",
+    "timeframe": "H4",
+    "max_hold_days": 7.0,
+    "breakeven_r": 0.0,
+    "sr_mode": "both",
+    "sr_trend": false,
+    "allow_short": false,
+    "sr_target": "rr",
+    "sr_rr": 2.0
+   },
+   "all": {
+    "trades": 1741,
+    "win_rate": 0.362,
+    "avg_r": 0.014,
+    "sum_r": 23.8,
+    "profit_factor": 1.02,
+    "median_r": -1.02,
+    "worst_r": -1.31
+   },
+   "fit": {
+    "trades": 1104,
+    "win_rate": 0.381,
+    "avg_r": 0.07,
+    "sum_r": 77.8,
+    "profit_factor": 1.11,
+    "median_r": -1.02,
+    "worst_r": -1.25
+   },
+   "blind": {
+    "trades": 637,
+    "win_rate": 0.328,
+    "avg_r": -0.085,
+    "sum_r": -53.9,
+    "profit_factor": 0.88,
+    "median_r": -1.02,
+    "worst_r": -1.31
+   },
+   "test": {
+    "n": 1741,
+    "mean_r": 0.014,
+    "ci95": [
+     -0.051,
+     0.08
+    ],
+    "p_value": 0.3371,
+    "win_rate": 0.362,
+    "profit_factor": 1.02,
+    "sum_r": 23.8
+   },
+   "by_symbol": {
+    "US500": {
+     "trades": 260,
+     "win_rate": 0.381,
+     "avg_r": 0.089,
+     "sum_r": 23.0,
+     "profit_factor": 1.14,
+     "median_r": -1.02,
+     "worst_r": -1.25
+    },
+    "NAS100": {
+     "trades": 282,
+     "win_rate": 0.351,
+     "avg_r": 0.001,
+     "sum_r": 0.2,
+     "profit_factor": 1.0,
+     "median_r": -1.01,
+     "worst_r": -1.13
+    },
+    "EURUSD": {
+     "trades": 283,
+     "win_rate": 0.346,
+     "avg_r": -0.079,
+     "sum_r": -22.4,
+     "profit_factor": 0.89,
+     "median_r": -1.04,
+     "worst_r": -1.3
+    },
+    "GBPUSD": {
+     "trades": 324,
+     "win_rate": 0.33,
+     "avg_r": -0.101,
+     "sum_r": -32.9,
+     "profit_factor": 0.86,
+     "median_r": -1.04,
+     "worst_r": -1.31
+    },
+    "XAUUSD": {
+     "trades": 284,
+     "win_rate": 0.412,
+     "avg_r": 0.158,
+     "sum_r": 44.9,
+     "profit_factor": 1.26,
+     "median_r": -1.01,
+     "worst_r": -1.15
+    },
+    "XTIUSD": {
+     "trades": 308,
+     "win_rate": 0.357,
+     "avg_r": 0.036,
+     "sum_r": 11.0,
+     "profit_factor": 1.05,
+     "median_r": -1.02,
+     "worst_r": -1.09
+    }
+   },
+   "by_side": {
+    "long": {
+     "trades": 1741,
+     "win_rate": 0.362,
+     "avg_r": 0.014,
+     "sum_r": 23.8,
+     "profit_factor": 1.02,
+     "median_r": -1.02,
+     "worst_r": -1.31
+    },
+    "short": {
+     "trades": 0
+    }
+   },
+   "exits": {
+    "stop": 1095,
+    "objetivo": 586,
+    "tiempo maximo": 60
+   }
+  },
+  {
+   "name": "bounce|rr2|tendencia|solo largos",
+   "params": {
+    "strategy": "sr",
+    "timeframe": "H4",
+    "max_hold_days": 7.0,
+    "breakeven_r": 0.0,
+    "sr_mode": "bounce",
+    "sr_trend": true,
+    "allow_short": false,
+    "sr_target": "rr",
+    "sr_rr": 2.0
+   },
+   "all": {
+    "trades": 1154,
+    "win_rate": 0.361,
+    "avg_r": -0.005,
+    "sum_r": -6.3,
+    "profit_factor": 0.99,
+    "median_r": -1.02,
+    "worst_r": -1.39
+   },
+   "fit": {
+    "trades": 762,
+    "win_rate": 0.378,
+    "avg_r": 0.054,
+    "sum_r": 41.3,
+    "profit_factor": 1.08,
+    "median_r": -1.02,
+    "worst_r": -1.23
+   },
+   "blind": {
+    "trades": 392,
+    "win_rate": 0.329,
+    "avg_r": -0.121,
+    "sum_r": -47.6,
+    "profit_factor": 0.83,
+    "median_r": -1.02,
+    "worst_r": -1.39
+   },
+   "test": {
+    "n": 1154,
+    "mean_r": -0.005,
+    "ci95": [
+     -0.086,
+     0.077
+    ],
+    "p_value": 0.5544,
+    "win_rate": 0.361,
+    "profit_factor": 0.99,
+    "sum_r": -6.3
+   },
+   "by_symbol": {
+    "US500": {
+     "trades": 197,
+     "win_rate": 0.381,
+     "avg_r": 0.053,
+     "sum_r": 10.5,
+     "profit_factor": 1.08,
+     "median_r": -1.02,
+     "worst_r": -1.17
+    },
+    "NAS100": {
+     "trades": 206,
+     "win_rate": 0.354,
+     "avg_r": -0.019,
+     "sum_r": -3.9,
+     "profit_factor": 0.97,
+     "median_r": -1.01,
+     "worst_r": -1.13
+    },
+    "EURUSD": {
+     "trades": 170,
+     "win_rate": 0.335,
+     "avg_r": -0.129,
+     "sum_r": -22.0,
+     "profit_factor": 0.82,
+     "median_r": -1.04,
+     "worst_r": -1.3
+    },
+    "GBPUSD": {
+     "trades": 209,
+     "win_rate": 0.354,
+     "avg_r": -0.042,
+     "sum_r": -8.8,
+     "profit_factor": 0.94,
+     "median_r": -1.04,
+     "worst_r": -1.39
+    },
+    "XAUUSD": {
+     "trades": 221,
+     "win_rate": 0.394,
+     "avg_r": 0.104,
+     "sum_r": 23.0,
+     "profit_factor": 1.17,
+     "median_r": -1.01,
+     "worst_r": -1.15
+    },
+    "XTIUSD": {
+     "trades": 151,
+     "win_rate": 0.338,
+     "avg_r": -0.034,
+     "sum_r": -5.1,
+     "profit_factor": 0.95,
+     "median_r": -1.01,
+     "worst_r": -1.09
+    }
+   },
+   "by_side": {
+    "long": {
+     "trades": 1154,
+     "win_rate": 0.361,
+     "avg_r": -0.005,
+     "sum_r": -6.3,
+     "profit_factor": 0.99,
+     "median_r": -1.02,
+     "worst_r": -1.39
+    },
+    "short": {
+     "trades": 0
+    }
+   },
+   "exits": {
+    "stop": 732,
+    "objetivo": 374,
+    "tiempo maximo": 48
+   }
+  },
+  {
+   "name": "both|rr2|tendencia|solo largos",
+   "params": {
+    "strategy": "sr",
+    "timeframe": "H4",
+    "max_hold_days": 7.0,
+    "breakeven_r": 0.0,
+    "sr_mode": "both",
+    "sr_trend": true,
+    "allow_short": false,
+    "sr_target": "rr",
+    "sr_rr": 2.0
+   },
+   "all": {
+    "trades": 1152,
+    "win_rate": 0.361,
+    "avg_r": -0.006,
+    "sum_r": -7.3,
+    "profit_factor": 0.99,
+    "median_r": -1.02,
+    "worst_r": -1.39
+   },
+   "fit": {
+    "trades": 762,
+    "win_rate": 0.378,
+    "avg_r": 0.054,
+    "sum_r": 41.3,
+    "profit_factor": 1.08,
+    "median_r": -1.02,
+    "worst_r": -1.23
+   },
+   "blind": {
+    "trades": 390,
+    "win_rate": 0.328,
+    "avg_r": -0.125,
+    "sum_r": -48.6,
+    "profit_factor": 0.82,
+    "median_r": -1.02,
+    "worst_r": -1.39
+   },
+   "test": {
+    "n": 1152,
+    "mean_r": -0.006,
+    "ci95": [
+     -0.087,
+     0.076
+    ],
+    "p_value": 0.5602,
+    "win_rate": 0.361,
+    "profit_factor": 0.99,
+    "sum_r": -7.3
+   },
+   "by_symbol": {
+    "US500": {
+     "trades": 195,
+     "win_rate": 0.379,
+     "avg_r": 0.049,
+     "sum_r": 9.5,
+     "profit_factor": 1.08,
+     "median_r": -1.02,
+     "worst_r": -1.17
+    },
+    "NAS100": {
+     "trades": 206,
+     "win_rate": 0.354,
+     "avg_r": -0.019,
+     "sum_r": -3.9,
+     "profit_factor": 0.97,
+     "median_r": -1.01,
+     "worst_r": -1.13
+    },
+    "EURUSD": {
+     "trades": 170,
+     "win_rate": 0.335,
+     "avg_r": -0.129,
+     "sum_r": -22.0,
+     "profit_factor": 0.82,
+     "median_r": -1.04,
+     "worst_r": -1.3
+    },
+    "GBPUSD": {
+     "trades": 209,
+     "win_rate": 0.354,
+     "avg_r": -0.042,
+     "sum_r": -8.8,
+     "profit_factor": 0.94,
+     "median_r": -1.04,
+     "worst_r": -1.39
+    },
+    "XAUUSD": {
+     "trades": 221,
+     "win_rate": 0.394,
+     "avg_r": 0.104,
+     "sum_r": 23.0,
+     "profit_factor": 1.17,
+     "median_r": -1.01,
+     "worst_r": -1.15
+    },
+    "XTIUSD": {
+     "trades": 151,
+     "win_rate": 0.338,
+     "avg_r": -0.034,
+     "sum_r": -5.1,
+     "profit_factor": 0.95,
+     "median_r": -1.01,
+     "worst_r": -1.09
+    }
+   },
+   "by_side": {
+    "long": {
+     "trades": 1152,
+     "win_rate": 0.361,
+     "avg_r": -0.006,
+     "sum_r": -7.3,
+     "profit_factor": 0.99,
+     "median_r": -1.02,
+     "worst_r": -1.39
+    },
+    "short": {
+     "trades": 0
+    }
+   },
+   "exits": {
+    "stop": 731,
+    "objetivo": 373,
+    "tiempo maximo": 48
+   }
+  },
+  {
+   "name": "retest|rr2|libre|solo largos",
+   "params": {
+    "strategy": "sr",
+    "timeframe": "H4",
+    "max_hold_days": 7.0,
+    "breakeven_r": 0.0,
+    "sr_mode": "retest",
+    "sr_trend": false,
+    "allow_short": false,
+    "sr_target": "rr",
+    "sr_rr": 2.0
+   },
+   "all": {
+    "trades": 1128,
+    "win_rate": 0.359,
+    "avg_r": -0.001,
+    "sum_r": -1.1,
+    "profit_factor": 1.0,
+    "median_r": -1.02,
+    "worst_r": -1.39
+   },
+   "fit": {
+    "trades": 722,
+    "win_rate": 0.374,
+    "avg_r": 0.042,
+    "sum_r": 30.3,
+    "profit_factor": 1.06,
+    "median_r": -1.02,
+    "worst_r": -1.34
+   },
+   "blind": {
+    "trades": 406,
+    "win_rate": 0.333,
+    "avg_r": -0.077,
+    "sum_r": -31.4,
+    "profit_factor": 0.89,
+    "median_r": -1.02,
+    "worst_r": -1.39
+   },
+   "test": {
+    "n": 1128,
+    "mean_r": -0.001,
+    "ci95": [
+     -0.083,
+     0.082
+    ],
+    "p_value": 0.5098,
+    "win_rate": 0.359,
+    "profit_factor": 1.0,
+    "sum_r": -1.1
+   },
+   "by_symbol": {
+    "US500": {
+     "trades": 173,
+     "win_rate": 0.353,
+     "avg_r": -0.007,
+     "sum_r": -1.2,
+     "profit_factor": 0.99,
+     "median_r": -1.02,
+     "worst_r": -1.18
+    },
+    "NAS100": {
+     "trades": 194,
+     "win_rate": 0.294,
+     "avg_r": -0.158,
+     "sum_r": -30.7,
+     "profit_factor": 0.78,
+     "median_r": -1.01,
+     "worst_r": -1.21
+    },
+    "EURUSD": {
+     "trades": 193,
+     "win_rate": 0.368,
+     "avg_r": -0.007,
+     "sum_r": -1.3,
+     "profit_factor": 0.99,
+     "median_r": -1.04,
+     "worst_r": -1.39
+    },
+    "GBPUSD": {
+     "trades": 211,
+     "win_rate": 0.346,
+     "avg_r": -0.073,
+     "sum_r": -15.4,
+     "profit_factor": 0.9,
+     "median_r": -1.04,
+     "worst_r": -1.34
+    },
+    "XAUUSD": {
+     "trades": 178,
+     "win_rate": 0.416,
+     "avg_r": 0.166,
+     "sum_r": 29.5,
+     "profit_factor": 1.28,
+     "median_r": -1.01,
+     "worst_r": -1.12
+    },
+    "XTIUSD": {
+     "trades": 179,
+     "win_rate": 0.385,
+     "avg_r": 0.101,
+     "sum_r": 18.0,
+     "profit_factor": 1.16,
+     "median_r": -1.02,
+     "worst_r": -1.08
+    }
+   },
+   "by_side": {
+    "long": {
+     "trades": 1128,
+     "win_rate": 0.359,
+     "avg_r": -0.001,
+     "sum_r": -1.1,
+     "profit_factor": 1.0,
+     "median_r": -1.02,
+     "worst_r": -1.39
+    },
+    "short": {
+     "trades": 0
+    }
+   },
+   "exits": {
+    "stop": 714,
+    "objetivo": 372,
+    "tiempo maximo": 42
+   }
+  },
+  {
+   "name": "bounce|level|tendencia|solo largos",
+   "params": {
+    "strategy": "sr",
+    "timeframe": "H4",
+    "max_hold_days": 7.0,
+    "breakeven_r": 0.0,
+    "sr_mode": "bounce",
+    "sr_trend": true,
+    "allow_short": false,
+    "sr_target": "level",
+    "sr_min_rr": 1.5
+   },
+   "all": {
+    "trades": 212,
+    "win_rate": 0.387,
+    "avg_r": 0.119,
+    "sum_r": 25.2,
+    "profit_factor": 1.19,
+    "median_r": -1.02,
+    "worst_r": -1.19
+   },
+   "fit": {
+    "trades": 140,
+    "win_rate": 0.357,
+    "avg_r": 0.038,
+    "sum_r": 5.3,
+    "profit_factor": 1.06,
+    "median_r": -1.02,
+    "worst_r": -1.13
+   },
+   "blind": {
+    "trades": 72,
+    "win_rate": 0.444,
+    "avg_r": 0.276,
+    "sum_r": 19.9,
+    "profit_factor": 1.48,
+    "median_r": -1.01,
+    "worst_r": -1.19
+   },
+   "test": {
+    "n": 212,
+    "mean_r": 0.119,
+    "ci95": [
+     -0.086,
+     0.328
+    ],
+    "p_value": 0.13,
+    "win_rate": 0.387,
+    "profit_factor": 1.19,
+    "sum_r": 25.2
+   },
+   "by_symbol": {
+    "US500": {
+     "trades": 30,
+     "win_rate": 0.2,
+     "avg_r": -0.469,
+     "sum_r": -14.1,
+     "profit_factor": 0.43,
+     "median_r": -1.03,
+     "worst_r": -1.07
+    },
+    "NAS100": {
+     "trades": 31,
+     "win_rate": 0.226,
+     "avg_r": -0.411,
+     "sum_r": -12.8,
+     "profit_factor": 0.48,
+     "median_r": -1.02,
+     "worst_r": -1.11
+    },
+    "EURUSD": {
+     "trades": 30,
+     "win_rate": 0.467,
+     "avg_r": 0.28,
+     "sum_r": 8.4,
+     "profit_factor": 1.49,
+     "median_r": -1.03,
+     "worst_r": -1.19
+    },
+    "GBPUSD": {
+     "trades": 46,
+     "win_rate": 0.587,
+     "avg_r": 0.739,
+     "sum_r": 34.0,
+     "profit_factor": 2.68,
+     "median_r": 1.53,
+     "worst_r": -1.11
+    },
+    "XAUUSD": {
+     "trades": 46,
+     "win_rate": 0.348,
+     "avg_r": 0.054,
+     "sum_r": 2.5,
+     "profit_factor": 1.08,
+     "median_r": -1.01,
+     "worst_r": -1.13
+    },
+    "XTIUSD": {
+     "trades": 29,
+     "win_rate": 0.414,
+     "avg_r": 0.246,
+     "sum_r": 7.1,
+     "profit_factor": 1.41,
+     "median_r": -1.01,
+     "worst_r": -1.05
+    }
+   },
+   "by_side": {
+    "long": {
+     "trades": 212,
+     "win_rate": 0.387,
+     "avg_r": 0.119,
+     "sum_r": 25.2,
+     "profit_factor": 1.19,
+     "median_r": -1.02,
+     "worst_r": -1.19
+    },
+    "short": {
+     "trades": 0
+    }
+   },
+   "exits": {
+    "stop": 130,
+    "objetivo": 79,
+    "tiempo maximo": 3
+   }
+  },
+  {
+   "name": "both|level|tendencia|solo largos",
+   "params": {
+    "strategy": "sr",
+    "timeframe": "H4",
+    "max_hold_days": 7.0,
+    "breakeven_r": 0.0,
+    "sr_mode": "both",
+    "sr_trend": true,
+    "allow_short": false,
+    "sr_target": "level",
+    "sr_min_rr": 1.5
+   },
+   "all": {
+    "trades": 212,
+    "win_rate": 0.387,
+    "avg_r": 0.119,
+    "sum_r": 25.2,
+    "profit_factor": 1.19,
+    "median_r": -1.02,
+    "worst_r": -1.19
+   },
+   "fit": {
+    "trades": 140,
+    "win_rate": 0.357,
+    "avg_r": 0.038,
+    "sum_r": 5.3,
+    "profit_factor": 1.06,
+    "median_r": -1.02,
+    "worst_r": -1.13
+   },
+   "blind": {
+    "trades": 72,
+    "win_rate": 0.444,
+    "avg_r": 0.276,
+    "sum_r": 19.9,
+    "profit_factor": 1.48,
+    "median_r": -1.01,
+    "worst_r": -1.19
+   },
+   "test": {
+    "n": 212,
+    "mean_r": 0.119,
+    "ci95": [
+     -0.086,
+     0.328
+    ],
+    "p_value": 0.13,
+    "win_rate": 0.387,
+    "profit_factor": 1.19,
+    "sum_r": 25.2
+   },
+   "by_symbol": {
+    "US500": {
+     "trades": 30,
+     "win_rate": 0.2,
+     "avg_r": -0.469,
+     "sum_r": -14.1,
+     "profit_factor": 0.43,
+     "median_r": -1.03,
+     "worst_r": -1.07
+    },
+    "NAS100": {
+     "trades": 31,
+     "win_rate": 0.226,
+     "avg_r": -0.411,
+     "sum_r": -12.8,
+     "profit_factor": 0.48,
+     "median_r": -1.02,
+     "worst_r": -1.11
+    },
+    "EURUSD": {
+     "trades": 30,
+     "win_rate": 0.467,
+     "avg_r": 0.28,
+     "sum_r": 8.4,
+     "profit_factor": 1.49,
+     "median_r": -1.03,
+     "worst_r": -1.19
+    },
+    "GBPUSD": {
+     "trades": 46,
+     "win_rate": 0.587,
+     "avg_r": 0.739,
+     "sum_r": 34.0,
+     "profit_factor": 2.68,
+     "median_r": 1.53,
+     "worst_r": -1.11
+    },
+    "XAUUSD": {
+     "trades": 46,
+     "win_rate": 0.348,
+     "avg_r": 0.054,
+     "sum_r": 2.5,
+     "profit_factor": 1.08,
+     "median_r": -1.01,
+     "worst_r": -1.13
+    },
+    "XTIUSD": {
+     "trades": 29,
+     "win_rate": 0.414,
+     "avg_r": 0.246,
+     "sum_r": 7.1,
+     "profit_factor": 1.41,
+     "median_r": -1.01,
+     "worst_r": -1.05
+    }
+   },
+   "by_side": {
+    "long": {
+     "trades": 212,
+     "win_rate": 0.387,
+     "avg_r": 0.119,
+     "sum_r": 25.2,
+     "profit_factor": 1.19,
+     "median_r": -1.02,
+     "worst_r": -1.19
+    },
+    "short": {
+     "trades": 0
+    }
+   },
+   "exits": {
+    "stop": 130,
+    "objetivo": 79,
+    "tiempo maximo": 3
+   }
+  },
+  {
+   "name": "retest|rr2|tendencia|solo largos",
+   "params": {
+    "strategy": "sr",
+    "timeframe": "H4",
+    "max_hold_days": 7.0,
+    "breakeven_r": 0.0,
+    "sr_mode": "retest",
+    "sr_trend": true,
+    "allow_short": false,
+    "sr_target": "rr",
+    "sr_rr": 2.0
+   },
+   "all": {
+    "trades": 771,
+    "win_rate": 0.367,
+    "avg_r": 0.014,
+    "sum_r": 11.2,
+    "profit_factor": 1.02,
+    "median_r": -1.02,
+    "worst_r": -1.39
+   },
+   "fit": {
+    "trades": 526,
+    "win_rate": 0.371,
+    "avg_r": 0.032,
+    "sum_r": 16.8,
+    "profit_factor": 1.05,
+    "median_r": -1.02,
+    "worst_r": -1.22
+   },
+   "blind": {
+    "trades": 245,
+    "win_rate": 0.359,
+    "avg_r": -0.023,
+    "sum_r": -5.7,
+    "profit_factor": 0.97,
+    "median_r": -1.01,
+    "worst_r": -1.39
+   },
+   "test": {
+    "n": 771,
+    "mean_r": 0.014,
+    "ci95": [
+     -0.085,
+     0.115
+    ],
+    "p_value": 0.3859,
+    "win_rate": 0.367,
+    "profit_factor": 1.02,
+    "sum_r": 11.2
+   },
+   "by_symbol": {
+    "US500": {
+     "trades": 139,
+     "win_rate": 0.388,
+     "avg_r": 0.077,
+     "sum_r": 10.7,
+     "profit_factor": 1.12,
+     "median_r": -1.02,
+     "worst_r": -1.16
+    },
+    "NAS100": {
+     "trades": 151,
+     "win_rate": 0.278,
+     "avg_r": -0.214,
+     "sum_r": -32.3,
+     "profit_factor": 0.71,
+     "median_r": -1.02,
+     "worst_r": -1.21
+    },
+    "EURUSD": {
+     "trades": 119,
+     "win_rate": 0.403,
+     "avg_r": 0.085,
+     "sum_r": 10.1,
+     "profit_factor": 1.13,
+     "median_r": -1.03,
+     "worst_r": -1.3
+    },
+    "GBPUSD": {
+     "trades": 137,
+     "win_rate": 0.336,
+     "avg_r": -0.09,
+     "sum_r": -12.3,
+     "profit_factor": 0.87,
+     "median_r": -1.04,
+     "worst_r": -1.39
+    },
+    "XAUUSD": {
+     "trades": 142,
+     "win_rate": 0.401,
+     "avg_r": 0.118,
+     "sum_r": 16.8,
+     "profit_factor": 1.19,
+     "median_r": -1.01,
+     "worst_r": -1.12
+    },
+    "XTIUSD": {
+     "trades": 83,
+     "win_rate": 0.434,
+     "avg_r": 0.22,
+     "sum_r": 18.2,
+     "profit_factor": 1.38,
+     "median_r": -1.01,
+     "worst_r": -1.08
+    }
+   },
+   "by_side": {
+    "long": {
+     "trades": 771,
+     "win_rate": 0.367,
+     "avg_r": 0.014,
+     "sum_r": 11.2,
+     "profit_factor": 1.02,
+     "median_r": -1.02,
+     "worst_r": -1.39
+    },
+    "short": {
+     "trades": 0
+    }
+   },
+   "exits": {
+    "stop": 482,
+    "objetivo": 254,
+    "tiempo maximo": 35
+   }
+  },
+  {
+   "name": "retest|level|libre|largo+corto",
+   "params": {
+    "strategy": "sr",
+    "timeframe": "H4",
+    "max_hold_days": 7.0,
+    "breakeven_r": 0.0,
+    "sr_mode": "retest",
+    "sr_trend": false,
+    "allow_short": true,
+    "sr_target": "level",
+    "sr_min_rr": 1.5
+   },
+   "all": {
+    "trades": 359,
+    "win_rate": 0.312,
+    "avg_r": -0.096,
+    "sum_r": -34.4,
+    "profit_factor": 0.87,
+    "median_r": -1.03,
+    "worst_r": -1.33
+   },
+   "fit": {
+    "trades": 220,
+    "win_rate": 0.341,
+    "avg_r": 0.004,
+    "sum_r": 0.8,
+    "profit_factor": 1.01,
+    "median_r": -1.03,
+    "worst_r": -1.33
+   },
+   "blind": {
+    "trades": 139,
+    "win_rate": 0.266,
+    "avg_r": -0.253,
+    "sum_r": -35.2,
+    "profit_factor": 0.67,
+    "median_r": -1.02,
+    "worst_r": -1.29
+   },
+   "test": {
+    "n": 359,
+    "mean_r": -0.096,
+    "ci95": [
+     -0.243,
+     0.061
+    ],
+    "p_value": 0.8956,
+    "win_rate": 0.312,
+    "profit_factor": 0.87,
+    "sum_r": -34.4
+   },
+   "by_symbol": {
+    "US500": {
+     "trades": 48,
+     "win_rate": 0.208,
+     "avg_r": -0.399,
+     "sum_r": -19.2,
+     "profit_factor": 0.52,
+     "median_r": -1.03,
+     "worst_r": -1.12
+    },
+    "NAS100": {
+     "trades": 36,
+     "win_rate": 0.25,
+     "avg_r": -0.151,
+     "sum_r": -5.5,
+     "profit_factor": 0.8,
+     "median_r": -1.02,
+     "worst_r": -1.11
+    },
+    "EURUSD": {
+     "trades": 68,
+     "win_rate": 0.279,
+     "avg_r": -0.263,
+     "sum_r": -17.9,
+     "profit_factor": 0.66,
+     "median_r": -1.05,
+     "worst_r": -1.33
+    },
+    "GBPUSD": {
+     "trades": 87,
+     "win_rate": 0.391,
+     "avg_r": 0.09,
+     "sum_r": 7.8,
+     "profit_factor": 1.14,
+     "median_r": -1.04,
+     "worst_r": -1.22
+    },
+    "XAUUSD": {
+     "trades": 59,
+     "win_rate": 0.322,
+     "avg_r": -0.025,
+     "sum_r": -1.5,
+     "profit_factor": 0.96,
+     "median_r": -1.02,
+     "worst_r": -1.12
+    },
+    "XTIUSD": {
+     "trades": 61,
+     "win_rate": 0.344,
+     "avg_r": 0.03,
+     "sum_r": 1.8,
+     "profit_factor": 1.05,
+     "median_r": -1.02,
+     "worst_r": -1.07
+    }
+   },
+   "by_side": {
+    "long": {
+     "trades": 145,
+     "win_rate": 0.386,
+     "avg_r": 0.129,
+     "sum_r": 18.8,
+     "profit_factor": 1.2,
+     "median_r": -1.02,
+     "worst_r": -1.27
+    },
+    "short": {
+     "trades": 214,
+     "win_rate": 0.262,
+     "avg_r": -0.248,
+     "sum_r": -53.1,
+     "profit_factor": 0.68,
+     "median_r": -1.03,
+     "worst_r": -1.33
+    }
+   },
+   "exits": {
+    "stop": 246,
+    "objetivo": 110,
+    "tiempo maximo": 3
+   }
+  },
+  {
+   "name": "retest|rr3|tendencia|largo+corto",
+   "params": {
+    "strategy": "sr",
+    "timeframe": "H4",
+    "max_hold_days": 7.0,
+    "breakeven_r": 0.0,
+    "sr_mode": "retest",
+    "sr_trend": true,
+    "allow_short": true,
+    "sr_target": "rr",
+    "sr_rr": 3.0
+   },
+   "all": {
+    "trades": 1142,
+    "win_rate": 0.278,
+    "avg_r": -0.04,
+    "sum_r": -45.7,
+    "profit_factor": 0.95,
+    "median_r": -1.02,
+    "worst_r": -1.34
+   },
+   "fit": {
+    "trades": 743,
+    "win_rate": 0.283,
+    "avg_r": -0.008,
+    "sum_r": -6.0,
+    "profit_factor": 0.99,
+    "median_r": -1.02,
+    "worst_r": -1.34
+   },
+   "blind": {
+    "trades": 399,
+    "win_rate": 0.268,
+    "avg_r": -0.099,
+    "sum_r": -39.7,
+    "profit_factor": 0.87,
+    "median_r": -1.02,
+    "worst_r": -1.32
+   },
+   "test": {
+    "n": 1142,
+    "mean_r": -0.04,
+    "ci95": [
+     -0.136,
+     0.058
+    ],
+    "p_value": 0.7919,
+    "win_rate": 0.278,
+    "profit_factor": 0.95,
+    "sum_r": -45.7
+   },
+   "by_symbol": {
+    "US500": {
+     "trades": 181,
+     "win_rate": 0.343,
+     "avg_r": 0.238,
+     "sum_r": 43.0,
+     "profit_factor": 1.35,
+     "median_r": -1.02,
+     "worst_r": -1.28
+    },
+    "NAS100": {
+     "trades": 196,
+     "win_rate": 0.224,
+     "avg_r": -0.212,
+     "sum_r": -41.5,
+     "profit_factor": 0.73,
+     "median_r": -1.02,
+     "worst_r": -1.21
+    },
+    "EURUSD": {
+     "trades": 185,
+     "win_rate": 0.281,
+     "avg_r": -0.06,
+     "sum_r": -11.1,
+     "profit_factor": 0.92,
+     "median_r": -1.04,
+     "worst_r": -1.34
+    },
+    "GBPUSD": {
+     "trades": 210,
+     "win_rate": 0.262,
+     "avg_r": -0.135,
+     "sum_r": -28.4,
+     "profit_factor": 0.83,
+     "median_r": -1.04,
+     "worst_r": -1.32
+    },
+    "XAUUSD": {
+     "trades": 190,
+     "win_rate": 0.268,
+     "avg_r": -0.066,
+     "sum_r": -12.5,
+     "profit_factor": 0.91,
+     "median_r": -1.02,
+     "worst_r": -1.15
+    },
+    "XTIUSD": {
+     "trades": 180,
+     "win_rate": 0.294,
+     "avg_r": 0.027,
+     "sum_r": 4.9,
+     "profit_factor": 1.04,
+     "median_r": -1.02,
+     "worst_r": -1.09
+    }
+   },
+   "by_side": {
+    "long": {
+     "trades": 681,
+     "win_rate": 0.314,
+     "avg_r": 0.084,
+     "sum_r": 57.1,
+     "profit_factor": 1.12,
+     "median_r": -1.02,
+     "worst_r": -1.32
+    },
+    "short": {
+     "trades": 461,
+     "win_rate": 0.223,
+     "avg_r": -0.223,
+     "sum_r": -102.8,
+     "profit_factor": 0.72,
+     "median_r": -1.02,
+     "worst_r": -1.34
+    }
+   },
+   "exits": {
+    "stop": 810,
+    "objetivo": 253,
+    "tiempo maximo": 79
+   }
+  },
+  {
+   "name": "retest|rr3|libre|largo+corto",
+   "params": {
+    "strategy": "sr",
+    "timeframe": "H4",
+    "max_hold_days": 7.0,
+    "breakeven_r": 0.0,
+    "sr_mode": "retest",
+    "sr_trend": false,
+    "allow_short": true,
+    "sr_target": "rr",
+    "sr_rr": 3.0
+   },
+   "all": {
+    "trades": 1416,
+    "win_rate": 0.27,
+    "avg_r": -0.061,
+    "sum_r": -85.7,
+    "profit_factor": 0.92,
+    "median_r": -1.02,
+    "worst_r": -1.5
+   },
+   "fit": {
+    "trades": 886,
+    "win_rate": 0.282,
+    "avg_r": -0.018,
+    "sum_r": -16.3,
+    "profit_factor": 0.98,
+    "median_r": -1.03,
+    "worst_r": -1.34
+   },
+   "blind": {
+    "trades": 530,
+    "win_rate": 0.251,
+    "avg_r": -0.131,
+    "sum_r": -69.4,
+    "profit_factor": 0.83,
+    "median_r": -1.02,
+    "worst_r": -1.5
+   },
+   "test": {
+    "n": 1416,
+    "mean_r": -0.061,
+    "ci95": [
+     -0.145,
+     0.028
+    ],
+    "p_value": 0.9149,
+    "win_rate": 0.27,
+    "profit_factor": 0.92,
+    "sum_r": -85.7
+   },
+   "by_symbol": {
+    "US500": {
+     "trades": 226,
+     "win_rate": 0.288,
+     "avg_r": 0.063,
+     "sum_r": 14.3,
+     "profit_factor": 1.09,
+     "median_r": -1.02,
+     "worst_r": -1.16
+    },
+    "NAS100": {
+     "trades": 240,
+     "win_rate": 0.225,
+     "avg_r": -0.22,
+     "sum_r": -52.7,
+     "profit_factor": 0.72,
+     "median_r": -1.02,
+     "worst_r": -1.21
+    },
+    "EURUSD": {
+     "trades": 249,
+     "win_rate": 0.241,
+     "avg_r": -0.193,
+     "sum_r": -48.2,
+     "profit_factor": 0.76,
+     "median_r": -1.05,
+     "worst_r": -1.39
+    },
+    "GBPUSD": {
+     "trades": 250,
+     "win_rate": 0.272,
+     "avg_r": -0.103,
+     "sum_r": -25.8,
+     "profit_factor": 0.87,
+     "median_r": -1.04,
+     "worst_r": -1.5
+    },
+    "XAUUSD": {
+     "trades": 220,
+     "win_rate": 0.309,
+     "avg_r": 0.069,
+     "sum_r": 15.3,
+     "profit_factor": 1.1,
+     "median_r": -1.02,
+     "worst_r": -1.15
+    },
+    "XTIUSD": {
+     "trades": 231,
+     "win_rate": 0.294,
+     "avg_r": 0.049,
+     "sum_r": 11.4,
+     "profit_factor": 1.07,
+     "median_r": -1.02,
+     "worst_r": -1.09
+    }
+   },
+   "by_side": {
+    "long": {
+     "trades": 730,
+     "win_rate": 0.308,
+     "avg_r": 0.046,
+     "sum_r": 33.7,
+     "profit_factor": 1.06,
+     "median_r": -1.02,
+     "worst_r": -1.39
+    },
+    "short": {
+     "trades": 686,
+     "win_rate": 0.23,
+     "avg_r": -0.174,
+     "sum_r": -119.4,
+     "profit_factor": 0.78,
+     "median_r": -1.03,
+     "worst_r": -1.5
+    }
+   },
+   "exits": {
+    "stop": 1014,
+    "objetivo": 309,
+    "tiempo maximo": 93
+   }
+  },
+  {
+   "name": "bounce|level|libre|largo+corto",
+   "params": {
+    "strategy": "sr",
+    "timeframe": "H4",
+    "max_hold_days": 7.0,
+    "breakeven_r": 0.0,
+    "sr_mode": "bounce",
+    "sr_trend": false,
+    "allow_short": true,
+    "sr_target": "level",
+    "sr_min_rr": 1.5
+   },
+   "all": {
+    "trades": 734,
+    "win_rate": 0.334,
+    "avg_r": -0.048,
+    "sum_r": -35.2,
+    "profit_factor": 0.93,
+    "median_r": -1.02,
+    "worst_r": -1.42
+   },
+   "fit": {
+    "trades": 447,
+    "win_rate": 0.338,
+    "avg_r": -0.031,
+    "sum_r": -13.7,
+    "profit_factor": 0.96,
+    "median_r": -1.03,
+    "worst_r": -1.42
+   },
+   "blind": {
+    "trades": 287,
+    "win_rate": 0.328,
+    "avg_r": -0.075,
+    "sum_r": -21.5,
+    "profit_factor": 0.89,
+    "median_r": -1.02,
+    "worst_r": -1.3
+   },
+   "test": {
+    "n": 734,
+    "mean_r": -0.048,
+    "ci95": [
+     -0.153,
+     0.062
+    ],
+    "p_value": 0.8085,
+    "win_rate": 0.334,
+    "profit_factor": 0.93,
+    "sum_r": -35.2
+   },
+   "by_symbol": {
+    "US500": {
+     "trades": 100,
+     "win_rate": 0.24,
+     "avg_r": -0.307,
+     "sum_r": -30.7,
+     "profit_factor": 0.61,
+     "median_r": -1.03,
+     "worst_r": -1.23
+    },
+    "NAS100": {
+     "trades": 100,
+     "win_rate": 0.29,
+     "avg_r": -0.119,
+     "sum_r": -11.9,
+     "profit_factor": 0.84,
+     "median_r": -1.02,
+     "worst_r": -1.11
+    },
+    "EURUSD": {
+     "trades": 132,
+     "win_rate": 0.333,
+     "avg_r": -0.169,
+     "sum_r": -22.3,
+     "profit_factor": 0.77,
+     "median_r": -1.05,
+     "worst_r": -1.33
+    },
+    "GBPUSD": {
+     "trades": 142,
+     "win_rate": 0.401,
+     "avg_r": 0.156,
+     "sum_r": 22.1,
+     "profit_factor": 1.24,
+     "median_r": -1.04,
+     "worst_r": -1.42
+    },
+    "XAUUSD": {
+     "trades": 117,
+     "win_rate": 0.35,
+     "avg_r": 0.024,
+     "sum_r": 2.8,
+     "profit_factor": 1.04,
+     "median_r": -1.01,
+     "worst_r": -1.13
+    },
+    "XTIUSD": {
+     "trades": 143,
+     "win_rate": 0.35,
+     "avg_r": 0.033,
+     "sum_r": 4.8,
+     "profit_factor": 1.05,
+     "median_r": -1.02,
+     "worst_r": -1.08
+    }
+   },
+   "by_side": {
+    "long": {
+     "trades": 305,
+     "win_rate": 0.393,
+     "avg_r": 0.141,
+     "sum_r": 43.0,
+     "profit_factor": 1.22,
+     "median_r": -1.02,
+     "worst_r": -1.42
+    },
+    "short": {
+     "trades": 429,
+     "win_rate": 0.291,
+     "avg_r": -0.182,
+     "sum_r": -78.2,
+     "profit_factor": 0.76,
+     "median_r": -1.03,
+     "worst_r": -1.33
+    }
+   },
+   "exits": {
+    "stop": 488,
+    "objetivo": 238,
+    "tiempo maximo": 8
+   }
+  },
+  {
+   "name": "both|level|libre|largo+corto",
+   "params": {
+    "strategy": "sr",
+    "timeframe": "H4",
+    "max_hold_days": 7.0,
+    "breakeven_r": 0.0,
+    "sr_mode": "both",
+    "sr_trend": false,
+    "allow_short": true,
+    "sr_target": "level",
+    "sr_min_rr": 1.5
+   },
+   "all": {
+    "trades": 734,
+    "win_rate": 0.334,
+    "avg_r": -0.048,
+    "sum_r": -35.2,
+    "profit_factor": 0.93,
+    "median_r": -1.02,
+    "worst_r": -1.42
+   },
+   "fit": {
+    "trades": 447,
+    "win_rate": 0.338,
+    "avg_r": -0.031,
+    "sum_r": -13.7,
+    "profit_factor": 0.96,
+    "median_r": -1.03,
+    "worst_r": -1.42
+   },
+   "blind": {
+    "trades": 287,
+    "win_rate": 0.328,
+    "avg_r": -0.075,
+    "sum_r": -21.5,
+    "profit_factor": 0.89,
+    "median_r": -1.02,
+    "worst_r": -1.3
+   },
+   "test": {
+    "n": 734,
+    "mean_r": -0.048,
+    "ci95": [
+     -0.153,
+     0.062
+    ],
+    "p_value": 0.8085,
+    "win_rate": 0.334,
+    "profit_factor": 0.93,
+    "sum_r": -35.2
+   },
+   "by_symbol": {
+    "US500": {
+     "trades": 100,
+     "win_rate": 0.24,
+     "avg_r": -0.307,
+     "sum_r": -30.7,
+     "profit_factor": 0.61,
+     "median_r": -1.03,
+     "worst_r": -1.23
+    },
+    "NAS100": {
+     "trades": 100,
+     "win_rate": 0.29,
+     "avg_r": -0.119,
+     "sum_r": -11.9,
+     "profit_factor": 0.84,
+     "median_r": -1.02,
+     "worst_r": -1.11
+    },
+    "EURUSD": {
+     "trades": 132,
+     "win_rate": 0.333,
+     "avg_r": -0.169,
+     "sum_r": -22.3,
+     "profit_factor": 0.77,
+     "median_r": -1.05,
+     "worst_r": -1.33
+    },
+    "GBPUSD": {
+     "trades": 142,
+     "win_rate": 0.401,
+     "avg_r": 0.156,
+     "sum_r": 22.1,
+     "profit_factor": 1.24,
+     "median_r": -1.04,
+     "worst_r": -1.42
+    },
+    "XAUUSD": {
+     "trades": 117,
+     "win_rate": 0.35,
+     "avg_r": 0.024,
+     "sum_r": 2.8,
+     "profit_factor": 1.04,
+     "median_r": -1.01,
+     "worst_r": -1.13
+    },
+    "XTIUSD": {
+     "trades": 143,
+     "win_rate": 0.35,
+     "avg_r": 0.033,
+     "sum_r": 4.8,
+     "profit_factor": 1.05,
+     "median_r": -1.02,
+     "worst_r": -1.08
+    }
+   },
+   "by_side": {
+    "long": {
+     "trades": 305,
+     "win_rate": 0.393,
+     "avg_r": 0.141,
+     "sum_r": 43.0,
+     "profit_factor": 1.22,
+     "median_r": -1.02,
+     "worst_r": -1.42
+    },
+    "short": {
+     "trades": 429,
+     "win_rate": 0.291,
+     "avg_r": -0.182,
+     "sum_r": -78.2,
+     "profit_factor": 0.76,
+     "median_r": -1.03,
+     "worst_r": -1.33
+    }
+   },
+   "exits": {
+    "stop": 488,
+    "objetivo": 238,
+    "tiempo maximo": 8
+   }
+  },
+  {
+   "name": "retest|rr2|libre|largo+corto",
+   "params": {
+    "strategy": "sr",
+    "timeframe": "H4",
+    "max_hold_days": 7.0,
+    "breakeven_r": 0.0,
+    "sr_mode": "retest",
+    "sr_trend": false,
+    "allow_short": true,
+    "sr_target": "rr",
+    "sr_rr": 2.0
+   },
+   "all": {
+    "trades": 1647,
+    "win_rate": 0.33,
+    "avg_r": -0.081,
+    "sum_r": -133.1,
+    "profit_factor": 0.88,
+    "median_r": -1.02,
+    "worst_r": -1.39
+   },
+   "fit": {
+    "trades": 1027,
+    "win_rate": 0.343,
+    "avg_r": -0.044,
+    "sum_r": -45.1,
+    "profit_factor": 0.94,
+    "median_r": -1.02,
+    "worst_r": -1.28
+   },
+   "blind": {
+    "trades": 620,
+    "win_rate": 0.308,
+    "avg_r": -0.142,
+    "sum_r": -88.0,
+    "profit_factor": 0.8,
+    "median_r": -1.02,
+    "worst_r": -1.39
+   },
+   "test": {
+    "n": 1647,
+    "mean_r": -0.081,
+    "ci95": [
+     -0.146,
+     -0.014
+    ],
+    "p_value": 0.9919,
+    "win_rate": 0.33,
+    "profit_factor": 0.88,
+    "sum_r": -133.1
+   },
+   "by_symbol": {
+    "US500": {
+     "trades": 240,
+     "win_rate": 0.317,
+     "avg_r": -0.107,
+     "sum_r": -25.8,
+     "profit_factor": 0.85,
+     "median_r": -1.02,
+     "worst_r": -1.16
+    },
+    "NAS100": {
+     "trades": 296,
+     "win_rate": 0.28,
+     "avg_r": -0.192,
+     "sum_r": -56.8,
+     "profit_factor": 0.74,
+     "median_r": -1.01,
+     "worst_r": -1.21
+    },
+    "EURUSD": {
+     "trades": 289,
+     "win_rate": 0.332,
+     "avg_r": -0.112,
+     "sum_r": -32.5,
+     "profit_factor": 0.84,
+     "median_r": -1.04,
+     "worst_r": -1.39
+    },
+    "GBPUSD": {
+     "trades": 290,
+     "win_rate": 0.348,
+     "avg_r": -0.057,
+     "sum_r": -16.5,
+     "profit_factor": 0.92,
+     "median_r": -1.04,
+     "worst_r": -1.28
+    },
+    "XAUUSD": {
+     "trades": 259,
+     "win_rate": 0.371,
+     "avg_r": 0.042,
+     "sum_r": 10.8,
+     "profit_factor": 1.06,
+     "median_r": -1.01,
+     "worst_r": -1.12
+    },
+    "XTIUSD": {
+     "trades": 273,
+     "win_rate": 0.333,
+     "avg_r": -0.045,
+     "sum_r": -12.3,
+     "profit_factor": 0.93,
+     "median_r": -1.02,
+     "worst_r": -1.08
+    }
+   },
+   "by_side": {
+    "long": {
+     "trades": 853,
+     "win_rate": 0.368,
+     "avg_r": 0.02,
+     "sum_r": 16.8,
+     "profit_factor": 1.03,
+     "median_r": -1.02,
+     "worst_r": -1.39
+    },
+    "short": {
+     "trades": 794,
+     "win_rate": 0.288,
+     "avg_r": -0.189,
+     "sum_r": -149.9,
+     "profit_factor": 0.74,
+     "median_r": -1.02,
+     "worst_r": -1.29
+    }
+   },
+   "exits": {
+    "stop": 1085,
+    "objetivo": 506,
+    "tiempo maximo": 56
+   }
+  },
+  {
+   "name": "bounce|rr3|libre|largo+corto",
+   "params": {
+    "strategy": "sr",
+    "timeframe": "H4",
+    "max_hold_days": 7.0,
+    "breakeven_r": 0.0,
+    "sr_mode": "bounce",
+    "sr_trend": false,
+    "allow_short": true,
+    "sr_target": "rr",
+    "sr_rr": 3.0
+   },
+   "all": {
+    "trades": 1702,
+    "win_rate": 0.261,
+    "avg_r": -0.1,
+    "sum_r": -169.7,
+    "profit_factor": 0.87,
+    "median_r": -1.02,
+    "worst_r": -1.5
+   },
+   "fit": {
+    "trades": 1084,
+    "win_rate": 0.271,
+    "avg_r": -0.057,
+    "sum_r": -61.7,
+    "profit_factor": 0.92,
+    "median_r": -1.03,
+    "worst_r": -1.38
+   },
+   "blind": {
+    "trades": 618,
+    "win_rate": 0.243,
+    "avg_r": -0.175,
+    "sum_r": -108.0,
+    "profit_factor": 0.78,
+    "median_r": -1.02,
+    "worst_r": -1.5
+   },
+   "test": {
+    "n": 1702,
+    "mean_r": -0.1,
+    "ci95": [
+     -0.177,
+     -0.021
+    ],
+    "p_value": 0.9951,
+    "win_rate": 0.261,
+    "profit_factor": 0.87,
+    "sum_r": -169.7
+   },
+   "by_symbol": {
+    "US500": {
+     "trades": 275,
+     "win_rate": 0.287,
+     "avg_r": 0.018,
+     "sum_r": 5.0,
+     "profit_factor": 1.02,
+     "median_r": -1.02,
+     "worst_r": -1.16
+    },
+    "NAS100": {
+     "trades": 266,
+     "win_rate": 0.256,
+     "avg_r": -0.11,
+     "sum_r": -29.3,
+     "profit_factor": 0.86,
+     "median_r": -1.02,
+     "worst_r": -1.18
+    },
+    "EURUSD": {
+     "trades": 293,
+     "win_rate": 0.256,
+     "avg_r": -0.154,
+     "sum_r": -45.2,
+     "profit_factor": 0.81,
+     "median_r": -1.05,
+     "worst_r": -1.41
+    },
+    "GBPUSD": {
+     "trades": 301,
+     "win_rate": 0.216,
+     "avg_r": -0.303,
+     "sum_r": -91.1,
+     "profit_factor": 0.64,
+     "median_r": -1.04,
+     "worst_r": -1.5
+    },
+    "XAUUSD": {
+     "trades": 282,
+     "win_rate": 0.266,
+     "avg_r": -0.032,
+     "sum_r": -9.1,
+     "profit_factor": 0.96,
+     "median_r": -1.02,
+     "worst_r": -1.2
+    },
+    "XTIUSD": {
+     "trades": 285,
+     "win_rate": 0.288,
+     "avg_r": 0.0,
+     "sum_r": 0.1,
+     "profit_factor": 1.0,
+     "median_r": -1.02,
+     "worst_r": -1.1
+    }
+   },
+   "by_side": {
+    "long": {
+     "trades": 920,
+     "win_rate": 0.295,
+     "avg_r": 0.004,
+     "sum_r": 4.0,
+     "profit_factor": 1.01,
+     "median_r": -1.02,
+     "worst_r": -1.41
+    },
+    "short": {
+     "trades": 782,
+     "win_rate": 0.221,
+     "avg_r": -0.222,
+     "sum_r": -173.7,
+     "profit_factor": 0.73,
+     "median_r": -1.03,
+     "worst_r": -1.5
+    }
+   },
+   "exits": {
+    "stop": 1232,
+    "objetivo": 354,
+    "tiempo maximo": 116
+   }
+  },
+  {
+   "name": "both|rr3|libre|largo+corto",
+   "params": {
+    "strategy": "sr",
+    "timeframe": "H4",
+    "max_hold_days": 7.0,
+    "breakeven_r": 0.0,
+    "sr_mode": "both",
+    "sr_trend": false,
+    "allow_short": true,
+    "sr_target": "rr",
+    "sr_rr": 3.0
+   },
+   "all": {
+    "trades": 1702,
+    "win_rate": 0.261,
+    "avg_r": -0.1,
+    "sum_r": -169.7,
+    "profit_factor": 0.87,
+    "median_r": -1.02,
+    "worst_r": -1.5
+   },
+   "fit": {
+    "trades": 1084,
+    "win_rate": 0.271,
+    "avg_r": -0.057,
+    "sum_r": -61.7,
+    "profit_factor": 0.92,
+    "median_r": -1.03,
+    "worst_r": -1.38
+   },
+   "blind": {
+    "trades": 618,
+    "win_rate": 0.243,
+    "avg_r": -0.175,
+    "sum_r": -108.0,
+    "profit_factor": 0.78,
+    "median_r": -1.02,
+    "worst_r": -1.5
+   },
+   "test": {
+    "n": 1702,
+    "mean_r": -0.1,
+    "ci95": [
+     -0.177,
+     -0.021
+    ],
+    "p_value": 0.9951,
+    "win_rate": 0.261,
+    "profit_factor": 0.87,
+    "sum_r": -169.7
+   },
+   "by_symbol": {
+    "US500": {
+     "trades": 275,
+     "win_rate": 0.287,
+     "avg_r": 0.018,
+     "sum_r": 5.0,
+     "profit_factor": 1.02,
+     "median_r": -1.02,
+     "worst_r": -1.16
+    },
+    "NAS100": {
+     "trades": 266,
+     "win_rate": 0.256,
+     "avg_r": -0.11,
+     "sum_r": -29.3,
+     "profit_factor": 0.86,
+     "median_r": -1.02,
+     "worst_r": -1.18
+    },
+    "EURUSD": {
+     "trades": 293,
+     "win_rate": 0.256,
+     "avg_r": -0.154,
+     "sum_r": -45.2,
+     "profit_factor": 0.81,
+     "median_r": -1.05,
+     "worst_r": -1.41
+    },
+    "GBPUSD": {
+     "trades": 301,
+     "win_rate": 0.216,
+     "avg_r": -0.303,
+     "sum_r": -91.1,
+     "profit_factor": 0.64,
+     "median_r": -1.04,
+     "worst_r": -1.5
+    },
+    "XAUUSD": {
+     "trades": 282,
+     "win_rate": 0.266,
+     "avg_r": -0.032,
+     "sum_r": -9.1,
+     "profit_factor": 0.96,
+     "median_r": -1.02,
+     "worst_r": -1.2
+    },
+    "XTIUSD": {
+     "trades": 285,
+     "win_rate": 0.288,
+     "avg_r": 0.0,
+     "sum_r": 0.1,
+     "profit_factor": 1.0,
+     "median_r": -1.02,
+     "worst_r": -1.1
+    }
+   },
+   "by_side": {
+    "long": {
+     "trades": 920,
+     "win_rate": 0.295,
+     "avg_r": 0.004,
+     "sum_r": 4.0,
+     "profit_factor": 1.01,
+     "median_r": -1.02,
+     "worst_r": -1.41
+    },
+    "short": {
+     "trades": 782,
+     "win_rate": 0.221,
+     "avg_r": -0.222,
+     "sum_r": -173.7,
+     "profit_factor": 0.73,
+     "median_r": -1.03,
+     "worst_r": -1.5
+    }
+   },
+   "exits": {
+    "stop": 1232,
+    "objetivo": 354,
+    "tiempo maximo": 116
+   }
+  },
+  {
+   "name": "bounce|rr2|libre|largo+corto",
+   "params": {
+    "strategy": "sr",
+    "timeframe": "H4",
+    "max_hold_days": 7.0,
+    "breakeven_r": 0.0,
+    "sr_mode": "bounce",
+    "sr_trend": false,
+    "allow_short": true,
+    "sr_target": "rr",
+    "sr_rr": 2.0
+   },
+   "all": {
+    "trades": 2102,
+    "win_rate": 0.329,
+    "avg_r": -0.075,
+    "sum_r": -158.6,
+    "profit_factor": 0.89,
+    "median_r": -1.02,
+    "worst_r": -1.41
+   },
+   "fit": {
+    "trades": 1347,
+    "win_rate": 0.335,
+    "avg_r": -0.058,
+    "sum_r": -78.3,
+    "profit_factor": 0.92,
+    "median_r": -1.02,
+    "worst_r": -1.28
+   },
+   "blind": {
+    "trades": 755,
+    "win_rate": 0.319,
+    "avg_r": -0.106,
+    "sum_r": -80.3,
+    "profit_factor": 0.85,
+    "median_r": -1.02,
+    "worst_r": -1.41
+   },
+   "test": {
+    "n": 2102,
+    "mean_r": -0.075,
+    "ci95": [
+     -0.133,
+     -0.016
+    ],
+    "p_value": 0.9948,
+    "win_rate": 0.329,
+    "profit_factor": 0.89,
+    "sum_r": -158.6
+   },
+   "by_symbol": {
+    "US500": {
+     "trades": 326,
+     "win_rate": 0.34,
+     "avg_r": -0.022,
+     "sum_r": -7.2,
+     "profit_factor": 0.97,
+     "median_r": -1.02,
+     "worst_r": -1.14
+    },
+    "NAS100": {
+     "trades": 363,
+     "win_rate": 0.325,
+     "avg_r": -0.071,
+     "sum_r": -25.7,
+     "profit_factor": 0.9,
+     "median_r": -1.01,
+     "worst_r": -1.18
+    },
+    "EURUSD": {
+     "trades": 352,
+     "win_rate": 0.321,
+     "avg_r": -0.134,
+     "sum_r": -47.3,
+     "profit_factor": 0.81,
+     "median_r": -1.04,
+     "worst_r": -1.41
+    },
+    "GBPUSD": {
+     "trades": 366,
+     "win_rate": 0.309,
+     "avg_r": -0.168,
+     "sum_r": -61.4,
+     "profit_factor": 0.77,
+     "median_r": -1.04,
+     "worst_r": -1.31
+    },
+    "XAUUSD": {
+     "trades": 363,
+     "win_rate": 0.347,
+     "avg_r": -0.005,
+     "sum_r": -1.8,
+     "profit_factor": 0.99,
+     "median_r": -1.02,
+     "worst_r": -1.12
+    },
+    "XTIUSD": {
+     "trades": 332,
+     "win_rate": 0.334,
+     "avg_r": -0.046,
+     "sum_r": -15.2,
+     "profit_factor": 0.93,
+     "median_r": -1.02,
+     "worst_r": -1.08
+    }
+   },
+   "by_side": {
+    "long": {
+     "trades": 1140,
+     "win_rate": 0.352,
+     "avg_r": -0.017,
+     "sum_r": -19.1,
+     "profit_factor": 0.97,
+     "median_r": -1.02,
+     "worst_r": -1.41
+    },
+    "short": {
+     "trades": 962,
+     "win_rate": 0.302,
+     "avg_r": -0.145,
+     "sum_r": -139.5,
+     "profit_factor": 0.8,
+     "median_r": -1.02,
+     "worst_r": -1.28
+    }
+   },
+   "exits": {
+    "stop": 1385,
+    "objetivo": 657,
+    "tiempo maximo": 60
+   }
+  },
+  {
+   "name": "both|rr2|libre|largo+corto",
+   "params": {
+    "strategy": "sr",
+    "timeframe": "H4",
+    "max_hold_days": 7.0,
+    "breakeven_r": 0.0,
+    "sr_mode": "both",
+    "sr_trend": false,
+    "allow_short": true,
+    "sr_target": "rr",
+    "sr_rr": 2.0
+   },
+   "all": {
+    "trades": 2102,
+    "win_rate": 0.329,
+    "avg_r": -0.075,
+    "sum_r": -158.6,
+    "profit_factor": 0.89,
+    "median_r": -1.02,
+    "worst_r": -1.41
+   },
+   "fit": {
+    "trades": 1347,
+    "win_rate": 0.335,
+    "avg_r": -0.058,
+    "sum_r": -78.3,
+    "profit_factor": 0.92,
+    "median_r": -1.02,
+    "worst_r": -1.28
+   },
+   "blind": {
+    "trades": 755,
+    "win_rate": 0.319,
+    "avg_r": -0.106,
+    "sum_r": -80.3,
+    "profit_factor": 0.85,
+    "median_r": -1.02,
+    "worst_r": -1.41
+   },
+   "test": {
+    "n": 2102,
+    "mean_r": -0.075,
+    "ci95": [
+     -0.133,
+     -0.016
+    ],
+    "p_value": 0.9948,
+    "win_rate": 0.329,
+    "profit_factor": 0.89,
+    "sum_r": -158.6
+   },
+   "by_symbol": {
+    "US500": {
+     "trades": 326,
+     "win_rate": 0.34,
+     "avg_r": -0.022,
+     "sum_r": -7.2,
+     "profit_factor": 0.97,
+     "median_r": -1.02,
+     "worst_r": -1.14
+    },
+    "NAS100": {
+     "trades": 363,
+     "win_rate": 0.325,
+     "avg_r": -0.071,
+     "sum_r": -25.7,
+     "profit_factor": 0.9,
+     "median_r": -1.01,
+     "worst_r": -1.18
+    },
+    "EURUSD": {
+     "trades": 352,
+     "win_rate": 0.321,
+     "avg_r": -0.134,
+     "sum_r": -47.3,
+     "profit_factor": 0.81,
+     "median_r": -1.04,
+     "worst_r": -1.41
+    },
+    "GBPUSD": {
+     "trades": 366,
+     "win_rate": 0.309,
+     "avg_r": -0.168,
+     "sum_r": -61.4,
+     "profit_factor": 0.77,
+     "median_r": -1.04,
+     "worst_r": -1.31
+    },
+    "XAUUSD": {
+     "trades": 363,
+     "win_rate": 0.347,
+     "avg_r": -0.005,
+     "sum_r": -1.8,
+     "profit_factor": 0.99,
+     "median_r": -1.02,
+     "worst_r": -1.12
+    },
+    "XTIUSD": {
+     "trades": 332,
+     "win_rate": 0.334,
+     "avg_r": -0.046,
+     "sum_r": -15.2,
+     "profit_factor": 0.93,
+     "median_r": -1.02,
+     "worst_r": -1.08
+    }
+   },
+   "by_side": {
+    "long": {
+     "trades": 1140,
+     "win_rate": 0.352,
+     "avg_r": -0.017,
+     "sum_r": -19.1,
+     "profit_factor": 0.97,
+     "median_r": -1.02,
+     "worst_r": -1.41
+    },
+    "short": {
+     "trades": 962,
+     "win_rate": 0.302,
+     "avg_r": -0.145,
+     "sum_r": -139.5,
+     "profit_factor": 0.8,
+     "median_r": -1.02,
+     "worst_r": -1.28
+    }
+   },
+   "exits": {
+    "stop": 1385,
+    "objetivo": 657,
+    "tiempo maximo": 60
+   }
+  },
+  {
+   "name": "bounce|rr3|tendencia|largo+corto",
+   "params": {
+    "strategy": "sr",
+    "timeframe": "H4",
+    "max_hold_days": 7.0,
+    "breakeven_r": 0.0,
+    "sr_mode": "bounce",
+    "sr_trend": true,
+    "allow_short": true,
+    "sr_target": "rr",
+    "sr_rr": 3.0
+   },
+   "all": {
+    "trades": 1551,
+    "win_rate": 0.269,
+    "avg_r": -0.09,
+    "sum_r": -139.1,
+    "profit_factor": 0.88,
+    "median_r": -1.02,
+    "worst_r": -1.42
+   },
+   "fit": {
+    "trades": 987,
+    "win_rate": 0.276,
+    "avg_r": -0.062,
+    "sum_r": -61.2,
+    "profit_factor": 0.92,
+    "median_r": -1.03,
+    "worst_r": -1.42
+   },
+   "blind": {
+    "trades": 564,
+    "win_rate": 0.257,
+    "avg_r": -0.138,
+    "sum_r": -77.9,
+    "profit_factor": 0.82,
+    "median_r": -1.02,
+    "worst_r": -1.31
+   },
+   "test": {
+    "n": 1551,
+    "mean_r": -0.09,
+    "ci95": [
+     -0.17,
+     -0.008
+    ],
+    "p_value": 0.9852,
+    "win_rate": 0.269,
+    "profit_factor": 0.88,
+    "sum_r": -139.1
+   },
+   "by_symbol": {
+    "US500": {
+     "trades": 233,
+     "win_rate": 0.313,
+     "avg_r": 0.075,
+     "sum_r": 17.4,
+     "profit_factor": 1.1,
+     "median_r": -1.02,
+     "worst_r": -1.21
+    },
+    "NAS100": {
+     "trades": 254,
+     "win_rate": 0.276,
+     "avg_r": -0.054,
+     "sum_r": -13.8,
+     "profit_factor": 0.93,
+     "median_r": -1.01,
+     "worst_r": -1.13
+    },
+    "EURUSD": {
+     "trades": 256,
+     "win_rate": 0.246,
+     "avg_r": -0.23,
+     "sum_r": -59.0,
+     "profit_factor": 0.71,
+     "median_r": -1.05,
+     "worst_r": -1.42
+    },
+    "GBPUSD": {
+     "trades": 264,
+     "win_rate": 0.273,
+     "avg_r": -0.106,
+     "sum_r": -28.0,
+     "profit_factor": 0.86,
+     "median_r": -1.04,
+     "worst_r": -1.31
+    },
+    "XAUUSD": {
+     "trades": 276,
+     "win_rate": 0.243,
+     "avg_r": -0.121,
+     "sum_r": -33.4,
+     "profit_factor": 0.84,
+     "median_r": -1.02,
+     "worst_r": -1.15
+    },
+    "XTIUSD": {
+     "trades": 268,
+     "win_rate": 0.269,
+     "avg_r": -0.083,
+     "sum_r": -22.3,
+     "profit_factor": 0.89,
+     "median_r": -1.02,
+     "worst_r": -1.09
+    }
+   },
+   "by_side": {
+    "long": {
+     "trades": 922,
+     "win_rate": 0.299,
+     "avg_r": 0.005,
+     "sum_r": 4.2,
+     "profit_factor": 1.01,
+     "median_r": -1.02,
+     "worst_r": -1.42
+    },
+    "short": {
+     "trades": 629,
+     "win_rate": 0.224,
+     "avg_r": -0.228,
+     "sum_r": -143.3,
+     "profit_factor": 0.72,
+     "median_r": -1.03,
+     "worst_r": -1.31
+    }
+   },
+   "exits": {
+    "stop": 1114,
+    "objetivo": 316,
+    "tiempo maximo": 121
+   }
+  },
+  {
+   "name": "both|rr3|tendencia|largo+corto",
+   "params": {
+    "strategy": "sr",
+    "timeframe": "H4",
+    "max_hold_days": 7.0,
+    "breakeven_r": 0.0,
+    "sr_mode": "both",
+    "sr_trend": true,
+    "allow_short": true,
+    "sr_target": "rr",
+    "sr_rr": 3.0
+   },
+   "all": {
+    "trades": 1548,
+    "win_rate": 0.269,
+    "avg_r": -0.09,
+    "sum_r": -140.0,
+    "profit_factor": 0.88,
+    "median_r": -1.02,
+    "worst_r": -1.42
+   },
+   "fit": {
+    "trades": 987,
+    "win_rate": 0.276,
+    "avg_r": -0.062,
+    "sum_r": -61.2,
+    "profit_factor": 0.92,
+    "median_r": -1.03,
+    "worst_r": -1.42
+   },
+   "blind": {
+    "trades": 561,
+    "win_rate": 0.257,
+    "avg_r": -0.14,
+    "sum_r": -78.8,
+    "profit_factor": 0.82,
+    "median_r": -1.02,
+    "worst_r": -1.31
+   },
+   "test": {
+    "n": 1548,
+    "mean_r": -0.09,
+    "ci95": [
+     -0.169,
+     -0.01
+    ],
+    "p_value": 0.9868,
+    "win_rate": 0.269,
+    "profit_factor": 0.88,
+    "sum_r": -140.0
+   },
+   "by_symbol": {
+    "US500": {
+     "trades": 230,
+     "win_rate": 0.313,
+     "avg_r": 0.072,
+     "sum_r": 16.6,
+     "profit_factor": 1.1,
+     "median_r": -1.02,
+     "worst_r": -1.21
+    },
+    "NAS100": {
+     "trades": 254,
+     "win_rate": 0.276,
+     "avg_r": -0.054,
+     "sum_r": -13.8,
+     "profit_factor": 0.93,
+     "median_r": -1.01,
+     "worst_r": -1.13
+    },
+    "EURUSD": {
+     "trades": 256,
+     "win_rate": 0.246,
+     "avg_r": -0.23,
+     "sum_r": -59.0,
+     "profit_factor": 0.71,
+     "median_r": -1.05,
+     "worst_r": -1.42
+    },
+    "GBPUSD": {
+     "trades": 264,
+     "win_rate": 0.273,
+     "avg_r": -0.106,
+     "sum_r": -28.0,
+     "profit_factor": 0.86,
+     "median_r": -1.04,
+     "worst_r": -1.31
+    },
+    "XAUUSD": {
+     "trades": 276,
+     "win_rate": 0.243,
+     "avg_r": -0.121,
+     "sum_r": -33.4,
+     "profit_factor": 0.84,
+     "median_r": -1.02,
+     "worst_r": -1.15
+    },
+    "XTIUSD": {
+     "trades": 268,
+     "win_rate": 0.269,
+     "avg_r": -0.083,
+     "sum_r": -22.3,
+     "profit_factor": 0.89,
+     "median_r": -1.02,
+     "worst_r": -1.09
+    }
+   },
+   "by_side": {
+    "long": {
+     "trades": 919,
+     "win_rate": 0.299,
+     "avg_r": 0.004,
+     "sum_r": 3.3,
+     "profit_factor": 1.0,
+     "median_r": -1.02,
+     "worst_r": -1.42
+    },
+    "short": {
+     "trades": 629,
+     "win_rate": 0.224,
+     "avg_r": -0.228,
+     "sum_r": -143.3,
+     "profit_factor": 0.72,
+     "median_r": -1.03,
+     "worst_r": -1.31
+    }
+   },
+   "exits": {
+    "stop": 1112,
+    "objetivo": 315,
+    "tiempo maximo": 121
+   }
+  },
+  {
+   "name": "bounce|rr2|tendencia|largo+corto",
+   "params": {
+    "strategy": "sr",
+    "timeframe": "H4",
+    "max_hold_days": 7.0,
+    "breakeven_r": 0.0,
+    "sr_mode": "bounce",
+    "sr_trend": true,
+    "allow_short": true,
+    "sr_target": "rr",
+    "sr_rr": 2.0
+   },
+   "all": {
+    "trades": 1849,
+    "win_rate": 0.333,
+    "avg_r": -0.075,
+    "sum_r": -138.0,
+    "profit_factor": 0.89,
+    "median_r": -1.02,
+    "worst_r": -1.38
+   },
+   "fit": {
+    "trades": 1183,
+    "win_rate": 0.334,
+    "avg_r": -0.066,
+    "sum_r": -78.4,
+    "profit_factor": 0.9,
+    "median_r": -1.02,
+    "worst_r": -1.38
+   },
+   "blind": {
+    "trades": 666,
+    "win_rate": 0.332,
+    "avg_r": -0.089,
+    "sum_r": -59.6,
+    "profit_factor": 0.87,
+    "median_r": -1.01,
+    "worst_r": -1.31
+   },
+   "test": {
+    "n": 1849,
+    "mean_r": -0.075,
+    "ci95": [
+     -0.137,
+     -0.012
+    ],
+    "p_value": 0.99,
+    "win_rate": 0.333,
+    "profit_factor": 0.89,
+    "sum_r": -138.0
+   },
+   "by_symbol": {
+    "US500": {
+     "trades": 268,
+     "win_rate": 0.384,
+     "avg_r": 0.078,
+     "sum_r": 20.8,
+     "profit_factor": 1.12,
+     "median_r": -1.02,
+     "worst_r": -1.17
+    },
+    "NAS100": {
+     "trades": 308,
+     "win_rate": 0.334,
+     "avg_r": -0.056,
+     "sum_r": -17.4,
+     "profit_factor": 0.92,
+     "median_r": -1.01,
+     "worst_r": -1.15
+    },
+    "EURUSD": {
+     "trades": 308,
+     "win_rate": 0.305,
+     "avg_r": -0.195,
+     "sum_r": -60.1,
+     "profit_factor": 0.74,
+     "median_r": -1.04,
+     "worst_r": -1.38
+    },
+    "GBPUSD": {
+     "trades": 324,
+     "win_rate": 0.34,
+     "avg_r": -0.079,
+     "sum_r": -25.5,
+     "profit_factor": 0.89,
+     "median_r": -1.03,
+     "worst_r": -1.31
+    },
+    "XAUUSD": {
+     "trades": 318,
+     "win_rate": 0.324,
+     "avg_r": -0.085,
+     "sum_r": -27.0,
+     "profit_factor": 0.88,
+     "median_r": -1.02,
+     "worst_r": -1.12
+    },
+    "XTIUSD": {
+     "trades": 323,
+     "win_rate": 0.319,
+     "avg_r": -0.089,
+     "sum_r": -28.8,
+     "profit_factor": 0.87,
+     "median_r": -1.02,
+     "worst_r": -1.09
+    }
+   },
+   "by_side": {
+    "long": {
+     "trades": 1116,
+     "win_rate": 0.366,
+     "avg_r": 0.013,
+     "sum_r": 14.2,
+     "profit_factor": 1.02,
+     "median_r": -1.02,
+     "worst_r": -1.31
+    },
+    "short": {
+     "trades": 733,
+     "win_rate": 0.284,
+     "avg_r": -0.208,
+     "sum_r": -152.2,
+     "profit_factor": 0.72,
+     "median_r": -1.02,
+     "worst_r": -1.38
+    }
+   },
+   "exits": {
+    "stop": 1219,
+    "objetivo": 570,
+    "tiempo maximo": 60
+   }
+  },
+  {
+   "name": "both|rr2|tendencia|largo+corto",
+   "params": {
+    "strategy": "sr",
+    "timeframe": "H4",
+    "max_hold_days": 7.0,
+    "breakeven_r": 0.0,
+    "sr_mode": "both",
+    "sr_trend": true,
+    "allow_short": true,
+    "sr_target": "rr",
+    "sr_rr": 2.0
+   },
+   "all": {
+    "trades": 1847,
+    "win_rate": 0.333,
+    "avg_r": -0.075,
+    "sum_r": -138.9,
+    "profit_factor": 0.89,
+    "median_r": -1.02,
+    "worst_r": -1.38
+   },
+   "fit": {
+    "trades": 1183,
+    "win_rate": 0.334,
+    "avg_r": -0.066,
+    "sum_r": -78.4,
+    "profit_factor": 0.9,
+    "median_r": -1.02,
+    "worst_r": -1.38
+   },
+   "blind": {
+    "trades": 664,
+    "win_rate": 0.331,
+    "avg_r": -0.091,
+    "sum_r": -60.6,
+    "profit_factor": 0.87,
+    "median_r": -1.01,
+    "worst_r": -1.31
+   },
+   "test": {
+    "n": 1847,
+    "mean_r": -0.075,
+    "ci95": [
+     -0.139,
+     -0.013
+    ],
+    "p_value": 0.9906,
+    "win_rate": 0.333,
+    "profit_factor": 0.89,
+    "sum_r": -138.9
+   },
+   "by_symbol": {
+    "US500": {
+     "trades": 266,
+     "win_rate": 0.383,
+     "avg_r": 0.075,
+     "sum_r": 19.8,
+     "profit_factor": 1.12,
+     "median_r": -1.02,
+     "worst_r": -1.17
+    },
+    "NAS100": {
+     "trades": 308,
+     "win_rate": 0.334,
+     "avg_r": -0.056,
+     "sum_r": -17.4,
+     "profit_factor": 0.92,
+     "median_r": -1.01,
+     "worst_r": -1.15
+    },
+    "EURUSD": {
+     "trades": 308,
+     "win_rate": 0.305,
+     "avg_r": -0.195,
+     "sum_r": -60.1,
+     "profit_factor": 0.74,
+     "median_r": -1.04,
+     "worst_r": -1.38
+    },
+    "GBPUSD": {
+     "trades": 324,
+     "win_rate": 0.34,
+     "avg_r": -0.079,
+     "sum_r": -25.5,
+     "profit_factor": 0.89,
+     "median_r": -1.03,
+     "worst_r": -1.31
+    },
+    "XAUUSD": {
+     "trades": 318,
+     "win_rate": 0.324,
+     "avg_r": -0.085,
+     "sum_r": -27.0,
+     "profit_factor": 0.88,
+     "median_r": -1.02,
+     "worst_r": -1.12
+    },
+    "XTIUSD": {
+     "trades": 323,
+     "win_rate": 0.319,
+     "avg_r": -0.089,
+     "sum_r": -28.8,
+     "profit_factor": 0.87,
+     "median_r": -1.02,
+     "worst_r": -1.09
+    }
+   },
+   "by_side": {
+    "long": {
+     "trades": 1114,
+     "win_rate": 0.365,
+     "avg_r": 0.012,
+     "sum_r": 13.3,
+     "profit_factor": 1.02,
+     "median_r": -1.02,
+     "worst_r": -1.31
+    },
+    "short": {
+     "trades": 733,
+     "win_rate": 0.284,
+     "avg_r": -0.208,
+     "sum_r": -152.2,
+     "profit_factor": 0.72,
+     "median_r": -1.02,
+     "worst_r": -1.38
+    }
+   },
+   "exits": {
+    "stop": 1218,
+    "objetivo": 569,
+    "tiempo maximo": 60
+   }
+  },
+  {
+   "name": "retest|level|tendencia|largo+corto",
+   "params": {
+    "strategy": "sr",
+    "timeframe": "H4",
+    "max_hold_days": 7.0,
+    "breakeven_r": 0.0,
+    "sr_mode": "retest",
+    "sr_trend": true,
+    "allow_short": true,
+    "sr_target": "level",
+    "sr_min_rr": 1.5
+   },
+   "all": {
+    "trades": 186,
+    "win_rate": 0.296,
+    "avg_r": -0.157,
+    "sum_r": -29.2,
+    "profit_factor": 0.79,
+    "median_r": -1.03,
+    "worst_r": -1.22
+   },
+   "fit": {
+    "trades": 115,
+    "win_rate": 0.313,
+    "avg_r": -0.081,
+    "sum_r": -9.3,
+    "profit_factor": 0.89,
+    "median_r": -1.03,
+    "worst_r": -1.22
+   },
+   "blind": {
+    "trades": 71,
+    "win_rate": 0.268,
+    "avg_r": -0.28,
+    "sum_r": -19.9,
+    "profit_factor": 0.63,
+    "median_r": -1.02,
+    "worst_r": -1.19
+   },
+   "test": {
+    "n": 186,
+    "mean_r": -0.157,
+    "ci95": [
+     -0.358,
+     0.055
+    ],
+    "p_value": 0.9361,
+    "win_rate": 0.296,
+    "profit_factor": 0.79,
+    "sum_r": -29.2
+   },
+   "by_symbol": {
+    "US500": {
+     "trades": 21,
+     "win_rate": 0.143,
+     "avg_r": -0.586,
+     "sum_r": -12.3,
+     "profit_factor": 0.34,
+     "median_r": -1.02,
+     "worst_r": -1.07
+    },
+    "NAS100": {
+     "trades": 18,
+     "win_rate": 0.111,
+     "avg_r": -0.697,
+     "sum_r": -12.5,
+     "profit_factor": 0.24,
+     "median_r": -1.03,
+     "worst_r": -1.11
+    },
+    "EURUSD": {
+     "trades": 33,
+     "win_rate": 0.273,
+     "avg_r": -0.292,
+     "sum_r": -9.6,
+     "profit_factor": 0.63,
+     "median_r": -1.05,
+     "worst_r": -1.19
+    },
+    "GBPUSD": {
+     "trades": 47,
+     "win_rate": 0.383,
+     "avg_r": 0.069,
+     "sum_r": 3.2,
+     "profit_factor": 1.1,
+     "median_r": -1.04,
+     "worst_r": -1.22
+    },
+    "XAUUSD": {
+     "trades": 30,
+     "win_rate": 0.4,
+     "avg_r": 0.24,
+     "sum_r": 7.2,
+     "profit_factor": 1.39,
+     "median_r": -1.01,
+     "worst_r": -1.09
+    },
+    "XTIUSD": {
+     "trades": 37,
+     "win_rate": 0.297,
+     "avg_r": -0.139,
+     "sum_r": -5.2,
+     "profit_factor": 0.8,
+     "median_r": -1.02,
+     "worst_r": -1.07
+    }
+   },
+   "by_side": {
+    "long": {
+     "trades": 91,
+     "win_rate": 0.385,
+     "avg_r": 0.148,
+     "sum_r": 13.5,
+     "profit_factor": 1.24,
+     "median_r": -1.02,
+     "worst_r": -1.19
+    },
+    "short": {
+     "trades": 95,
+     "win_rate": 0.211,
+     "avg_r": -0.45,
+     "sum_r": -42.7,
+     "profit_factor": 0.46,
+     "median_r": -1.03,
+     "worst_r": -1.22
+    }
+   },
+   "exits": {
+    "stop": 130,
+    "objetivo": 53,
+    "tiempo maximo": 3
+   }
+  },
+  {
+   "name": "retest|rr2|tendencia|largo+corto",
+   "params": {
+    "strategy": "sr",
+    "timeframe": "H4",
+    "max_hold_days": 7.0,
+    "breakeven_r": 0.0,
+    "sr_mode": "retest",
+    "sr_trend": true,
+    "allow_short": true,
+    "sr_target": "rr",
+    "sr_rr": 2.0
+   },
+   "all": {
+    "trades": 1279,
+    "win_rate": 0.325,
+    "avg_r": -0.094,
+    "sum_r": -119.8,
+    "profit_factor": 0.87,
+    "median_r": -1.02,
+    "worst_r": -1.3
+   },
+   "fit": {
+    "trades": 815,
+    "win_rate": 0.328,
+    "avg_r": -0.083,
+    "sum_r": -67.3,
+    "profit_factor": 0.88,
+    "median_r": -1.02,
+    "worst_r": -1.22
+   },
+   "blind": {
+    "trades": 464,
+    "win_rate": 0.321,
+    "avg_r": -0.113,
+    "sum_r": -52.5,
+    "profit_factor": 0.84,
+    "median_r": -1.02,
+    "worst_r": -1.3
+   },
+   "test": {
+    "n": 1279,
+    "mean_r": -0.094,
+    "ci95": [
+     -0.169,
+     -0.021
+    ],
+    "p_value": 0.994,
+    "win_rate": 0.325,
+    "profit_factor": 0.87,
+    "sum_r": -119.8
+   },
+   "by_symbol": {
+    "US500": {
+     "trades": 193,
+     "win_rate": 0.378,
+     "avg_r": 0.061,
+     "sum_r": 11.7,
+     "profit_factor": 1.1,
+     "median_r": -1.02,
+     "worst_r": -1.16
+    },
+    "NAS100": {
+     "trades": 219,
+     "win_rate": 0.274,
+     "avg_r": -0.212,
+     "sum_r": -46.4,
+     "profit_factor": 0.71,
+     "median_r": -1.01,
+     "worst_r": -1.21
+    },
+    "EURUSD": {
+     "trades": 215,
+     "win_rate": 0.34,
+     "avg_r": -0.084,
+     "sum_r": -18.0,
+     "profit_factor": 0.88,
+     "median_r": -1.04,
+     "worst_r": -1.3
+    },
+    "GBPUSD": {
+     "trades": 241,
+     "win_rate": 0.295,
+     "avg_r": -0.195,
+     "sum_r": -47.1,
+     "profit_factor": 0.73,
+     "median_r": -1.04,
+     "worst_r": -1.22
+    },
+    "XAUUSD": {
+     "trades": 211,
+     "win_rate": 0.322,
+     "avg_r": -0.101,
+     "sum_r": -21.3,
+     "profit_factor": 0.86,
+     "median_r": -1.02,
+     "worst_r": -1.12
+    },
+    "XTIUSD": {
+     "trades": 200,
+     "win_rate": 0.355,
+     "avg_r": 0.006,
+     "sum_r": 1.2,
+     "profit_factor": 1.01,
+     "median_r": -1.02,
+     "worst_r": -1.08
+    }
+   },
+   "by_side": {
+    "long": {
+     "trades": 754,
+     "win_rate": 0.362,
+     "avg_r": 0.005,
+     "sum_r": 3.6,
+     "profit_factor": 1.01,
+     "median_r": -1.02,
+     "worst_r": -1.3
+    },
+    "short": {
+     "trades": 525,
+     "win_rate": 0.272,
+     "avg_r": -0.235,
+     "sum_r": -123.4,
+     "profit_factor": 0.69,
+     "median_r": -1.02,
+     "worst_r": -1.22
+    }
+   },
+   "exits": {
+    "stop": 849,
+    "objetivo": 384,
+    "tiempo maximo": 46
+   }
+  },
+  {
+   "name": "bounce|level|tendencia|largo+corto",
+   "params": {
+    "strategy": "sr",
+    "timeframe": "H4",
+    "max_hold_days": 7.0,
+    "breakeven_r": 0.0,
+    "sr_mode": "bounce",
+    "sr_trend": true,
+    "allow_short": true,
+    "sr_target": "level",
+    "sr_min_rr": 1.5
+   },
+   "all": {
+    "trades": 405,
+    "win_rate": 0.316,
+    "avg_r": -0.124,
+    "sum_r": -50.0,
+    "profit_factor": 0.83,
+    "median_r": -1.03,
+    "worst_r": -1.3
+   },
+   "fit": {
+    "trades": 247,
+    "win_rate": 0.3,
+    "avg_r": -0.157,
+    "sum_r": -38.7,
+    "profit_factor": 0.79,
+    "median_r": -1.03,
+    "worst_r": -1.22
+   },
+   "blind": {
+    "trades": 158,
+    "win_rate": 0.342,
+    "avg_r": -0.072,
+    "sum_r": -11.4,
+    "profit_factor": 0.9,
+    "median_r": -1.02,
+    "worst_r": -1.3
+   },
+   "test": {
+    "n": 405,
+    "mean_r": -0.124,
+    "ci95": [
+     -0.259,
+     0.013
+    ],
+    "p_value": 0.9637,
+    "win_rate": 0.316,
+    "profit_factor": 0.83,
+    "sum_r": -50.0
+   },
+   "by_symbol": {
+    "US500": {
+     "trades": 55,
+     "win_rate": 0.2,
+     "avg_r": -0.478,
+     "sum_r": -26.3,
+     "profit_factor": 0.42,
+     "median_r": -1.02,
+     "worst_r": -1.09
+    },
+    "NAS100": {
+     "trades": 48,
+     "win_rate": 0.271,
+     "avg_r": -0.26,
+     "sum_r": -12.5,
+     "profit_factor": 0.65,
+     "median_r": -1.02,
+     "worst_r": -1.11
+    },
+    "EURUSD": {
+     "trades": 70,
+     "win_rate": 0.3,
+     "avg_r": -0.244,
+     "sum_r": -17.1,
+     "profit_factor": 0.68,
+     "median_r": -1.05,
+     "worst_r": -1.3
+    },
+    "GBPUSD": {
+     "trades": 84,
+     "win_rate": 0.405,
+     "avg_r": 0.155,
+     "sum_r": 13.0,
+     "profit_factor": 1.24,
+     "median_r": -1.04,
+     "worst_r": -1.26
+    },
+    "XAUUSD": {
+     "trades": 65,
+     "win_rate": 0.385,
+     "avg_r": 0.121,
+     "sum_r": 7.9,
+     "profit_factor": 1.19,
+     "median_r": -1.01,
+     "worst_r": -1.13
+    },
+    "XTIUSD": {
+     "trades": 83,
+     "win_rate": 0.289,
+     "avg_r": -0.182,
+     "sum_r": -15.1,
+     "profit_factor": 0.75,
+     "median_r": -1.03,
+     "worst_r": -1.07
+    }
+   },
+   "by_side": {
+    "long": {
+     "trades": 212,
+     "win_rate": 0.387,
+     "avg_r": 0.119,
+     "sum_r": 25.2,
+     "profit_factor": 1.19,
+     "median_r": -1.02,
+     "worst_r": -1.19
+    },
+    "short": {
+     "trades": 193,
+     "win_rate": 0.238,
+     "avg_r": -0.39,
+     "sum_r": -75.2,
+     "profit_factor": 0.51,
+     "median_r": -1.03,
+     "worst_r": -1.3
+    }
+   },
+   "exits": {
+    "stop": 277,
+    "objetivo": 125,
+    "tiempo maximo": 3
+   }
+  },
+  {
+   "name": "both|level|tendencia|largo+corto",
+   "params": {
+    "strategy": "sr",
+    "timeframe": "H4",
+    "max_hold_days": 7.0,
+    "breakeven_r": 0.0,
+    "sr_mode": "both",
+    "sr_trend": true,
+    "allow_short": true,
+    "sr_target": "level",
+    "sr_min_rr": 1.5
+   },
+   "all": {
+    "trades": 405,
+    "win_rate": 0.316,
+    "avg_r": -0.124,
+    "sum_r": -50.0,
+    "profit_factor": 0.83,
+    "median_r": -1.03,
+    "worst_r": -1.3
+   },
+   "fit": {
+    "trades": 247,
+    "win_rate": 0.3,
+    "avg_r": -0.157,
+    "sum_r": -38.7,
+    "profit_factor": 0.79,
+    "median_r": -1.03,
+    "worst_r": -1.22
+   },
+   "blind": {
+    "trades": 158,
+    "win_rate": 0.342,
+    "avg_r": -0.072,
+    "sum_r": -11.4,
+    "profit_factor": 0.9,
+    "median_r": -1.02,
+    "worst_r": -1.3
+   },
+   "test": {
+    "n": 405,
+    "mean_r": -0.124,
+    "ci95": [
+     -0.259,
+     0.013
+    ],
+    "p_value": 0.9637,
+    "win_rate": 0.316,
+    "profit_factor": 0.83,
+    "sum_r": -50.0
+   },
+   "by_symbol": {
+    "US500": {
+     "trades": 55,
+     "win_rate": 0.2,
+     "avg_r": -0.478,
+     "sum_r": -26.3,
+     "profit_factor": 0.42,
+     "median_r": -1.02,
+     "worst_r": -1.09
+    },
+    "NAS100": {
+     "trades": 48,
+     "win_rate": 0.271,
+     "avg_r": -0.26,
+     "sum_r": -12.5,
+     "profit_factor": 0.65,
+     "median_r": -1.02,
+     "worst_r": -1.11
+    },
+    "EURUSD": {
+     "trades": 70,
+     "win_rate": 0.3,
+     "avg_r": -0.244,
+     "sum_r": -17.1,
+     "profit_factor": 0.68,
+     "median_r": -1.05,
+     "worst_r": -1.3
+    },
+    "GBPUSD": {
+     "trades": 84,
+     "win_rate": 0.405,
+     "avg_r": 0.155,
+     "sum_r": 13.0,
+     "profit_factor": 1.24,
+     "median_r": -1.04,
+     "worst_r": -1.26
+    },
+    "XAUUSD": {
+     "trades": 65,
+     "win_rate": 0.385,
+     "avg_r": 0.121,
+     "sum_r": 7.9,
+     "profit_factor": 1.19,
+     "median_r": -1.01,
+     "worst_r": -1.13
+    },
+    "XTIUSD": {
+     "trades": 83,
+     "win_rate": 0.289,
+     "avg_r": -0.182,
+     "sum_r": -15.1,
+     "profit_factor": 0.75,
+     "median_r": -1.03,
+     "worst_r": -1.07
+    }
+   },
+   "by_side": {
+    "long": {
+     "trades": 212,
+     "win_rate": 0.387,
+     "avg_r": 0.119,
+     "sum_r": 25.2,
+     "profit_factor": 1.19,
+     "median_r": -1.02,
+     "worst_r": -1.19
+    },
+    "short": {
+     "trades": 193,
+     "win_rate": 0.238,
+     "avg_r": -0.39,
+     "sum_r": -75.2,
+     "profit_factor": 0.51,
+     "median_r": -1.03,
+     "worst_r": -1.3
+    }
+   },
+   "exits": {
+    "stop": 277,
+    "objetivo": 125,
+    "tiempo maximo": 3
+   }
+  }
+ ],
+ "neighborhood": [
+  {
+   "name": "toques 2 | R min 1.5 | memoria 160 | libre",
+   "params": {
+    "strategy": "sr",
+    "timeframe": "H4",
+    "max_hold_days": 7.0,
+    "breakeven_r": 0.0,
+    "sr_mode": "bounce",
+    "allow_short": false,
+    "sr_target": "level",
+    "sr_min_rr": 1.5,
+    "sr_min_touches": 2,
+    "sr_lookback": 160,
+    "sr_trend": false
+   },
+   "all": {
+    "trades": 367,
+    "win_rate": 0.357,
+    "avg_r": 0.033,
+    "sum_r": 11.9,
+    "profit_factor": 1.05,
+    "median_r": -1.02,
+    "worst_r": -1.42
+   },
+   "fit": {
+    "trades": 235,
+    "win_rate": 0.383,
+    "avg_r": 0.099,
+    "sum_r": 23.2,
+    "profit_factor": 1.15,
+    "median_r": -1.02,
+    "worst_r": -1.42
+   },
+   "blind": {
+    "trades": 132,
+    "win_rate": 0.311,
+    "avg_r": -0.086,
+    "sum_r": -11.3,
+    "profit_factor": 0.88,
+    "median_r": -1.02,
+    "worst_r": -1.27
+   },
+   "test": {
+    "n": 367,
+    "mean_r": 0.033,
+    "ci95": [
+     -0.118,
+     0.185
+    ],
+    "p_value": 0.3381,
+    "win_rate": 0.357,
+    "profit_factor": 1.05,
+    "sum_r": 11.9
+   },
+   "by_symbol": {
+    "US500": {
+     "trades": 44,
+     "win_rate": 0.341,
+     "avg_r": -0.009,
+     "sum_r": -0.4,
+     "profit_factor": 0.99,
+     "median_r": -1.02,
+     "worst_r": -1.08
+    },
+    "NAS100": {
+     "trades": 58,
+     "win_rate": 0.293,
+     "avg_r": -0.214,
+     "sum_r": -12.4,
+     "profit_factor": 0.71,
+     "median_r": -1.02,
+     "worst_r": -1.21
+    },
+    "EURUSD": {
+     "trades": 67,
+     "win_rate": 0.328,
+     "avg_r": -0.123,
+     "sum_r": -8.3,
+     "profit_factor": 0.83,
+     "median_r": -1.05,
+     "worst_r": -1.27
+    },
+    "GBPUSD": {
+     "trades": 69,
+     "win_rate": 0.493,
+     "avg_r": 0.424,
+     "sum_r": 29.3,
+     "profit_factor": 1.77,
+     "median_r": -1.02,
+     "worst_r": -1.42
+    },
+    "XAUUSD": {
+     "trades": 60,
+     "win_rate": 0.3,
+     "avg_r": -0.079,
+     "sum_r": -4.8,
+     "profit_factor": 0.89,
+     "median_r": -1.01,
+     "worst_r": -1.13
+    },
+    "XTIUSD": {
+     "trades": 69,
+     "win_rate": 0.362,
+     "avg_r": 0.124,
+     "sum_r": 8.5,
+     "profit_factor": 1.19,
+     "median_r": -1.02,
+     "worst_r": -1.09
+    }
+   },
+   "by_side": {
+    "long": {
+     "trades": 367,
+     "win_rate": 0.357,
+     "avg_r": 0.033,
+     "sum_r": 11.9,
+     "profit_factor": 1.05,
+     "median_r": -1.02,
+     "worst_r": -1.42
+    },
+    "short": {
+     "trades": 0
+    }
+   },
+   "exits": {
+    "stop": 236,
+    "objetivo": 127,
+    "tiempo maximo": 4
+   }
+  },
+  {
+   "name": "toques 2 | R min 1.5 | memoria 160 | tendencia",
+   "params": {
+    "strategy": "sr",
+    "timeframe": "H4",
+    "max_hold_days": 7.0,
+    "breakeven_r": 0.0,
+    "sr_mode": "bounce",
+    "allow_short": false,
+    "sr_target": "level",
+    "sr_min_rr": 1.5,
+    "sr_min_touches": 2,
+    "sr_lookback": 160,
+    "sr_trend": true
+   },
+   "all": {
+    "trades": 222,
+    "win_rate": 0.347,
+    "avg_r": -0.006,
+    "sum_r": -1.4,
+    "profit_factor": 0.99,
+    "median_r": -1.02,
+    "worst_r": -1.27
+   },
+   "fit": {
+    "trades": 147,
+    "win_rate": 0.327,
+    "avg_r": -0.046,
+    "sum_r": -6.7,
+    "profit_factor": 0.93,
+    "median_r": -1.02,
+    "worst_r": -1.27
+   },
+   "blind": {
+    "trades": 75,
+    "win_rate": 0.387,
+    "avg_r": 0.071,
+    "sum_r": 5.3,
+    "profit_factor": 1.11,
+    "median_r": -1.01,
+    "worst_r": -1.21
+   },
+   "test": {
+    "n": 222,
+    "mean_r": -0.006,
+    "ci95": [
+     -0.194,
+     0.188
+    ],
+    "p_value": 0.5231,
+    "win_rate": 0.347,
+    "profit_factor": 0.99,
+    "sum_r": -1.4
+   },
+   "by_symbol": {
+    "US500": {
+     "trades": 31,
+     "win_rate": 0.258,
+     "avg_r": -0.281,
+     "sum_r": -8.7,
+     "profit_factor": 0.63,
+     "median_r": -1.03,
+     "worst_r": -1.08
+    },
+    "NAS100": {
+     "trades": 41,
+     "win_rate": 0.268,
+     "avg_r": -0.306,
+     "sum_r": -12.5,
+     "profit_factor": 0.6,
+     "median_r": -1.02,
+     "worst_r": -1.21
+    },
+    "EURUSD": {
+     "trades": 30,
+     "win_rate": 0.433,
+     "avg_r": 0.181,
+     "sum_r": 5.4,
+     "profit_factor": 1.3,
+     "median_r": -1.04,
+     "worst_r": -1.19
+    },
+    "GBPUSD": {
+     "trades": 46,
+     "win_rate": 0.5,
+     "avg_r": 0.455,
+     "sum_r": 20.9,
+     "profit_factor": 1.84,
+     "median_r": 0.19,
+     "worst_r": -1.27
+    },
+    "XAUUSD": {
+     "trades": 43,
+     "win_rate": 0.326,
+     "avg_r": 0.024,
+     "sum_r": 1.0,
+     "profit_factor": 1.03,
+     "median_r": -1.01,
+     "worst_r": -1.13
+    },
+    "XTIUSD": {
+     "trades": 31,
+     "win_rate": 0.258,
+     "avg_r": -0.242,
+     "sum_r": -7.5,
+     "profit_factor": 0.68,
+     "median_r": -1.02,
+     "worst_r": -1.09
+    }
+   },
+   "by_side": {
+    "long": {
+     "trades": 222,
+     "win_rate": 0.347,
+     "avg_r": -0.006,
+     "sum_r": -1.4,
+     "profit_factor": 0.99,
+     "median_r": -1.02,
+     "worst_r": -1.27
+    },
+    "short": {
+     "trades": 0
+    }
+   },
+   "exits": {
+    "stop": 145,
+    "objetivo": 76,
+    "tiempo maximo": 1
+   }
+  },
+  {
+   "name": "toques 2 | R min 1.5 | memoria 240 | libre",
+   "params": {
+    "strategy": "sr",
+    "timeframe": "H4",
+    "max_hold_days": 7.0,
+    "breakeven_r": 0.0,
+    "sr_mode": "bounce",
+    "allow_short": false,
+    "sr_target": "level",
+    "sr_min_rr": 1.5,
+    "sr_min_touches": 2,
+    "sr_lookback": 240,
+    "sr_trend": false
+   },
+   "all": {
+    "trades": 342,
+    "win_rate": 0.392,
+    "avg_r": 0.146,
+    "sum_r": 50.0,
+    "profit_factor": 1.23,
+    "median_r": -1.02,
+    "worst_r": -1.42
+   },
+   "fit": {
+    "trades": 218,
+    "win_rate": 0.399,
+    "avg_r": 0.161,
+    "sum_r": 35.1,
+    "profit_factor": 1.26,
+    "median_r": -1.02,
+    "worst_r": -1.42
+   },
+   "blind": {
+    "trades": 124,
+    "win_rate": 0.379,
+    "avg_r": 0.12,
+    "sum_r": 14.9,
+    "profit_factor": 1.19,
+    "median_r": -1.01,
+    "worst_r": -1.27
+   },
+   "test": {
+    "n": 342,
+    "mean_r": 0.146,
+    "ci95": [
+     -0.019,
+     0.315
+    ],
+    "p_value": 0.0419,
+    "win_rate": 0.392,
+    "profit_factor": 1.23,
+    "sum_r": 50.0
+   },
+   "by_symbol": {
+    "US500": {
+     "trades": 38,
+     "win_rate": 0.263,
+     "avg_r": -0.244,
+     "sum_r": -9.3,
+     "profit_factor": 0.68,
+     "median_r": -1.03,
+     "worst_r": -1.07
+    },
+    "NAS100": {
+     "trades": 43,
+     "win_rate": 0.233,
+     "avg_r": -0.367,
+     "sum_r": -15.8,
+     "profit_factor": 0.53,
+     "median_r": -1.02,
+     "worst_r": -1.11
+    },
+    "EURUSD": {
+     "trades": 64,
+     "win_rate": 0.422,
+     "avg_r": 0.17,
+     "sum_r": 10.9,
+     "profit_factor": 1.27,
+     "median_r": -1.04,
+     "worst_r": -1.27
+    },
+    "GBPUSD": {
+     "trades": 72,
+     "win_rate": 0.542,
+     "avg_r": 0.576,
+     "sum_r": 41.4,
+     "profit_factor": 2.16,
+     "median_r": 1.44,
+     "worst_r": -1.42
+    },
+    "XAUUSD": {
+     "trades": 63,
+     "win_rate": 0.333,
+     "avg_r": 0.014,
+     "sum_r": 0.9,
+     "profit_factor": 1.02,
+     "median_r": -1.01,
+     "worst_r": -1.13
+    },
+    "XTIUSD": {
+     "trades": 62,
+     "win_rate": 0.435,
+     "avg_r": 0.352,
+     "sum_r": 21.8,
+     "profit_factor": 1.61,
+     "median_r": -1.01,
+     "worst_r": -1.07
+    }
+   },
+   "by_side": {
+    "long": {
+     "trades": 342,
+     "win_rate": 0.392,
+     "avg_r": 0.146,
+     "sum_r": 50.0,
+     "profit_factor": 1.23,
+     "median_r": -1.02,
+     "worst_r": -1.42
+    },
+    "short": {
+     "trades": 0
+    }
+   },
+   "exits": {
+    "stop": 208,
+    "objetivo": 129,
+    "tiempo maximo": 5
+   }
+  },
+  {
+   "name": "toques 2 | R min 1.5 | memoria 240 | tendencia",
+   "params": {
+    "strategy": "sr",
+    "timeframe": "H4",
+    "max_hold_days": 7.0,
+    "breakeven_r": 0.0,
+    "sr_mode": "bounce",
+    "allow_short": false,
+    "sr_target": "level",
+    "sr_min_rr": 1.5,
+    "sr_min_touches": 2,
+    "sr_lookback": 240,
+    "sr_trend": true
+   },
+   "all": {
+    "trades": 212,
+    "win_rate": 0.387,
+    "avg_r": 0.119,
+    "sum_r": 25.2,
+    "profit_factor": 1.19,
+    "median_r": -1.02,
+    "worst_r": -1.19
+   },
+   "fit": {
+    "trades": 140,
+    "win_rate": 0.357,
+    "avg_r": 0.038,
+    "sum_r": 5.3,
+    "profit_factor": 1.06,
+    "median_r": -1.02,
+    "worst_r": -1.13
+   },
+   "blind": {
+    "trades": 72,
+    "win_rate": 0.444,
+    "avg_r": 0.276,
+    "sum_r": 19.9,
+    "profit_factor": 1.48,
+    "median_r": -1.01,
+    "worst_r": -1.19
+   },
+   "test": {
+    "n": 212,
+    "mean_r": 0.119,
+    "ci95": [
+     -0.086,
+     0.328
+    ],
+    "p_value": 0.13,
+    "win_rate": 0.387,
+    "profit_factor": 1.19,
+    "sum_r": 25.2
+   },
+   "by_symbol": {
+    "US500": {
+     "trades": 30,
+     "win_rate": 0.2,
+     "avg_r": -0.469,
+     "sum_r": -14.1,
+     "profit_factor": 0.43,
+     "median_r": -1.03,
+     "worst_r": -1.07
+    },
+    "NAS100": {
+     "trades": 31,
+     "win_rate": 0.226,
+     "avg_r": -0.411,
+     "sum_r": -12.8,
+     "profit_factor": 0.48,
+     "median_r": -1.02,
+     "worst_r": -1.11
+    },
+    "EURUSD": {
+     "trades": 30,
+     "win_rate": 0.467,
+     "avg_r": 0.28,
+     "sum_r": 8.4,
+     "profit_factor": 1.49,
+     "median_r": -1.03,
+     "worst_r": -1.19
+    },
+    "GBPUSD": {
+     "trades": 46,
+     "win_rate": 0.587,
+     "avg_r": 0.739,
+     "sum_r": 34.0,
+     "profit_factor": 2.68,
+     "median_r": 1.53,
+     "worst_r": -1.11
+    },
+    "XAUUSD": {
+     "trades": 46,
+     "win_rate": 0.348,
+     "avg_r": 0.054,
+     "sum_r": 2.5,
+     "profit_factor": 1.08,
+     "median_r": -1.01,
+     "worst_r": -1.13
+    },
+    "XTIUSD": {
+     "trades": 29,
+     "win_rate": 0.414,
+     "avg_r": 0.246,
+     "sum_r": 7.1,
+     "profit_factor": 1.41,
+     "median_r": -1.01,
+     "worst_r": -1.05
+    }
+   },
+   "by_side": {
+    "long": {
+     "trades": 212,
+     "win_rate": 0.387,
+     "avg_r": 0.119,
+     "sum_r": 25.2,
+     "profit_factor": 1.19,
+     "median_r": -1.02,
+     "worst_r": -1.19
+    },
+    "short": {
+     "trades": 0
+    }
+   },
+   "exits": {
+    "stop": 130,
+    "objetivo": 79,
+    "tiempo maximo": 3
+   }
+  },
+  {
+   "name": "toques 2 | R min 1.5 | memoria 360 | libre",
+   "params": {
+    "strategy": "sr",
+    "timeframe": "H4",
+    "max_hold_days": 7.0,
+    "breakeven_r": 0.0,
+    "sr_mode": "bounce",
+    "allow_short": false,
+    "sr_target": "level",
+    "sr_min_rr": 1.5,
+    "sr_min_touches": 2,
+    "sr_lookback": 360,
+    "sr_trend": false
+   },
+   "all": {
+    "trades": 322,
+    "win_rate": 0.394,
+    "avg_r": 0.135,
+    "sum_r": 43.5,
+    "profit_factor": 1.21,
+    "median_r": -1.02,
+    "worst_r": -1.42
+   },
+   "fit": {
+    "trades": 212,
+    "win_rate": 0.406,
+    "avg_r": 0.166,
+    "sum_r": 35.1,
+    "profit_factor": 1.27,
+    "median_r": -1.02,
+    "worst_r": -1.42
+   },
+   "blind": {
+    "trades": 110,
+    "win_rate": 0.373,
+    "avg_r": 0.076,
+    "sum_r": 8.4,
+    "profit_factor": 1.12,
+    "median_r": -1.01,
+    "worst_r": -1.27
+   },
+   "test": {
+    "n": 322,
+    "mean_r": 0.135,
+    "ci95": [
+     -0.033,
+     0.304
+    ],
+    "p_value": 0.0624,
+    "win_rate": 0.394,
+    "profit_factor": 1.21,
+    "sum_r": 43.5
+   },
+   "by_symbol": {
+    "US500": {
+     "trades": 40,
+     "win_rate": 0.25,
+     "avg_r": -0.304,
+     "sum_r": -12.2,
+     "profit_factor": 0.61,
+     "median_r": -1.02,
+     "worst_r": -1.07
+    },
+    "NAS100": {
+     "trades": 42,
+     "win_rate": 0.333,
+     "avg_r": -0.093,
+     "sum_r": -3.9,
+     "profit_factor": 0.86,
+     "median_r": -1.02,
+     "worst_r": -1.05
+    },
+    "EURUSD": {
+     "trades": 57,
+     "win_rate": 0.404,
+     "avg_r": 0.102,
+     "sum_r": 5.8,
+     "profit_factor": 1.16,
+     "median_r": -1.05,
+     "worst_r": -1.27
+    },
+    "GBPUSD": {
+     "trades": 59,
+     "win_rate": 0.525,
+     "avg_r": 0.506,
+     "sum_r": 29.9,
+     "profit_factor": 1.98,
+     "median_r": 1.42,
+     "worst_r": -1.42
+    },
+    "XAUUSD": {
+     "trades": 60,
+     "win_rate": 0.383,
+     "avg_r": 0.105,
+     "sum_r": 6.3,
+     "profit_factor": 1.17,
+     "median_r": -1.01,
+     "worst_r": -1.13
+    },
+    "XTIUSD": {
+     "trades": 64,
+     "win_rate": 0.406,
+     "avg_r": 0.274,
+     "sum_r": 17.5,
+     "profit_factor": 1.45,
+     "median_r": -1.01,
+     "worst_r": -1.07
+    }
+   },
+   "by_side": {
+    "long": {
+     "trades": 322,
+     "win_rate": 0.394,
+     "avg_r": 0.135,
+     "sum_r": 43.5,
+     "profit_factor": 1.21,
+     "median_r": -1.02,
+     "worst_r": -1.42
+    },
+    "short": {
+     "trades": 0
+    }
+   },
+   "exits": {
+    "stop": 195,
+    "objetivo": 123,
+    "tiempo maximo": 4
+   }
+  },
+  {
+   "name": "toques 2 | R min 1.5 | memoria 360 | tendencia",
+   "params": {
+    "strategy": "sr",
+    "timeframe": "H4",
+    "max_hold_days": 7.0,
+    "breakeven_r": 0.0,
+    "sr_mode": "bounce",
+    "allow_short": false,
+    "sr_target": "level",
+    "sr_min_rr": 1.5,
+    "sr_min_touches": 2,
+    "sr_lookback": 360,
+    "sr_trend": true
+   },
+   "all": {
+    "trades": 215,
+    "win_rate": 0.386,
+    "avg_r": 0.119,
+    "sum_r": 25.7,
+    "profit_factor": 1.19,
+    "median_r": -1.02,
+    "worst_r": -1.19
+   },
+   "fit": {
+    "trades": 144,
+    "win_rate": 0.368,
+    "avg_r": 0.079,
+    "sum_r": 11.4,
+    "profit_factor": 1.12,
+    "median_r": -1.02,
+    "worst_r": -1.13
+   },
+   "blind": {
+    "trades": 71,
+    "win_rate": 0.423,
+    "avg_r": 0.202,
+    "sum_r": 14.3,
+    "profit_factor": 1.34,
+    "median_r": -1.01,
+    "worst_r": -1.19
+   },
+   "test": {
+    "n": 215,
+    "mean_r": 0.119,
+    "ci95": [
+     -0.09,
+     0.326
+    ],
+    "p_value": 0.1314,
+    "win_rate": 0.386,
+    "profit_factor": 1.19,
+    "sum_r": 25.7
+   },
+   "by_symbol": {
+    "US500": {
+     "trades": 35,
+     "win_rate": 0.2,
+     "avg_r": -0.479,
+     "sum_r": -16.8,
+     "profit_factor": 0.42,
+     "median_r": -1.03,
+     "worst_r": -1.07
+    },
+    "NAS100": {
+     "trades": 31,
+     "win_rate": 0.355,
+     "avg_r": -0.045,
+     "sum_r": -1.4,
+     "profit_factor": 0.93,
+     "median_r": -1.02,
+     "worst_r": -1.05
+    },
+    "EURUSD": {
+     "trades": 33,
+     "win_rate": 0.364,
+     "avg_r": -0.063,
+     "sum_r": -2.1,
+     "profit_factor": 0.91,
+     "median_r": -1.04,
+     "worst_r": -1.19
+    },
+    "GBPUSD": {
+     "trades": 43,
+     "win_rate": 0.558,
+     "avg_r": 0.645,
+     "sum_r": 27.7,
+     "profit_factor": 2.38,
+     "median_r": 1.44,
+     "worst_r": -1.11
+    },
+    "XAUUSD": {
+     "trades": 42,
+     "win_rate": 0.405,
+     "avg_r": 0.226,
+     "sum_r": 9.5,
+     "profit_factor": 1.37,
+     "median_r": -1.01,
+     "worst_r": -1.13
+    },
+    "XTIUSD": {
+     "trades": 31,
+     "win_rate": 0.387,
+     "avg_r": 0.281,
+     "sum_r": 8.7,
+     "profit_factor": 1.45,
+     "median_r": -1.01,
+     "worst_r": -1.04
+    }
+   },
+   "by_side": {
+    "long": {
+     "trades": 215,
+     "win_rate": 0.386,
+     "avg_r": 0.119,
+     "sum_r": 25.7,
+     "profit_factor": 1.19,
+     "median_r": -1.02,
+     "worst_r": -1.19
+    },
+    "short": {
+     "trades": 0
+    }
+   },
+   "exits": {
+    "stop": 132,
+    "objetivo": 81,
+    "tiempo maximo": 2
+   }
+  },
+  {
+   "name": "toques 2 | R min 2 | memoria 160 | libre",
+   "params": {
+    "strategy": "sr",
+    "timeframe": "H4",
+    "max_hold_days": 7.0,
+    "breakeven_r": 0.0,
+    "sr_mode": "bounce",
+    "allow_short": false,
+    "sr_target": "level",
+    "sr_min_rr": 2.0,
+    "sr_min_touches": 2,
+    "sr_lookback": 160,
+    "sr_trend": false
+   },
+   "all": {
+    "trades": 183,
+    "win_rate": 0.295,
+    "avg_r": -0.013,
+    "sum_r": -2.4,
+    "profit_factor": 0.98,
+    "median_r": -1.02,
+    "worst_r": -1.42
+   },
+   "fit": {
+    "trades": 119,
+    "win_rate": 0.319,
+    "avg_r": 0.03,
+    "sum_r": 3.6,
+    "profit_factor": 1.04,
+    "median_r": -1.02,
+    "worst_r": -1.42
+   },
+   "blind": {
+    "trades": 64,
+    "win_rate": 0.25,
+    "avg_r": -0.093,
+    "sum_r": -5.9,
+    "profit_factor": 0.88,
+    "median_r": -1.02,
+    "worst_r": -1.21
+   },
+   "test": {
+    "n": 183,
+    "mean_r": -0.013,
+    "ci95": [
+     -0.25,
+     0.24
+    ],
+    "p_value": 0.5386,
+    "win_rate": 0.295,
+    "profit_factor": 0.98,
+    "sum_r": -2.4
+   },
+   "by_symbol": {
+    "US500": {
+     "trades": 21,
+     "win_rate": 0.429,
+     "avg_r": 0.446,
+     "sum_r": 9.4,
+     "profit_factor": 1.75,
+     "median_r": -1.02,
+     "worst_r": -1.07
+    },
+    "NAS100": {
+     "trades": 25,
+     "win_rate": 0.16,
+     "avg_r": -0.532,
+     "sum_r": -13.3,
+     "profit_factor": 0.39,
+     "median_r": -1.02,
+     "worst_r": -1.21
+    },
+    "EURUSD": {
+     "trades": 28,
+     "win_rate": 0.25,
+     "avg_r": -0.239,
+     "sum_r": -6.7,
+     "profit_factor": 0.7,
+     "median_r": -1.05,
+     "worst_r": -1.16
+    },
+    "GBPUSD": {
+     "trades": 37,
+     "win_rate": 0.378,
+     "avg_r": 0.238,
+     "sum_r": 8.8,
+     "profit_factor": 1.35,
+     "median_r": -1.04,
+     "worst_r": -1.42
+    },
+    "XAUUSD": {
+     "trades": 33,
+     "win_rate": 0.303,
+     "avg_r": 0.055,
+     "sum_r": 1.8,
+     "profit_factor": 1.08,
+     "median_r": -1.01,
+     "worst_r": -1.13
+    },
+    "XTIUSD": {
+     "trades": 39,
+     "win_rate": 0.256,
+     "avg_r": -0.061,
+     "sum_r": -2.4,
+     "profit_factor": 0.92,
+     "median_r": -1.02,
+     "worst_r": -1.09
+    }
+   },
+   "by_side": {
+    "long": {
+     "trades": 183,
+     "win_rate": 0.295,
+     "avg_r": -0.013,
+     "sum_r": -2.4,
+     "profit_factor": 0.98,
+     "median_r": -1.02,
+     "worst_r": -1.42
+    },
+    "short": {
+     "trades": 0
+    }
+   },
+   "exits": {
+    "stop": 129,
+    "objetivo": 50,
+    "tiempo maximo": 4
+   }
+  },
+  {
+   "name": "toques 2 | R min 2 | memoria 160 | tendencia",
+   "params": {
+    "strategy": "sr",
+    "timeframe": "H4",
+    "max_hold_days": 7.0,
+    "breakeven_r": 0.0,
+    "sr_mode": "bounce",
+    "allow_short": false,
+    "sr_target": "level",
+    "sr_min_rr": 2.0,
+    "sr_min_touches": 2,
+    "sr_lookback": 160,
+    "sr_trend": true
+   },
+   "all": {
+    "trades": 105,
+    "win_rate": 0.276,
+    "avg_r": -0.072,
+    "sum_r": -7.5,
+    "profit_factor": 0.91,
+    "median_r": -1.02,
+    "worst_r": -1.27
+   },
+   "fit": {
+    "trades": 72,
+    "win_rate": 0.278,
+    "avg_r": -0.064,
+    "sum_r": -4.6,
+    "profit_factor": 0.92,
+    "median_r": -1.03,
+    "worst_r": -1.27
+   },
+   "blind": {
+    "trades": 33,
+    "win_rate": 0.273,
+    "avg_r": -0.09,
+    "sum_r": -3.0,
+    "profit_factor": 0.88,
+    "median_r": -1.02,
+    "worst_r": -1.21
+   },
+   "test": {
+    "n": 105,
+    "mean_r": -0.072,
+    "ci95": [
+     -0.373,
+     0.239
+    ],
+    "p_value": 0.6635,
+    "win_rate": 0.276,
+    "profit_factor": 0.91,
+    "sum_r": -7.5
+   },
+   "by_symbol": {
+    "US500": {
+     "trades": 12,
+     "win_rate": 0.333,
+     "avg_r": 0.151,
+     "sum_r": 1.8,
+     "profit_factor": 1.22,
+     "median_r": -1.03,
+     "worst_r": -1.07
+    },
+    "NAS100": {
+     "trades": 19,
+     "win_rate": 0.105,
+     "avg_r": -0.722,
+     "sum_r": -13.7,
+     "profit_factor": 0.22,
+     "median_r": -1.02,
+     "worst_r": -1.21
+    },
+    "EURUSD": {
+     "trades": 11,
+     "win_rate": 0.364,
+     "avg_r": 0.165,
+     "sum_r": 1.8,
+     "profit_factor": 1.24,
+     "median_r": -1.05,
+     "worst_r": -1.16
+    },
+    "GBPUSD": {
+     "trades": 23,
+     "win_rate": 0.435,
+     "avg_r": 0.416,
+     "sum_r": 9.6,
+     "profit_factor": 1.67,
+     "median_r": -1.04,
+     "worst_r": -1.27
+    },
+    "XAUUSD": {
+     "trades": 22,
+     "win_rate": 0.273,
+     "avg_r": 0.05,
+     "sum_r": 1.1,
+     "profit_factor": 1.07,
+     "median_r": -1.02,
+     "worst_r": -1.13
+    },
+    "XTIUSD": {
+     "trades": 18,
+     "win_rate": 0.167,
+     "avg_r": -0.451,
+     "sum_r": -8.1,
+     "profit_factor": 0.48,
+     "median_r": -1.03,
+     "worst_r": -1.09
+    }
+   },
+   "by_side": {
+    "long": {
+     "trades": 105,
+     "win_rate": 0.276,
+     "avg_r": -0.072,
+     "sum_r": -7.5,
+     "profit_factor": 0.91,
+     "median_r": -1.02,
+     "worst_r": -1.27
+    },
+    "short": {
+     "trades": 0
+    }
+   },
+   "exits": {
+    "stop": 76,
+    "objetivo": 28,
+    "tiempo maximo": 1
+   }
+  },
+  {
+   "name": "toques 2 | R min 2 | memoria 240 | libre",
+   "params": {
+    "strategy": "sr",
+    "timeframe": "H4",
+    "max_hold_days": 7.0,
+    "breakeven_r": 0.0,
+    "sr_mode": "bounce",
+    "allow_short": false,
+    "sr_target": "level",
+    "sr_min_rr": 2.0,
+    "sr_min_touches": 2,
+    "sr_lookback": 240,
+    "sr_trend": false
+   },
+   "all": {
+    "trades": 158,
+    "win_rate": 0.373,
+    "avg_r": 0.276,
+    "sum_r": 43.6,
+    "profit_factor": 1.42,
+    "median_r": -1.02,
+    "worst_r": -1.42
+   },
+   "fit": {
+    "trades": 98,
+    "win_rate": 0.398,
+    "avg_r": 0.337,
+    "sum_r": 33.0,
+    "profit_factor": 1.53,
+    "median_r": -1.02,
+    "worst_r": -1.42
+   },
+   "blind": {
+    "trades": 60,
+    "win_rate": 0.333,
+    "avg_r": 0.177,
+    "sum_r": 10.6,
+    "profit_factor": 1.26,
+    "median_r": -1.01,
+    "worst_r": -1.2
+   },
+   "test": {
+    "n": 158,
+    "mean_r": 0.276,
+    "ci95": [
+     -0.005,
+     0.561
+    ],
+    "p_value": 0.0301,
+    "win_rate": 0.373,
+    "profit_factor": 1.42,
+    "sum_r": 43.6
+   },
+   "by_symbol": {
+    "US500": {
+     "trades": 13,
+     "win_rate": 0.462,
+     "avg_r": 0.433,
+     "sum_r": 5.6,
+     "profit_factor": 1.77,
+     "median_r": -1.02,
+     "worst_r": -1.07
+    },
+    "NAS100": {
+     "trades": 22,
+     "win_rate": 0.182,
+     "avg_r": -0.456,
+     "sum_r": -10.0,
+     "profit_factor": 0.46,
+     "median_r": -1.02,
+     "worst_r": -1.04
+    },
+    "EURUSD": {
+     "trades": 23,
+     "win_rate": 0.348,
+     "avg_r": 0.216,
+     "sum_r": 5.0,
+     "profit_factor": 1.31,
+     "median_r": -1.05,
+     "worst_r": -1.16
+    },
+    "GBPUSD": {
+     "trades": 32,
+     "win_rate": 0.5,
+     "avg_r": 0.693,
+     "sum_r": 22.2,
+     "profit_factor": 2.27,
+     "median_r": 0.44,
+     "worst_r": -1.42
+    },
+    "XAUUSD": {
+     "trades": 31,
+     "win_rate": 0.355,
+     "avg_r": 0.24,
+     "sum_r": 7.4,
+     "profit_factor": 1.36,
+     "median_r": -1.01,
+     "worst_r": -1.13
+    },
+    "XTIUSD": {
+     "trades": 37,
+     "win_rate": 0.378,
+     "avg_r": 0.365,
+     "sum_r": 13.5,
+     "profit_factor": 1.57,
+     "median_r": -1.01,
+     "worst_r": -1.09
+    }
+   },
+   "by_side": {
+    "long": {
+     "trades": 158,
+     "win_rate": 0.373,
+     "avg_r": 0.276,
+     "sum_r": 43.6,
+     "profit_factor": 1.42,
+     "median_r": -1.02,
+     "worst_r": -1.42
+    },
+    "short": {
+     "trades": 0
+    }
+   },
+   "exits": {
+    "stop": 99,
+    "objetivo": 54,
+    "tiempo maximo": 5
+   }
+  },
+  {
+   "name": "toques 2 | R min 2 | memoria 240 | tendencia",
+   "params": {
+    "strategy": "sr",
+    "timeframe": "H4",
+    "max_hold_days": 7.0,
+    "breakeven_r": 0.0,
+    "sr_mode": "bounce",
+    "allow_short": false,
+    "sr_target": "level",
+    "sr_min_rr": 2.0,
+    "sr_min_touches": 2,
+    "sr_lookback": 240,
+    "sr_trend": true
+   },
+   "all": {
+    "trades": 88,
+    "win_rate": 0.386,
+    "avg_r": 0.3,
+    "sum_r": 26.4,
+    "profit_factor": 1.47,
+    "median_r": -1.02,
+    "worst_r": -1.16
+   },
+   "fit": {
+    "trades": 58,
+    "win_rate": 0.362,
+    "avg_r": 0.231,
+    "sum_r": 13.4,
+    "profit_factor": 1.35,
+    "median_r": -1.02,
+    "worst_r": -1.13
+   },
+   "blind": {
+    "trades": 30,
+    "win_rate": 0.433,
+    "avg_r": 0.436,
+    "sum_r": 13.1,
+    "profit_factor": 1.74,
+    "median_r": -1.01,
+    "worst_r": -1.16
+   },
+   "test": {
+    "n": 88,
+    "mean_r": 0.3,
+    "ci95": [
+     -0.074,
+     0.676
+    ],
+    "p_value": 0.0616,
+    "win_rate": 0.386,
+    "profit_factor": 1.47,
+    "sum_r": 26.4
+   },
+   "by_symbol": {
+    "US500": {
+     "trades": 8,
+     "win_rate": 0.375,
+     "avg_r": 0.087,
+     "sum_r": 0.7,
+     "profit_factor": 1.13,
+     "median_r": -1.02,
+     "worst_r": -1.07
+    },
+    "NAS100": {
+     "trades": 15,
+     "win_rate": 0.133,
+     "avg_r": -0.63,
+     "sum_r": -9.4,
+     "profit_factor": 0.29,
+     "median_r": -1.02,
+     "worst_r": -1.04
+    },
+    "EURUSD": {
+     "trades": 9,
+     "win_rate": 0.444,
+     "avg_r": 0.496,
+     "sum_r": 4.5,
+     "profit_factor": 1.82,
+     "median_r": -1.05,
+     "worst_r": -1.16
+    },
+    "GBPUSD": {
+     "trades": 19,
+     "win_rate": 0.579,
+     "avg_r": 1.023,
+     "sum_r": 19.4,
+     "profit_factor": 3.29,
+     "median_r": 1.95,
+     "worst_r": -1.1
+    },
+    "XAUUSD": {
+     "trades": 21,
+     "win_rate": 0.381,
+     "avg_r": 0.323,
+     "sum_r": 6.8,
+     "profit_factor": 1.5,
+     "median_r": -1.01,
+     "worst_r": -1.13
+    },
+    "XTIUSD": {
+     "trades": 16,
+     "win_rate": 0.375,
+     "avg_r": 0.283,
+     "sum_r": 4.5,
+     "profit_factor": 1.44,
+     "median_r": -1.02,
+     "worst_r": -1.09
+    }
+   },
+   "by_side": {
+    "long": {
+     "trades": 88,
+     "win_rate": 0.386,
+     "avg_r": 0.3,
+     "sum_r": 26.4,
+     "profit_factor": 1.47,
+     "median_r": -1.02,
+     "worst_r": -1.16
+    },
+    "short": {
+     "trades": 0
+    }
+   },
+   "exits": {
+    "stop": 54,
+    "objetivo": 31,
+    "tiempo maximo": 3
+   }
+  },
+  {
+   "name": "toques 2 | R min 2 | memoria 360 | libre",
+   "params": {
+    "strategy": "sr",
+    "timeframe": "H4",
+    "max_hold_days": 7.0,
+    "breakeven_r": 0.0,
+    "sr_mode": "bounce",
+    "allow_short": false,
+    "sr_target": "level",
+    "sr_min_rr": 2.0,
+    "sr_min_touches": 2,
+    "sr_lookback": 360,
+    "sr_trend": false
+   },
+   "all": {
+    "trades": 139,
+    "win_rate": 0.374,
+    "avg_r": 0.289,
+    "sum_r": 40.1,
+    "profit_factor": 1.44,
+    "median_r": -1.02,
+    "worst_r": -1.42
+   },
+   "fit": {
+    "trades": 88,
+    "win_rate": 0.409,
+    "avg_r": 0.374,
+    "sum_r": 32.9,
+    "profit_factor": 1.6,
+    "median_r": -1.02,
+    "worst_r": -1.42
+   },
+   "blind": {
+    "trades": 51,
+    "win_rate": 0.314,
+    "avg_r": 0.142,
+    "sum_r": 7.2,
+    "profit_factor": 1.2,
+    "median_r": -1.01,
+    "worst_r": -1.2
+   },
+   "test": {
+    "n": 139,
+    "mean_r": 0.289,
+    "ci95": [
+     -0.008,
+     0.602
+    ],
+    "p_value": 0.035,
+    "win_rate": 0.374,
+    "profit_factor": 1.44,
+    "sum_r": 40.1
+   },
+   "by_symbol": {
+    "US500": {
+     "trades": 11,
+     "win_rate": 0.455,
+     "avg_r": 0.401,
+     "sum_r": 4.4,
+     "profit_factor": 1.71,
+     "median_r": -1.02,
+     "worst_r": -1.07
+    },
+    "NAS100": {
+     "trades": 20,
+     "win_rate": 0.25,
+     "avg_r": -0.164,
+     "sum_r": -3.3,
+     "profit_factor": 0.79,
+     "median_r": -1.02,
+     "worst_r": -1.04
+    },
+    "EURUSD": {
+     "trades": 20,
+     "win_rate": 0.4,
+     "avg_r": 0.345,
+     "sum_r": 6.9,
+     "profit_factor": 1.53,
+     "median_r": -1.05,
+     "worst_r": -1.15
+    },
+    "GBPUSD": {
+     "trades": 28,
+     "win_rate": 0.5,
+     "avg_r": 0.633,
+     "sum_r": 17.7,
+     "profit_factor": 2.15,
+     "median_r": 0.44,
+     "worst_r": -1.42
+    },
+    "XAUUSD": {
+     "trades": 24,
+     "win_rate": 0.333,
+     "avg_r": 0.192,
+     "sum_r": 4.6,
+     "profit_factor": 1.28,
+     "median_r": -1.01,
+     "worst_r": -1.13
+    },
+    "XTIUSD": {
+     "trades": 36,
+     "win_rate": 0.333,
+     "avg_r": 0.271,
+     "sum_r": 9.8,
+     "profit_factor": 1.39,
+     "median_r": -1.02,
+     "worst_r": -1.09
+    }
+   },
+   "by_side": {
+    "long": {
+     "trades": 139,
+     "win_rate": 0.374,
+     "avg_r": 0.289,
+     "sum_r": 40.1,
+     "profit_factor": 1.44,
+     "median_r": -1.02,
+     "worst_r": -1.42
+    },
+    "short": {
+     "trades": 0
+    }
+   },
+   "exits": {
+    "stop": 87,
+    "objetivo": 48,
+    "tiempo maximo": 4
+   }
+  },
+  {
+   "name": "toques 2 | R min 2 | memoria 360 | tendencia",
+   "params": {
+    "strategy": "sr",
+    "timeframe": "H4",
+    "max_hold_days": 7.0,
+    "breakeven_r": 0.0,
+    "sr_mode": "bounce",
+    "allow_short": false,
+    "sr_target": "level",
+    "sr_min_rr": 2.0,
+    "sr_min_touches": 2,
+    "sr_lookback": 360,
+    "sr_trend": true
+   },
+   "all": {
+    "trades": 85,
+    "win_rate": 0.435,
+    "avg_r": 0.505,
+    "sum_r": 42.9,
+    "profit_factor": 1.86,
+    "median_r": -1.01,
+    "worst_r": -1.13
+   },
+   "fit": {
+    "trades": 54,
+    "win_rate": 0.426,
+    "avg_r": 0.471,
+    "sum_r": 25.4,
+    "profit_factor": 1.79,
+    "median_r": -1.02,
+    "worst_r": -1.13
+   },
+   "blind": {
+    "trades": 31,
+    "win_rate": 0.452,
+    "avg_r": 0.563,
+    "sum_r": 17.4,
+    "profit_factor": 1.99,
+    "median_r": -1.01,
+    "worst_r": -1.11
+   },
+   "test": {
+    "n": 85,
+    "mean_r": 0.505,
+    "ci95": [
+     0.115,
+     0.913
+    ],
+    "p_value": 0.0075,
+    "win_rate": 0.435,
+    "profit_factor": 1.86,
+    "sum_r": 42.9
+   },
+   "by_symbol": {
+    "US500": {
+     "trades": 8,
+     "win_rate": 0.375,
+     "avg_r": 0.087,
+     "sum_r": 0.7,
+     "profit_factor": 1.13,
+     "median_r": -1.02,
+     "worst_r": -1.07
+    },
+    "NAS100": {
+     "trades": 14,
+     "win_rate": 0.286,
+     "avg_r": -0.018,
+     "sum_r": -0.3,
+     "profit_factor": 0.97,
+     "median_r": -1.02,
+     "worst_r": -1.04
+    },
+    "EURUSD": {
+     "trades": 10,
+     "win_rate": 0.5,
+     "avg_r": 0.528,
+     "sum_r": 5.3,
+     "profit_factor": 1.97,
+     "median_r": 0.41,
+     "worst_r": -1.11
+    },
+    "GBPUSD": {
+     "trades": 17,
+     "win_rate": 0.647,
+     "avg_r": 1.207,
+     "sum_r": 20.5,
+     "profit_factor": 4.2,
+     "median_r": 1.97,
+     "worst_r": -1.1
+    },
+    "XAUUSD": {
+     "trades": 19,
+     "win_rate": 0.421,
+     "avg_r": 0.513,
+     "sum_r": 9.8,
+     "profit_factor": 1.86,
+     "median_r": -1.01,
+     "worst_r": -1.13
+    },
+    "XTIUSD": {
+     "trades": 17,
+     "win_rate": 0.353,
+     "avg_r": 0.406,
+     "sum_r": 6.9,
+     "profit_factor": 1.61,
+     "median_r": -1.02,
+     "worst_r": -1.09
+    }
+   },
+   "by_side": {
+    "long": {
+     "trades": 85,
+     "win_rate": 0.435,
+     "avg_r": 0.505,
+     "sum_r": 42.9,
+     "profit_factor": 1.86,
+     "median_r": -1.01,
+     "worst_r": -1.13
+    },
+    "short": {
+     "trades": 0
+    }
+   },
+   "exits": {
+    "stop": 48,
+    "objetivo": 35,
+    "tiempo maximo": 2
+   }
+  },
+  {
+   "name": "toques 2 | R min 3 | memoria 160 | libre",
+   "params": {
+    "strategy": "sr",
+    "timeframe": "H4",
+    "max_hold_days": 7.0,
+    "breakeven_r": 0.0,
+    "sr_mode": "bounce",
+    "allow_short": false,
+    "sr_target": "level",
+    "sr_min_rr": 3.0,
+    "sr_min_touches": 2,
+    "sr_lookback": 160,
+    "sr_trend": false
+   },
+   "all": {
+    "trades": 72,
+    "win_rate": 0.208,
+    "avg_r": -0.049,
+    "sum_r": -3.5,
+    "profit_factor": 0.94,
+    "median_r": -1.02,
+    "worst_r": -1.27
+   },
+   "fit": {
+    "trades": 41,
+    "win_rate": 0.195,
+    "avg_r": -0.1,
+    "sum_r": -4.1,
+    "profit_factor": 0.88,
+    "median_r": -1.03,
+    "worst_r": -1.27
+   },
+   "blind": {
+    "trades": 31,
+    "win_rate": 0.226,
+    "avg_r": 0.02,
+    "sum_r": 0.6,
+    "profit_factor": 1.02,
+    "median_r": -1.01,
+    "worst_r": -1.21
+   },
+   "test": {
+    "n": 72,
+    "mean_r": -0.049,
+    "ci95": [
+     -0.496,
+     0.437
+    ],
+    "p_value": 0.5692,
+    "win_rate": 0.208,
+    "profit_factor": 0.94,
+    "sum_r": -3.5
+   },
+   "by_symbol": {
+    "US500": {
+     "trades": 4,
+     "win_rate": 0.25,
+     "avg_r": 0.035,
+     "sum_r": 0.1,
+     "profit_factor": 1.05,
+     "median_r": -1.02,
+     "worst_r": -1.05
+    },
+    "NAS100": {
+     "trades": 12,
+     "win_rate": 0.167,
+     "avg_r": -0.161,
+     "sum_r": -1.9,
+     "profit_factor": 0.81,
+     "median_r": -1.02,
+     "worst_r": -1.21
+    },
+    "EURUSD": {
+     "trades": 10,
+     "win_rate": 0.1,
+     "avg_r": -0.546,
+     "sum_r": -5.5,
+     "profit_factor": 0.44,
+     "median_r": -1.06,
+     "worst_r": -1.19
+    },
+    "GBPUSD": {
+     "trades": 11,
+     "win_rate": 0.182,
+     "avg_r": -0.135,
+     "sum_r": -1.5,
+     "profit_factor": 0.85,
+     "median_r": -1.07,
+     "worst_r": -1.27
+    },
+    "XAUUSD": {
+     "trades": 15,
+     "win_rate": 0.267,
+     "avg_r": 0.153,
+     "sum_r": 2.3,
+     "profit_factor": 1.2,
+     "median_r": -1.01,
+     "worst_r": -1.04
+    },
+    "XTIUSD": {
+     "trades": 20,
+     "win_rate": 0.25,
+     "avg_r": 0.147,
+     "sum_r": 2.9,
+     "profit_factor": 1.19,
+     "median_r": -1.02,
+     "worst_r": -1.07
+    }
+   },
+   "by_side": {
+    "long": {
+     "trades": 72,
+     "win_rate": 0.208,
+     "avg_r": -0.049,
+     "sum_r": -3.5,
+     "profit_factor": 0.94,
+     "median_r": -1.02,
+     "worst_r": -1.27
+    },
+    "short": {
+     "trades": 0
+    }
+   },
+   "exits": {
+    "stop": 57,
+    "objetivo": 12,
+    "tiempo maximo": 3
+   }
+  },
+  {
+   "name": "toques 2 | R min 3 | memoria 160 | tendencia",
+   "params": {
+    "strategy": "sr",
+    "timeframe": "H4",
+    "max_hold_days": 7.0,
+    "breakeven_r": 0.0,
+    "sr_mode": "bounce",
+    "allow_short": false,
+    "sr_target": "level",
+    "sr_min_rr": 3.0,
+    "sr_min_touches": 2,
+    "sr_lookback": 160,
+    "sr_trend": true
+   },
+   "all": {
+    "trades": 41,
+    "win_rate": 0.171,
+    "avg_r": -0.156,
+    "sum_r": -6.4,
+    "profit_factor": 0.82,
+    "median_r": -1.03,
+    "worst_r": -1.27
+   },
+   "fit": {
+    "trades": 24,
+    "win_rate": 0.167,
+    "avg_r": -0.085,
+    "sum_r": -2.1,
+    "profit_factor": 0.9,
+    "median_r": -1.03,
+    "worst_r": -1.27
+   },
+   "blind": {
+    "trades": 17,
+    "win_rate": 0.176,
+    "avg_r": -0.255,
+    "sum_r": -4.3,
+    "profit_factor": 0.71,
+    "median_r": -1.02,
+    "worst_r": -1.21
+   },
+   "test": {
+    "n": 41,
+    "mean_r": -0.156,
+    "ci95": [
+     -0.732,
+     0.499
+    ],
+    "p_value": 0.6715,
+    "win_rate": 0.171,
+    "profit_factor": 0.82,
+    "sum_r": -6.4
+   },
+   "by_symbol": {
+    "US500": {
+     "trades": 1,
+     "win_rate": 1.0,
+     "avg_r": 3.227,
+     "sum_r": 3.2,
+     "profit_factor": null,
+     "median_r": 3.23,
+     "worst_r": 3.23
+    },
+    "NAS100": {
+     "trades": 10,
+     "win_rate": 0.1,
+     "avg_r": -0.575,
+     "sum_r": -5.7,
+     "profit_factor": 0.39,
+     "median_r": -1.02,
+     "worst_r": -1.21
+    },
+    "EURUSD": {
+     "trades": 5,
+     "win_rate": 0.2,
+     "avg_r": -0.02,
+     "sum_r": -0.1,
+     "profit_factor": 0.98,
+     "median_r": -1.06,
+     "worst_r": -1.19
+    },
+    "GBPUSD": {
+     "trades": 8,
+     "win_rate": 0.125,
+     "avg_r": -0.37,
+     "sum_r": -3.0,
+     "profit_factor": 0.62,
+     "median_r": -1.08,
+     "worst_r": -1.27
+    },
+    "XAUUSD": {
+     "trades": 8,
+     "win_rate": 0.25,
+     "avg_r": 0.528,
+     "sum_r": 4.2,
+     "profit_factor": 1.69,
+     "median_r": -1.01,
+     "worst_r": -1.04
+    },
+    "XTIUSD": {
+     "trades": 9,
+     "win_rate": 0.111,
+     "avg_r": -0.56,
+     "sum_r": -5.0,
+     "profit_factor": 0.39,
+     "median_r": -1.02,
+     "worst_r": -1.07
+    }
+   },
+   "by_side": {
+    "long": {
+     "trades": 41,
+     "win_rate": 0.171,
+     "avg_r": -0.156,
+     "sum_r": -6.4,
+     "profit_factor": 0.82,
+     "median_r": -1.03,
+     "worst_r": -1.27
+    },
+    "short": {
+     "trades": 0
+    }
+   },
+   "exits": {
+    "stop": 34,
+    "objetivo": 6,
+    "tiempo maximo": 1
+   }
+  },
+  {
+   "name": "toques 2 | R min 3 | memoria 240 | libre",
+   "params": {
+    "strategy": "sr",
+    "timeframe": "H4",
+    "max_hold_days": 7.0,
+    "breakeven_r": 0.0,
+    "sr_mode": "bounce",
+    "allow_short": false,
+    "sr_target": "level",
+    "sr_min_rr": 3.0,
+    "sr_min_touches": 2,
+    "sr_lookback": 240,
+    "sr_trend": false
+   },
+   "all": {
+    "trades": 55,
+    "win_rate": 0.364,
+    "avg_r": 0.733,
+    "sum_r": 40.3,
+    "profit_factor": 2.11,
+    "median_r": -1.02,
+    "worst_r": -1.19
+   },
+   "fit": {
+    "trades": 32,
+    "win_rate": 0.344,
+    "avg_r": 0.785,
+    "sum_r": 25.1,
+    "profit_factor": 2.15,
+    "median_r": -1.02,
+    "worst_r": -1.09
+   },
+   "blind": {
+    "trades": 23,
+    "win_rate": 0.391,
+    "avg_r": 0.661,
+    "sum_r": 15.2,
+    "profit_factor": 2.04,
+    "median_r": -1.01,
+    "worst_r": -1.19
+   },
+   "test": {
+    "n": 55,
+    "mean_r": 0.733,
+    "ci95": [
+     0.083,
+     1.459
+    ],
+    "p_value": 0.023,
+    "win_rate": 0.364,
+    "profit_factor": 2.11,
+    "sum_r": 40.3
+   },
+   "by_symbol": {
+    "US500": {
+     "trades": 1,
+     "win_rate": 0.0,
+     "avg_r": -1.049,
+     "sum_r": -1.0,
+     "profit_factor": 0.0,
+     "median_r": -1.05,
+     "worst_r": -1.05
+    },
+    "NAS100": {
+     "trades": 9,
+     "win_rate": 0.222,
+     "avg_r": 0.145,
+     "sum_r": 1.3,
+     "profit_factor": 1.18,
+     "median_r": -1.03,
+     "worst_r": -1.03
+    },
+    "EURUSD": {
+     "trades": 8,
+     "win_rate": 0.375,
+     "avg_r": 0.844,
+     "sum_r": 6.7,
+     "profit_factor": 2.24,
+     "median_r": -1.05,
+     "worst_r": -1.19
+    },
+    "GBPUSD": {
+     "trades": 5,
+     "win_rate": 0.4,
+     "avg_r": 0.834,
+     "sum_r": 4.2,
+     "profit_factor": 2.31,
+     "median_r": -1.03,
+     "worst_r": -1.08
+    },
+    "XAUUSD": {
+     "trades": 13,
+     "win_rate": 0.385,
+     "avg_r": 0.525,
+     "sum_r": 6.8,
+     "profit_factor": 1.83,
+     "median_r": -1.01,
+     "worst_r": -1.09
+    },
+    "XTIUSD": {
+     "trades": 19,
+     "win_rate": 0.421,
+     "avg_r": 1.175,
+     "sum_r": 22.3,
+     "profit_factor": 2.96,
+     "median_r": -1.01,
+     "worst_r": -1.09
+    }
+   },
+   "by_side": {
+    "long": {
+     "trades": 55,
+     "win_rate": 0.364,
+     "avg_r": 0.733,
+     "sum_r": 40.3,
+     "profit_factor": 2.11,
+     "median_r": -1.02,
+     "worst_r": -1.19
+    },
+    "short": {
+     "trades": 0
+    }
+   },
+   "exits": {
+    "stop": 35,
+    "objetivo": 16,
+    "tiempo maximo": 4
+   }
+  },
+  {
+   "name": "toques 2 | R min 3 | memoria 240 | tendencia",
+   "params": {
+    "strategy": "sr",
+    "timeframe": "H4",
+    "max_hold_days": 7.0,
+    "breakeven_r": 0.0,
+    "sr_mode": "bounce",
+    "allow_short": false,
+    "sr_target": "level",
+    "sr_min_rr": 3.0,
+    "sr_min_touches": 2,
+    "sr_lookback": 240,
+    "sr_trend": true
+   },
+   "all": {
+    "trades": 34,
+    "win_rate": 0.353,
+    "avg_r": 0.473,
+    "sum_r": 16.1,
+    "profit_factor": 1.7,
+    "median_r": -1.02,
+    "worst_r": -1.19
+   },
+   "fit": {
+    "trades": 20,
+    "win_rate": 0.3,
+    "avg_r": 0.324,
+    "sum_r": 6.5,
+    "profit_factor": 1.44,
+    "median_r": -1.02,
+    "worst_r": -1.09
+   },
+   "blind": {
+    "trades": 14,
+    "win_rate": 0.429,
+    "avg_r": 0.685,
+    "sum_r": 9.6,
+    "profit_factor": 2.14,
+    "median_r": -1.01,
+    "worst_r": -1.19
+   },
+   "test": {
+    "n": 34,
+    "mean_r": 0.473,
+    "ci95": [
+     -0.243,
+     1.26
+    ],
+    "p_value": 0.1133,
+    "win_rate": 0.353,
+    "profit_factor": 1.7,
+    "sum_r": 16.1
+   },
+   "by_symbol": {
+    "US500": {
+     "trades": 0
+    },
+    "NAS100": {
+     "trades": 7,
+     "win_rate": 0.143,
+     "avg_r": -0.359,
+     "sum_r": -2.5,
+     "profit_factor": 0.59,
+     "median_r": -1.03,
+     "worst_r": -1.03
+    },
+    "EURUSD": {
+     "trades": 5,
+     "win_rate": 0.4,
+     "avg_r": 0.832,
+     "sum_r": 4.2,
+     "profit_factor": 2.25,
+     "median_r": -1.05,
+     "worst_r": -1.19
+    },
+    "GBPUSD": {
+     "trades": 4,
+     "win_rate": 0.5,
+     "avg_r": 1.31,
+     "sum_r": 5.2,
+     "profit_factor": 3.48,
+     "median_r": 1.01,
+     "worst_r": -1.08
+    },
+    "XAUUSD": {
+     "trades": 9,
+     "win_rate": 0.444,
+     "avg_r": 0.752,
+     "sum_r": 6.8,
+     "profit_factor": 2.31,
+     "median_r": -1.01,
+     "worst_r": -1.09
+    },
+    "XTIUSD": {
+     "trades": 9,
+     "win_rate": 0.333,
+     "avg_r": 0.269,
+     "sum_r": 2.4,
+     "profit_factor": 1.39,
+     "median_r": -1.02,
+     "worst_r": -1.09
+    }
+   },
+   "by_side": {
+    "long": {
+     "trades": 34,
+     "win_rate": 0.353,
+     "avg_r": 0.473,
+     "sum_r": 16.1,
+     "profit_factor": 1.7,
+     "median_r": -1.02,
+     "worst_r": -1.19
+    },
+    "short": {
+     "trades": 0
+    }
+   },
+   "exits": {
+    "stop": 22,
+    "objetivo": 9,
+    "tiempo maximo": 3
+   }
+  },
+  {
+   "name": "toques 2 | R min 3 | memoria 360 | libre",
+   "params": {
+    "strategy": "sr",
+    "timeframe": "H4",
+    "max_hold_days": 7.0,
+    "breakeven_r": 0.0,
+    "sr_mode": "bounce",
+    "allow_short": false,
+    "sr_target": "level",
+    "sr_min_rr": 3.0,
+    "sr_min_touches": 2,
+    "sr_lookback": 360,
+    "sr_trend": false
+   },
+   "all": {
+    "trades": 45,
+    "win_rate": 0.311,
+    "avg_r": 0.418,
+    "sum_r": 18.8,
+    "profit_factor": 1.58,
+    "median_r": -1.02,
+    "worst_r": -1.1
+   },
+   "fit": {
+    "trades": 25,
+    "win_rate": 0.28,
+    "avg_r": 0.296,
+    "sum_r": 7.4,
+    "profit_factor": 1.4,
+    "median_r": -1.03,
+    "worst_r": -1.09
+   },
+   "blind": {
+    "trades": 20,
+    "win_rate": 0.35,
+    "avg_r": 0.569,
+    "sum_r": 11.4,
+    "profit_factor": 1.85,
+    "median_r": -1.01,
+    "worst_r": -1.1
+   },
+   "test": {
+    "n": 45,
+    "mean_r": 0.418,
+    "ci95": [
+     -0.23,
+     1.125
+    ],
+    "p_value": 0.1172,
+    "win_rate": 0.311,
+    "profit_factor": 1.58,
+    "sum_r": 18.8
+   },
+   "by_symbol": {
+    "US500": {
+     "trades": 0
+    },
+    "NAS100": {
+     "trades": 8,
+     "win_rate": 0.25,
+     "avg_r": 0.145,
+     "sum_r": 1.2,
+     "profit_factor": 1.19,
+     "median_r": -1.02,
+     "worst_r": -1.03
+    },
+    "EURUSD": {
+     "trades": 4,
+     "win_rate": 0.25,
+     "avg_r": 0.38,
+     "sum_r": 1.5,
+     "profit_factor": 1.48,
+     "median_r": -1.04,
+     "worst_r": -1.1
+    },
+    "GBPUSD": {
+     "trades": 5,
+     "win_rate": 0.2,
+     "avg_r": 0.004,
+     "sum_r": 0.0,
+     "profit_factor": 1.0,
+     "median_r": -1.07,
+     "worst_r": -1.1
+    },
+    "XAUUSD": {
+     "trades": 9,
+     "win_rate": 0.333,
+     "avg_r": 0.45,
+     "sum_r": 4.1,
+     "profit_factor": 1.66,
+     "median_r": -1.01,
+     "worst_r": -1.04
+    },
+    "XTIUSD": {
+     "trades": 19,
+     "win_rate": 0.368,
+     "avg_r": 0.634,
+     "sum_r": 12.0,
+     "profit_factor": 1.97,
+     "median_r": -1.01,
+     "worst_r": -1.09
+    }
+   },
+   "by_side": {
+    "long": {
+     "trades": 45,
+     "win_rate": 0.311,
+     "avg_r": 0.418,
+     "sum_r": 18.8,
+     "profit_factor": 1.58,
+     "median_r": -1.02,
+     "worst_r": -1.1
+    },
+    "short": {
+     "trades": 0
+    }
+   },
+   "exits": {
+    "stop": 31,
+    "objetivo": 11,
+    "tiempo maximo": 3
+   }
+  },
+  {
+   "name": "toques 2 | R min 3 | memoria 360 | tendencia",
+   "params": {
+    "strategy": "sr",
+    "timeframe": "H4",
+    "max_hold_days": 7.0,
+    "breakeven_r": 0.0,
+    "sr_mode": "bounce",
+    "allow_short": false,
+    "sr_target": "level",
+    "sr_min_rr": 3.0,
+    "sr_min_touches": 2,
+    "sr_lookback": 360,
+    "sr_trend": true
+   },
+   "all": {
+    "trades": 29,
+    "win_rate": 0.31,
+    "avg_r": 0.425,
+    "sum_r": 12.3,
+    "profit_factor": 1.59,
+    "median_r": -1.02,
+    "worst_r": -1.1
+   },
+   "fit": {
+    "trades": 16,
+    "win_rate": 0.25,
+    "avg_r": 0.279,
+    "sum_r": 4.5,
+    "profit_factor": 1.36,
+    "median_r": -1.02,
+    "worst_r": -1.09
+   },
+   "blind": {
+    "trades": 13,
+    "win_rate": 0.385,
+    "avg_r": 0.604,
+    "sum_r": 7.8,
+    "profit_factor": 1.94,
+    "median_r": -1.01,
+    "worst_r": -1.1
+   },
+   "test": {
+    "n": 29,
+    "mean_r": 0.425,
+    "ci95": [
+     -0.369,
+     1.286
+    ],
+    "p_value": 0.1615,
+    "win_rate": 0.31,
+    "profit_factor": 1.59,
+    "sum_r": 12.3
+   },
+   "by_symbol": {
+    "US500": {
+     "trades": 0
+    },
+    "NAS100": {
+     "trades": 8,
+     "win_rate": 0.25,
+     "avg_r": 0.145,
+     "sum_r": 1.2,
+     "profit_factor": 1.19,
+     "median_r": -1.02,
+     "worst_r": -1.03
+    },
+    "EURUSD": {
+     "trades": 1,
+     "win_rate": 0.0,
+     "avg_r": -1.097,
+     "sum_r": -1.1,
+     "profit_factor": 0.0,
+     "median_r": -1.1,
+     "worst_r": -1.1
+    },
+    "GBPUSD": {
+     "trades": 4,
+     "win_rate": 0.25,
+     "avg_r": 0.272,
+     "sum_r": 1.1,
+     "profit_factor": 1.34,
+     "median_r": -1.05,
+     "worst_r": -1.1
+    },
+    "XAUUSD": {
+     "trades": 7,
+     "win_rate": 0.429,
+     "avg_r": 0.871,
+     "sum_r": 6.1,
+     "profit_factor": 2.49,
+     "median_r": -1.01,
+     "worst_r": -1.04
+    },
+    "XTIUSD": {
+     "trades": 9,
+     "win_rate": 0.333,
+     "avg_r": 0.562,
+     "sum_r": 5.1,
+     "profit_factor": 1.81,
+     "median_r": -1.02,
+     "worst_r": -1.09
+    }
+   },
+   "by_side": {
+    "long": {
+     "trades": 29,
+     "win_rate": 0.31,
+     "avg_r": 0.425,
+     "sum_r": 12.3,
+     "profit_factor": 1.59,
+     "median_r": -1.02,
+     "worst_r": -1.1
+    },
+    "short": {
+     "trades": 0
+    }
+   },
+   "exits": {
+    "stop": 20,
+    "objetivo": 7,
+    "tiempo maximo": 2
+   }
+  },
+  {
+   "name": "toques 3 | R min 1.5 | memoria 160 | libre",
+   "params": {
+    "strategy": "sr",
+    "timeframe": "H4",
+    "max_hold_days": 7.0,
+    "breakeven_r": 0.0,
+    "sr_mode": "bounce",
+    "allow_short": false,
+    "sr_target": "level",
+    "sr_min_rr": 1.5,
+    "sr_min_touches": 3,
+    "sr_lookback": 160,
+    "sr_trend": false
+   },
+   "all": {
+    "trades": 289,
+    "win_rate": 0.332,
+    "avg_r": -0.018,
+    "sum_r": -5.1,
+    "profit_factor": 0.97,
+    "median_r": -1.02,
+    "worst_r": -1.38
+   },
+   "fit": {
+    "trades": 190,
+    "win_rate": 0.337,
+    "avg_r": 0.004,
+    "sum_r": 0.8,
+    "profit_factor": 1.01,
+    "median_r": -1.03,
+    "worst_r": -1.31
+   },
+   "blind": {
+    "trades": 99,
+    "win_rate": 0.323,
+    "avg_r": -0.059,
+    "sum_r": -5.9,
+    "profit_factor": 0.92,
+    "median_r": -1.02,
+    "worst_r": -1.38
+   },
+   "test": {
+    "n": 289,
+    "mean_r": -0.018,
+    "ci95": [
+     -0.187,
+     0.161
+    ],
+    "p_value": 0.5733,
+    "win_rate": 0.332,
+    "profit_factor": 0.97,
+    "sum_r": -5.1
+   },
+   "by_symbol": {
+    "US500": {
+     "trades": 29,
+     "win_rate": 0.276,
+     "avg_r": -0.153,
+     "sum_r": -4.5,
+     "profit_factor": 0.8,
+     "median_r": -1.03,
+     "worst_r": -1.16
+    },
+    "NAS100": {
+     "trades": 42,
+     "win_rate": 0.31,
+     "avg_r": -0.067,
+     "sum_r": -2.8,
+     "profit_factor": 0.91,
+     "median_r": -1.02,
+     "worst_r": -1.17
+    },
+    "EURUSD": {
+     "trades": 58,
+     "win_rate": 0.293,
+     "avg_r": -0.108,
+     "sum_r": -6.2,
+     "profit_factor": 0.86,
+     "median_r": -1.04,
+     "worst_r": -1.38
+    },
+    "GBPUSD": {
+     "trades": 60,
+     "win_rate": 0.417,
+     "avg_r": 0.194,
+     "sum_r": 11.7,
+     "profit_factor": 1.31,
+     "median_r": -1.04,
+     "worst_r": -1.31
+    },
+    "XAUUSD": {
+     "trades": 48,
+     "win_rate": 0.312,
+     "avg_r": -0.103,
+     "sum_r": -4.9,
+     "profit_factor": 0.85,
+     "median_r": -1.02,
+     "worst_r": -1.09
+    },
+    "XTIUSD": {
+     "trades": 52,
+     "win_rate": 0.346,
+     "avg_r": 0.032,
+     "sum_r": 1.7,
+     "profit_factor": 1.05,
+     "median_r": -1.02,
+     "worst_r": -1.06
+    }
+   },
+   "by_side": {
+    "long": {
+     "trades": 289,
+     "win_rate": 0.332,
+     "avg_r": -0.018,
+     "sum_r": -5.1,
+     "profit_factor": 0.97,
+     "median_r": -1.02,
+     "worst_r": -1.38
+    },
+    "short": {
+     "trades": 0
+    }
+   },
+   "exits": {
+    "stop": 193,
+    "objetivo": 95,
+    "tiempo maximo": 1
+   }
+  },
+  {
+   "name": "toques 3 | R min 1.5 | memoria 160 | tendencia",
+   "params": {
+    "strategy": "sr",
+    "timeframe": "H4",
+    "max_hold_days": 7.0,
+    "breakeven_r": 0.0,
+    "sr_mode": "bounce",
+    "allow_short": false,
+    "sr_target": "level",
+    "sr_min_rr": 1.5,
+    "sr_min_touches": 3,
+    "sr_lookback": 160,
+    "sr_trend": true
+   },
+   "all": {
+    "trades": 162,
+    "win_rate": 0.34,
+    "avg_r": 0.016,
+    "sum_r": 2.5,
+    "profit_factor": 1.02,
+    "median_r": -1.02,
+    "worst_r": -1.19
+   },
+   "fit": {
+    "trades": 104,
+    "win_rate": 0.346,
+    "avg_r": 0.042,
+    "sum_r": 4.4,
+    "profit_factor": 1.06,
+    "median_r": -1.02,
+    "worst_r": -1.18
+   },
+   "blind": {
+    "trades": 58,
+    "win_rate": 0.328,
+    "avg_r": -0.032,
+    "sum_r": -1.8,
+    "profit_factor": 0.95,
+    "median_r": -1.02,
+    "worst_r": -1.19
+   },
+   "test": {
+    "n": 162,
+    "mean_r": 0.016,
+    "ci95": [
+     -0.209,
+     0.247
+    ],
+    "p_value": 0.4424,
+    "win_rate": 0.34,
+    "profit_factor": 1.02,
+    "sum_r": 2.5
+   },
+   "by_symbol": {
+    "US500": {
+     "trades": 21,
+     "win_rate": 0.238,
+     "avg_r": -0.205,
+     "sum_r": -4.3,
+     "profit_factor": 0.74,
+     "median_r": -1.04,
+     "worst_r": -1.16
+    },
+    "NAS100": {
+     "trades": 29,
+     "win_rate": 0.31,
+     "avg_r": -0.05,
+     "sum_r": -1.5,
+     "profit_factor": 0.93,
+     "median_r": -1.02,
+     "worst_r": -1.17
+    },
+    "EURUSD": {
+     "trades": 22,
+     "win_rate": 0.318,
+     "avg_r": -0.05,
+     "sum_r": -1.1,
+     "profit_factor": 0.93,
+     "median_r": -1.03,
+     "worst_r": -1.19
+    },
+    "GBPUSD": {
+     "trades": 31,
+     "win_rate": 0.452,
+     "avg_r": 0.323,
+     "sum_r": 10.0,
+     "profit_factor": 1.54,
+     "median_r": -1.04,
+     "worst_r": -1.18
+    },
+    "XAUUSD": {
+     "trades": 34,
+     "win_rate": 0.294,
+     "avg_r": -0.174,
+     "sum_r": -5.9,
+     "profit_factor": 0.76,
+     "median_r": -1.02,
+     "worst_r": -1.09
+    },
+    "XTIUSD": {
+     "trades": 25,
+     "win_rate": 0.4,
+     "avg_r": 0.21,
+     "sum_r": 5.3,
+     "profit_factor": 1.34,
+     "median_r": -1.02,
+     "worst_r": -1.05
+    }
+   },
+   "by_side": {
+    "long": {
+     "trades": 162,
+     "win_rate": 0.34,
+     "avg_r": 0.016,
+     "sum_r": 2.5,
+     "profit_factor": 1.02,
+     "median_r": -1.02,
+     "worst_r": -1.19
+    },
+    "short": {
+     "trades": 0
+    }
+   },
+   "exits": {
+    "stop": 107,
+    "objetivo": 55
+   }
+  },
+  {
+   "name": "toques 3 | R min 1.5 | memoria 240 | libre",
+   "params": {
+    "strategy": "sr",
+    "timeframe": "H4",
+    "max_hold_days": 7.0,
+    "breakeven_r": 0.0,
+    "sr_mode": "bounce",
+    "allow_short": false,
+    "sr_target": "level",
+    "sr_min_rr": 1.5,
+    "sr_min_touches": 3,
+    "sr_lookback": 240,
+    "sr_trend": false
+   },
+   "all": {
+    "trades": 316,
+    "win_rate": 0.342,
+    "avg_r": 0.002,
+    "sum_r": 0.6,
+    "profit_factor": 1.0,
+    "median_r": -1.02,
+    "worst_r": -1.38
+   },
+   "fit": {
+    "trades": 218,
+    "win_rate": 0.372,
+    "avg_r": 0.096,
+    "sum_r": 21.0,
+    "profit_factor": 1.15,
+    "median_r": -1.02,
+    "worst_r": -1.31
+   },
+   "blind": {
+    "trades": 98,
+    "win_rate": 0.276,
+    "avg_r": -0.208,
+    "sum_r": -20.4,
+    "profit_factor": 0.73,
+    "median_r": -1.02,
+    "worst_r": -1.38
+   },
+   "test": {
+    "n": 316,
+    "mean_r": 0.002,
+    "ci95": [
+     -0.167,
+     0.174
+    ],
+    "p_value": 0.4859,
+    "win_rate": 0.342,
+    "profit_factor": 1.0,
+    "sum_r": 0.6
+   },
+   "by_symbol": {
+    "US500": {
+     "trades": 37,
+     "win_rate": 0.243,
+     "avg_r": -0.306,
+     "sum_r": -11.3,
+     "profit_factor": 0.61,
+     "median_r": -1.03,
+     "worst_r": -1.16
+    },
+    "NAS100": {
+     "trades": 43,
+     "win_rate": 0.302,
+     "avg_r": -0.183,
+     "sum_r": -7.9,
+     "profit_factor": 0.75,
+     "median_r": -1.01,
+     "worst_r": -1.21
+    },
+    "EURUSD": {
+     "trades": 64,
+     "win_rate": 0.328,
+     "avg_r": -0.09,
+     "sum_r": -5.7,
+     "profit_factor": 0.88,
+     "median_r": -1.04,
+     "worst_r": -1.38
+    },
+    "GBPUSD": {
+     "trades": 70,
+     "win_rate": 0.443,
+     "avg_r": 0.356,
+     "sum_r": 24.9,
+     "profit_factor": 1.59,
+     "median_r": -1.03,
+     "worst_r": -1.31
+    },
+    "XAUUSD": {
+     "trades": 50,
+     "win_rate": 0.26,
+     "avg_r": -0.251,
+     "sum_r": -12.5,
+     "profit_factor": 0.67,
+     "median_r": -1.02,
+     "worst_r": -1.09
+    },
+    "XTIUSD": {
+     "trades": 52,
+     "win_rate": 0.404,
+     "avg_r": 0.253,
+     "sum_r": 13.2,
+     "profit_factor": 1.41,
+     "median_r": -1.02,
+     "worst_r": -1.05
+    }
+   },
+   "by_side": {
+    "long": {
+     "trades": 316,
+     "win_rate": 0.342,
+     "avg_r": 0.002,
+     "sum_r": 0.6,
+     "profit_factor": 1.0,
+     "median_r": -1.02,
+     "worst_r": -1.38
+    },
+    "short": {
+     "trades": 0
+    }
+   },
+   "exits": {
+    "stop": 208,
+    "objetivo": 106,
+    "tiempo maximo": 2
+   }
+  },
+  {
+   "name": "toques 3 | R min 1.5 | memoria 240 | tendencia",
+   "params": {
+    "strategy": "sr",
+    "timeframe": "H4",
+    "max_hold_days": 7.0,
+    "breakeven_r": 0.0,
+    "sr_mode": "bounce",
+    "allow_short": false,
+    "sr_target": "level",
+    "sr_min_rr": 1.5,
+    "sr_min_touches": 3,
+    "sr_lookback": 240,
+    "sr_trend": true
+   },
+   "all": {
+    "trades": 190,
+    "win_rate": 0.337,
+    "avg_r": -0.004,
+    "sum_r": -0.7,
+    "profit_factor": 0.99,
+    "median_r": -1.02,
+    "worst_r": -1.28
+   },
+   "fit": {
+    "trades": 133,
+    "win_rate": 0.376,
+    "avg_r": 0.116,
+    "sum_r": 15.5,
+    "profit_factor": 1.18,
+    "median_r": -1.02,
+    "worst_r": -1.28
+   },
+   "blind": {
+    "trades": 57,
+    "win_rate": 0.246,
+    "avg_r": -0.285,
+    "sum_r": -16.2,
+    "profit_factor": 0.64,
+    "median_r": -1.02,
+    "worst_r": -1.21
+   },
+   "test": {
+    "n": 190,
+    "mean_r": -0.004,
+    "ci95": [
+     -0.216,
+     0.21
+    ],
+    "p_value": 0.5067,
+    "win_rate": 0.337,
+    "profit_factor": 0.99,
+    "sum_r": -0.7
+   },
+   "by_symbol": {
+    "US500": {
+     "trades": 30,
+     "win_rate": 0.233,
+     "avg_r": -0.329,
+     "sum_r": -9.9,
+     "profit_factor": 0.59,
+     "median_r": -1.03,
+     "worst_r": -1.16
+    },
+    "NAS100": {
+     "trades": 32,
+     "win_rate": 0.281,
+     "avg_r": -0.236,
+     "sum_r": -7.6,
+     "profit_factor": 0.68,
+     "median_r": -1.02,
+     "worst_r": -1.21
+    },
+    "EURUSD": {
+     "trades": 26,
+     "win_rate": 0.308,
+     "avg_r": -0.065,
+     "sum_r": -1.7,
+     "profit_factor": 0.91,
+     "median_r": -1.04,
+     "worst_r": -1.19
+    },
+    "GBPUSD": {
+     "trades": 38,
+     "win_rate": 0.526,
+     "avg_r": 0.63,
+     "sum_r": 23.9,
+     "profit_factor": 2.24,
+     "median_r": 1.43,
+     "worst_r": -1.28
+    },
+    "XAUUSD": {
+     "trades": 39,
+     "win_rate": 0.282,
+     "avg_r": -0.206,
+     "sum_r": -8.0,
+     "profit_factor": 0.72,
+     "median_r": -1.01,
+     "worst_r": -1.09
+    },
+    "XTIUSD": {
+     "trades": 25,
+     "win_rate": 0.36,
+     "avg_r": 0.098,
+     "sum_r": 2.4,
+     "profit_factor": 1.15,
+     "median_r": -1.02,
+     "worst_r": -1.05
+    }
+   },
+   "by_side": {
+    "long": {
+     "trades": 190,
+     "win_rate": 0.337,
+     "avg_r": -0.004,
+     "sum_r": -0.7,
+     "profit_factor": 0.99,
+     "median_r": -1.02,
+     "worst_r": -1.28
+    },
+    "short": {
+     "trades": 0
+    }
+   },
+   "exits": {
+    "stop": 126,
+    "objetivo": 64
+   }
+  },
+  {
+   "name": "toques 3 | R min 1.5 | memoria 360 | libre",
+   "params": {
+    "strategy": "sr",
+    "timeframe": "H4",
+    "max_hold_days": 7.0,
+    "breakeven_r": 0.0,
+    "sr_mode": "bounce",
+    "allow_short": false,
+    "sr_target": "level",
+    "sr_min_rr": 1.5,
+    "sr_min_touches": 3,
+    "sr_lookback": 360,
+    "sr_trend": false
+   },
+   "all": {
+    "trades": 330,
+    "win_rate": 0.373,
+    "avg_r": 0.107,
+    "sum_r": 35.2,
+    "profit_factor": 1.16,
+    "median_r": -1.02,
+    "worst_r": -1.31
+   },
+   "fit": {
+    "trades": 213,
+    "win_rate": 0.371,
+    "avg_r": 0.069,
+    "sum_r": 14.8,
+    "profit_factor": 1.1,
+    "median_r": -1.02,
+    "worst_r": -1.31
+   },
+   "blind": {
+    "trades": 117,
+    "win_rate": 0.376,
+    "avg_r": 0.174,
+    "sum_r": 20.4,
+    "profit_factor": 1.27,
+    "median_r": -1.02,
+    "worst_r": -1.21
+   },
+   "test": {
+    "n": 330,
+    "mean_r": 0.107,
+    "ci95": [
+     -0.073,
+     0.297
+    ],
+    "p_value": 0.131,
+    "win_rate": 0.373,
+    "profit_factor": 1.16,
+    "sum_r": 35.2
+   },
+   "by_symbol": {
+    "US500": {
+     "trades": 34,
+     "win_rate": 0.206,
+     "avg_r": -0.422,
+     "sum_r": -14.3,
+     "profit_factor": 0.49,
+     "median_r": -1.03,
+     "worst_r": -1.16
+    },
+    "NAS100": {
+     "trades": 39,
+     "win_rate": 0.333,
+     "avg_r": -0.058,
+     "sum_r": -2.2,
+     "profit_factor": 0.92,
+     "median_r": -1.01,
+     "worst_r": -1.21
+    },
+    "EURUSD": {
+     "trades": 71,
+     "win_rate": 0.38,
+     "avg_r": 0.015,
+     "sum_r": 1.1,
+     "profit_factor": 1.02,
+     "median_r": -1.04,
+     "worst_r": -1.21
+    },
+    "GBPUSD": {
+     "trades": 74,
+     "win_rate": 0.459,
+     "avg_r": 0.287,
+     "sum_r": 21.2,
+     "profit_factor": 1.49,
+     "median_r": -1.03,
+     "worst_r": -1.31
+    },
+    "XAUUSD": {
+     "trades": 51,
+     "win_rate": 0.333,
+     "avg_r": -0.026,
+     "sum_r": -1.3,
+     "profit_factor": 0.96,
+     "median_r": -1.01,
+     "worst_r": -1.09
+    },
+    "XTIUSD": {
+     "trades": 61,
+     "win_rate": 0.41,
+     "avg_r": 0.504,
+     "sum_r": 30.7,
+     "profit_factor": 1.83,
+     "median_r": -1.02,
+     "worst_r": -1.07
+    }
+   },
+   "by_side": {
+    "long": {
+     "trades": 330,
+     "win_rate": 0.373,
+     "avg_r": 0.107,
+     "sum_r": 35.2,
+     "profit_factor": 1.16,
+     "median_r": -1.02,
+     "worst_r": -1.31
+    },
+    "short": {
+     "trades": 0
+    }
+   },
+   "exits": {
+    "stop": 207,
+    "objetivo": 117,
+    "tiempo maximo": 6
+   }
+  },
+  {
+   "name": "toques 3 | R min 1.5 | memoria 360 | tendencia",
+   "params": {
+    "strategy": "sr",
+    "timeframe": "H4",
+    "max_hold_days": 7.0,
+    "breakeven_r": 0.0,
+    "sr_mode": "bounce",
+    "allow_short": false,
+    "sr_target": "level",
+    "sr_min_rr": 1.5,
+    "sr_min_touches": 3,
+    "sr_lookback": 360,
+    "sr_trend": true
+   },
+   "all": {
+    "trades": 204,
+    "win_rate": 0.373,
+    "avg_r": 0.065,
+    "sum_r": 13.3,
+    "profit_factor": 1.1,
+    "median_r": -1.02,
+    "worst_r": -1.26
+   },
+   "fit": {
+    "trades": 135,
+    "win_rate": 0.37,
+    "avg_r": 0.072,
+    "sum_r": 9.8,
+    "profit_factor": 1.11,
+    "median_r": -1.02,
+    "worst_r": -1.26
+   },
+   "blind": {
+    "trades": 69,
+    "win_rate": 0.377,
+    "avg_r": 0.052,
+    "sum_r": 3.6,
+    "profit_factor": 1.08,
+    "median_r": -1.01,
+    "worst_r": -1.21
+   },
+   "test": {
+    "n": 204,
+    "mean_r": 0.065,
+    "ci95": [
+     -0.136,
+     0.269
+    ],
+    "p_value": 0.2628,
+    "win_rate": 0.373,
+    "profit_factor": 1.1,
+    "sum_r": 13.3
+   },
+   "by_symbol": {
+    "US500": {
+     "trades": 26,
+     "win_rate": 0.192,
+     "avg_r": -0.43,
+     "sum_r": -11.2,
+     "profit_factor": 0.49,
+     "median_r": -1.03,
+     "worst_r": -1.16
+    },
+    "NAS100": {
+     "trades": 29,
+     "win_rate": 0.345,
+     "avg_r": -0.021,
+     "sum_r": -0.6,
+     "profit_factor": 0.97,
+     "median_r": -1.02,
+     "worst_r": -1.21
+    },
+    "EURUSD": {
+     "trades": 38,
+     "win_rate": 0.395,
+     "avg_r": 0.112,
+     "sum_r": 4.3,
+     "profit_factor": 1.17,
+     "median_r": -1.03,
+     "worst_r": -1.19
+    },
+    "GBPUSD": {
+     "trades": 42,
+     "win_rate": 0.5,
+     "avg_r": 0.375,
+     "sum_r": 15.7,
+     "profit_factor": 1.69,
+     "median_r": 0.19,
+     "worst_r": -1.26
+    },
+    "XAUUSD": {
+     "trades": 37,
+     "win_rate": 0.351,
+     "avg_r": 0.048,
+     "sum_r": 1.8,
+     "profit_factor": 1.07,
+     "median_r": -1.01,
+     "worst_r": -1.09
+    },
+    "XTIUSD": {
+     "trades": 32,
+     "win_rate": 0.375,
+     "avg_r": 0.104,
+     "sum_r": 3.3,
+     "profit_factor": 1.16,
+     "median_r": -1.02,
+     "worst_r": -1.05
+    }
+   },
+   "by_side": {
+    "long": {
+     "trades": 204,
+     "win_rate": 0.373,
+     "avg_r": 0.065,
+     "sum_r": 13.3,
+     "profit_factor": 1.1,
+     "median_r": -1.02,
+     "worst_r": -1.26
+    },
+    "short": {
+     "trades": 0
+    }
+   },
+   "exits": {
+    "stop": 128,
+    "objetivo": 75,
+    "tiempo maximo": 1
+   }
+  },
+  {
+   "name": "toques 3 | R min 2 | memoria 160 | libre",
+   "params": {
+    "strategy": "sr",
+    "timeframe": "H4",
+    "max_hold_days": 7.0,
+    "breakeven_r": 0.0,
+    "sr_mode": "bounce",
+    "allow_short": false,
+    "sr_target": "level",
+    "sr_min_rr": 2.0,
+    "sr_min_touches": 3,
+    "sr_lookback": 160,
+    "sr_trend": false
+   },
+   "all": {
+    "trades": 180,
+    "win_rate": 0.311,
+    "avg_r": 0.029,
+    "sum_r": 5.3,
+    "profit_factor": 1.04,
+    "median_r": -1.03,
+    "worst_r": -1.31
+   },
+   "fit": {
+    "trades": 116,
+    "win_rate": 0.328,
+    "avg_r": 0.091,
+    "sum_r": 10.5,
+    "profit_factor": 1.13,
+    "median_r": -1.03,
+    "worst_r": -1.31
+   },
+   "blind": {
+    "trades": 64,
+    "win_rate": 0.281,
+    "avg_r": -0.082,
+    "sum_r": -5.2,
+    "profit_factor": 0.89,
+    "median_r": -1.02,
+    "worst_r": -1.28
+   },
+   "test": {
+    "n": 180,
+    "mean_r": 0.029,
+    "ci95": [
+     -0.205,
+     0.275
+    ],
+    "p_value": 0.4064,
+    "win_rate": 0.311,
+    "profit_factor": 1.04,
+    "sum_r": 5.3
+   },
+   "by_symbol": {
+    "US500": {
+     "trades": 18,
+     "win_rate": 0.278,
+     "avg_r": 0.026,
+     "sum_r": 0.5,
+     "profit_factor": 1.03,
+     "median_r": -1.04,
+     "worst_r": -1.16
+    },
+    "NAS100": {
+     "trades": 23,
+     "win_rate": 0.348,
+     "avg_r": 0.114,
+     "sum_r": 2.6,
+     "profit_factor": 1.17,
+     "median_r": -1.02,
+     "worst_r": -1.17
+    },
+    "EURUSD": {
+     "trades": 35,
+     "win_rate": 0.314,
+     "avg_r": 0.091,
+     "sum_r": 3.2,
+     "profit_factor": 1.12,
+     "median_r": -1.05,
+     "worst_r": -1.28
+    },
+    "GBPUSD": {
+     "trades": 36,
+     "win_rate": 0.361,
+     "avg_r": 0.122,
+     "sum_r": 4.4,
+     "profit_factor": 1.18,
+     "median_r": -1.05,
+     "worst_r": -1.31
+    },
+    "XAUUSD": {
+     "trades": 30,
+     "win_rate": 0.3,
+     "avg_r": -0.023,
+     "sum_r": -0.7,
+     "profit_factor": 0.97,
+     "median_r": -1.02,
+     "worst_r": -1.08
+    },
+    "XTIUSD": {
+     "trades": 38,
+     "win_rate": 0.263,
+     "avg_r": -0.124,
+     "sum_r": -4.7,
+     "profit_factor": 0.84,
+     "median_r": -1.03,
+     "worst_r": -1.06
+    }
+   },
+   "by_side": {
+    "long": {
+     "trades": 180,
+     "win_rate": 0.311,
+     "avg_r": 0.029,
+     "sum_r": 5.3,
+     "profit_factor": 1.04,
+     "median_r": -1.03,
+     "worst_r": -1.31
+    },
+    "short": {
+     "trades": 0
+    }
+   },
+   "exits": {
+    "stop": 124,
+    "objetivo": 55,
+    "tiempo maximo": 1
+   }
+  },
+  {
+   "name": "toques 3 | R min 2 | memoria 160 | tendencia",
+   "params": {
+    "strategy": "sr",
+    "timeframe": "H4",
+    "max_hold_days": 7.0,
+    "breakeven_r": 0.0,
+    "sr_mode": "bounce",
+    "allow_short": false,
+    "sr_target": "level",
+    "sr_min_rr": 2.0,
+    "sr_min_touches": 3,
+    "sr_lookback": 160,
+    "sr_trend": true
+   },
+   "all": {
+    "trades": 99,
+    "win_rate": 0.374,
+    "avg_r": 0.219,
+    "sum_r": 21.7,
+    "profit_factor": 1.33,
+    "median_r": -1.02,
+    "worst_r": -1.17
+   },
+   "fit": {
+    "trades": 62,
+    "win_rate": 0.419,
+    "avg_r": 0.355,
+    "sum_r": 22.0,
+    "profit_factor": 1.58,
+    "median_r": -1.02,
+    "worst_r": -1.16
+   },
+   "blind": {
+    "trades": 37,
+    "win_rate": 0.297,
+    "avg_r": -0.009,
+    "sum_r": -0.3,
+    "profit_factor": 0.99,
+    "median_r": -1.02,
+    "worst_r": -1.17
+   },
+   "test": {
+    "n": 99,
+    "mean_r": 0.219,
+    "ci95": [
+     -0.105,
+     0.554
+    ],
+    "p_value": 0.0977,
+    "win_rate": 0.374,
+    "profit_factor": 1.33,
+    "sum_r": 21.7
+   },
+   "by_symbol": {
+    "US500": {
+     "trades": 14,
+     "win_rate": 0.286,
+     "avg_r": 0.108,
+     "sum_r": 1.5,
+     "profit_factor": 1.14,
+     "median_r": -1.04,
+     "worst_r": -1.16
+    },
+    "NAS100": {
+     "trades": 17,
+     "win_rate": 0.353,
+     "avg_r": 0.136,
+     "sum_r": 2.3,
+     "profit_factor": 1.2,
+     "median_r": -1.02,
+     "worst_r": -1.17
+    },
+    "EURUSD": {
+     "trades": 13,
+     "win_rate": 0.462,
+     "avg_r": 0.481,
+     "sum_r": 6.3,
+     "profit_factor": 1.84,
+     "median_r": -1.03,
+     "worst_r": -1.12
+    },
+    "GBPUSD": {
+     "trades": 19,
+     "win_rate": 0.474,
+     "avg_r": 0.468,
+     "sum_r": 8.9,
+     "profit_factor": 1.82,
+     "median_r": -1.03,
+     "worst_r": -1.17
+    },
+    "XAUUSD": {
+     "trades": 19,
+     "win_rate": 0.316,
+     "avg_r": 0.037,
+     "sum_r": 0.7,
+     "profit_factor": 1.05,
+     "median_r": -1.02,
+     "worst_r": -1.03
+    },
+    "XTIUSD": {
+     "trades": 17,
+     "win_rate": 0.353,
+     "avg_r": 0.118,
+     "sum_r": 2.0,
+     "profit_factor": 1.18,
+     "median_r": -1.03,
+     "worst_r": -1.05
+    }
+   },
+   "by_side": {
+    "long": {
+     "trades": 99,
+     "win_rate": 0.374,
+     "avg_r": 0.219,
+     "sum_r": 21.7,
+     "profit_factor": 1.33,
+     "median_r": -1.02,
+     "worst_r": -1.17
+    },
+    "short": {
+     "trades": 0
+    }
+   },
+   "exits": {
+    "stop": 62,
+    "objetivo": 37
+   }
+  },
+  {
+   "name": "toques 3 | R min 2 | memoria 240 | libre",
+   "params": {
+    "strategy": "sr",
+    "timeframe": "H4",
+    "max_hold_days": 7.0,
+    "breakeven_r": 0.0,
+    "sr_mode": "bounce",
+    "allow_short": false,
+    "sr_target": "level",
+    "sr_min_rr": 2.0,
+    "sr_min_touches": 3,
+    "sr_lookback": 240,
+    "sr_trend": false
+   },
+   "all": {
+    "trades": 186,
+    "win_rate": 0.312,
+    "avg_r": 0.031,
+    "sum_r": 5.8,
+    "profit_factor": 1.04,
+    "median_r": -1.02,
+    "worst_r": -1.31
+   },
+   "fit": {
+    "trades": 124,
+    "win_rate": 0.347,
+    "avg_r": 0.16,
+    "sum_r": 19.9,
+    "profit_factor": 1.23,
+    "median_r": -1.02,
+    "worst_r": -1.31
+   },
+   "blind": {
+    "trades": 62,
+    "win_rate": 0.242,
+    "avg_r": -0.228,
+    "sum_r": -14.1,
+    "profit_factor": 0.71,
+    "median_r": -1.02,
+    "worst_r": -1.18
+   },
+   "test": {
+    "n": 186,
+    "mean_r": 0.031,
+    "ci95": [
+     -0.204,
+     0.271
+    ],
+    "p_value": 0.3895,
+    "win_rate": 0.312,
+    "profit_factor": 1.04,
+    "sum_r": 5.8
+   },
+   "by_symbol": {
+    "US500": {
+     "trades": 19,
+     "win_rate": 0.263,
+     "avg_r": -0.163,
+     "sum_r": -3.1,
+     "profit_factor": 0.79,
+     "median_r": -1.04,
+     "worst_r": -1.16
+    },
+    "NAS100": {
+     "trades": 23,
+     "win_rate": 0.174,
+     "avg_r": -0.49,
+     "sum_r": -11.3,
+     "profit_factor": 0.42,
+     "median_r": -1.01,
+     "worst_r": -1.1
+    },
+    "EURUSD": {
+     "trades": 30,
+     "win_rate": 0.3,
+     "avg_r": -0.064,
+     "sum_r": -1.9,
+     "profit_factor": 0.91,
+     "median_r": -1.05,
+     "worst_r": -1.17
+    },
+    "GBPUSD": {
+     "trades": 41,
+     "win_rate": 0.366,
+     "avg_r": 0.326,
+     "sum_r": 13.4,
+     "profit_factor": 1.48,
+     "median_r": -1.04,
+     "worst_r": -1.31
+    },
+    "XAUUSD": {
+     "trades": 32,
+     "win_rate": 0.25,
+     "avg_r": -0.176,
+     "sum_r": -5.6,
+     "profit_factor": 0.77,
+     "median_r": -1.02,
+     "worst_r": -1.08
+    },
+    "XTIUSD": {
+     "trades": 41,
+     "win_rate": 0.415,
+     "avg_r": 0.349,
+     "sum_r": 14.3,
+     "profit_factor": 1.58,
+     "median_r": -1.02,
+     "worst_r": -1.05
+    }
+   },
+   "by_side": {
+    "long": {
+     "trades": 186,
+     "win_rate": 0.312,
+     "avg_r": 0.031,
+     "sum_r": 5.8,
+     "profit_factor": 1.04,
+     "median_r": -1.02,
+     "worst_r": -1.31
+    },
+    "short": {
+     "trades": 0
+    }
+   },
+   "exits": {
+    "stop": 128,
+    "objetivo": 56,
+    "tiempo maximo": 2
+   }
+  },
+  {
+   "name": "toques 3 | R min 2 | memoria 240 | tendencia",
+   "params": {
+    "strategy": "sr",
+    "timeframe": "H4",
+    "max_hold_days": 7.0,
+    "breakeven_r": 0.0,
+    "sr_mode": "bounce",
+    "allow_short": false,
+    "sr_target": "level",
+    "sr_min_rr": 2.0,
+    "sr_min_touches": 3,
+    "sr_lookback": 240,
+    "sr_trend": true
+   },
+   "all": {
+    "trades": 103,
+    "win_rate": 0.34,
+    "avg_r": 0.134,
+    "sum_r": 13.8,
+    "profit_factor": 1.19,
+    "median_r": -1.02,
+    "worst_r": -1.28
+   },
+   "fit": {
+    "trades": 68,
+    "win_rate": 0.382,
+    "avg_r": 0.296,
+    "sum_r": 20.1,
+    "profit_factor": 1.46,
+    "median_r": -1.02,
+    "worst_r": -1.28
+   },
+   "blind": {
+    "trades": 35,
+    "win_rate": 0.257,
+    "avg_r": -0.179,
+    "sum_r": -6.3,
+    "profit_factor": 0.77,
+    "median_r": -1.01,
+    "worst_r": -1.15
+   },
+   "test": {
+    "n": 103,
+    "mean_r": 0.134,
+    "ci95": [
+     -0.187,
+     0.466
+    ],
+    "p_value": 0.212,
+    "win_rate": 0.34,
+    "profit_factor": 1.19,
+    "sum_r": 13.8
+   },
+   "by_symbol": {
+    "US500": {
+     "trades": 14,
+     "win_rate": 0.286,
+     "avg_r": -0.091,
+     "sum_r": -1.3,
+     "profit_factor": 0.88,
+     "median_r": -1.05,
+     "worst_r": -1.16
+    },
+    "NAS100": {
+     "trades": 17,
+     "win_rate": 0.176,
+     "avg_r": -0.481,
+     "sum_r": -8.2,
+     "profit_factor": 0.43,
+     "median_r": -1.01,
+     "worst_r": -1.1
+    },
+    "EURUSD": {
+     "trades": 12,
+     "win_rate": 0.5,
+     "avg_r": 0.679,
+     "sum_r": 8.1,
+     "profit_factor": 2.26,
+     "median_r": 0.5,
+     "worst_r": -1.12
+    },
+    "GBPUSD": {
+     "trades": 19,
+     "win_rate": 0.474,
+     "avg_r": 0.735,
+     "sum_r": 14.0,
+     "profit_factor": 2.3,
+     "median_r": -1.03,
+     "worst_r": -1.28
+    },
+    "XAUUSD": {
+     "trades": 21,
+     "win_rate": 0.286,
+     "avg_r": -0.055,
+     "sum_r": -1.1,
+     "profit_factor": 0.92,
+     "median_r": -1.01,
+     "worst_r": -1.03
+    },
+    "XTIUSD": {
+     "trades": 20,
+     "win_rate": 0.35,
+     "avg_r": 0.117,
+     "sum_r": 2.3,
+     "profit_factor": 1.17,
+     "median_r": -1.03,
+     "worst_r": -1.05
+    }
+   },
+   "by_side": {
+    "long": {
+     "trades": 103,
+     "win_rate": 0.34,
+     "avg_r": 0.134,
+     "sum_r": 13.8,
+     "profit_factor": 1.19,
+     "median_r": -1.02,
+     "worst_r": -1.28
+    },
+    "short": {
+     "trades": 0
+    }
+   },
+   "exits": {
+    "stop": 68,
+    "objetivo": 35
+   }
+  },
+  {
+   "name": "toques 3 | R min 2 | memoria 360 | libre",
+   "params": {
+    "strategy": "sr",
+    "timeframe": "H4",
+    "max_hold_days": 7.0,
+    "breakeven_r": 0.0,
+    "sr_mode": "bounce",
+    "allow_short": false,
+    "sr_target": "level",
+    "sr_min_rr": 2.0,
+    "sr_min_touches": 3,
+    "sr_lookback": 360,
+    "sr_trend": false
+   },
+   "all": {
+    "trades": 190,
+    "win_rate": 0.326,
+    "avg_r": 0.113,
+    "sum_r": 21.5,
+    "profit_factor": 1.16,
+    "median_r": -1.02,
+    "worst_r": -1.31
+   },
+   "fit": {
+    "trades": 123,
+    "win_rate": 0.333,
+    "avg_r": 0.069,
+    "sum_r": 8.5,
+    "profit_factor": 1.1,
+    "median_r": -1.02,
+    "worst_r": -1.31
+   },
+   "blind": {
+    "trades": 67,
+    "win_rate": 0.313,
+    "avg_r": 0.193,
+    "sum_r": 12.9,
+    "profit_factor": 1.27,
+    "median_r": -1.02,
+    "worst_r": -1.15
+   },
+   "test": {
+    "n": 190,
+    "mean_r": 0.113,
+    "ci95": [
+     -0.16,
+     0.413
+    ],
+    "p_value": 0.2116,
+    "win_rate": 0.326,
+    "profit_factor": 1.16,
+    "sum_r": 21.5
+   },
+   "by_symbol": {
+    "US500": {
+     "trades": 16,
+     "win_rate": 0.25,
+     "avg_r": -0.263,
+     "sum_r": -4.2,
+     "profit_factor": 0.67,
+     "median_r": -1.04,
+     "worst_r": -1.16
+    },
+    "NAS100": {
+     "trades": 22,
+     "win_rate": 0.182,
+     "avg_r": -0.424,
+     "sum_r": -9.3,
+     "profit_factor": 0.49,
+     "median_r": -1.01,
+     "worst_r": -1.1
+    },
+    "EURUSD": {
+     "trades": 32,
+     "win_rate": 0.281,
+     "avg_r": -0.166,
+     "sum_r": -5.3,
+     "profit_factor": 0.79,
+     "median_r": -1.05,
+     "worst_r": -1.17
+    },
+    "GBPUSD": {
+     "trades": 38,
+     "win_rate": 0.421,
+     "avg_r": 0.332,
+     "sum_r": 12.6,
+     "profit_factor": 1.52,
+     "median_r": -1.04,
+     "worst_r": -1.31
+    },
+    "XAUUSD": {
+     "trades": 35,
+     "win_rate": 0.314,
+     "avg_r": 0.034,
+     "sum_r": 1.2,
+     "profit_factor": 1.05,
+     "median_r": -1.02,
+     "worst_r": -1.09
+    },
+    "XTIUSD": {
+     "trades": 47,
+     "win_rate": 0.383,
+     "avg_r": 0.564,
+     "sum_r": 26.5,
+     "profit_factor": 1.88,
+     "median_r": -1.02,
+     "worst_r": -1.07
+    }
+   },
+   "by_side": {
+    "long": {
+     "trades": 190,
+     "win_rate": 0.326,
+     "avg_r": 0.113,
+     "sum_r": 21.5,
+     "profit_factor": 1.16,
+     "median_r": -1.02,
+     "worst_r": -1.31
+    },
+    "short": {
+     "trades": 0
+    }
+   },
+   "exits": {
+    "stop": 128,
+    "objetivo": 55,
+    "tiempo maximo": 7
+   }
+  },
+  {
+   "name": "toques 3 | R min 2 | memoria 360 | tendencia",
+   "params": {
+    "strategy": "sr",
+    "timeframe": "H4",
+    "max_hold_days": 7.0,
+    "breakeven_r": 0.0,
+    "sr_mode": "bounce",
+    "allow_short": false,
+    "sr_target": "level",
+    "sr_min_rr": 2.0,
+    "sr_min_touches": 3,
+    "sr_lookback": 360,
+    "sr_trend": true
+   },
+   "all": {
+    "trades": 112,
+    "win_rate": 0.33,
+    "avg_r": 0.065,
+    "sum_r": 7.2,
+    "profit_factor": 1.09,
+    "median_r": -1.02,
+    "worst_r": -1.26
+   },
+   "fit": {
+    "trades": 74,
+    "win_rate": 0.351,
+    "avg_r": 0.121,
+    "sum_r": 9.0,
+    "profit_factor": 1.18,
+    "median_r": -1.02,
+    "worst_r": -1.26
+   },
+   "blind": {
+    "trades": 38,
+    "win_rate": 0.289,
+    "avg_r": -0.046,
+    "sum_r": -1.8,
+    "profit_factor": 0.94,
+    "median_r": -1.02,
+    "worst_r": -1.15
+   },
+   "test": {
+    "n": 112,
+    "mean_r": 0.065,
+    "ci95": [
+     -0.233,
+     0.369
+    ],
+    "p_value": 0.3296,
+    "win_rate": 0.33,
+    "profit_factor": 1.09,
+    "sum_r": 7.2
+   },
+   "by_symbol": {
+    "US500": {
+     "trades": 12,
+     "win_rate": 0.333,
+     "avg_r": -0.005,
+     "sum_r": -0.1,
+     "profit_factor": 0.99,
+     "median_r": -1.05,
+     "worst_r": -1.16
+    },
+    "NAS100": {
+     "trades": 17,
+     "win_rate": 0.235,
+     "avg_r": -0.249,
+     "sum_r": -4.2,
+     "profit_factor": 0.68,
+     "median_r": -1.01,
+     "worst_r": -1.1
+    },
+    "EURUSD": {
+     "trades": 17,
+     "win_rate": 0.353,
+     "avg_r": 0.157,
+     "sum_r": 2.7,
+     "profit_factor": 1.22,
+     "median_r": -1.06,
+     "worst_r": -1.14
+    },
+    "GBPUSD": {
+     "trades": 20,
+     "win_rate": 0.45,
+     "avg_r": 0.363,
+     "sum_r": 7.3,
+     "profit_factor": 1.61,
+     "median_r": -1.04,
+     "worst_r": -1.26
+    },
+    "XAUUSD": {
+     "trades": 23,
+     "win_rate": 0.348,
+     "avg_r": 0.225,
+     "sum_r": 5.2,
+     "profit_factor": 1.33,
+     "median_r": -1.02,
+     "worst_r": -1.09
+    },
+    "XTIUSD": {
+     "trades": 23,
+     "win_rate": 0.261,
+     "avg_r": -0.155,
+     "sum_r": -3.6,
+     "profit_factor": 0.8,
+     "median_r": -1.03,
+     "worst_r": -1.05
+    }
+   },
+   "by_side": {
+    "long": {
+     "trades": 112,
+     "win_rate": 0.33,
+     "avg_r": 0.065,
+     "sum_r": 7.2,
+     "profit_factor": 1.09,
+     "median_r": -1.02,
+     "worst_r": -1.26
+    },
+    "short": {
+     "trades": 0
+    }
+   },
+   "exits": {
+    "stop": 75,
+    "objetivo": 35,
+    "tiempo maximo": 2
+   }
+  },
+  {
+   "name": "toques 3 | R min 3 | memoria 160 | libre",
+   "params": {
+    "strategy": "sr",
+    "timeframe": "H4",
+    "max_hold_days": 7.0,
+    "breakeven_r": 0.0,
+    "sr_mode": "bounce",
+    "allow_short": false,
+    "sr_target": "level",
+    "sr_min_rr": 3.0,
+    "sr_min_touches": 3,
+    "sr_lookback": 160,
+    "sr_trend": false
+   },
+   "all": {
+    "trades": 68,
+    "win_rate": 0.162,
+    "avg_r": -0.332,
+    "sum_r": -22.6,
+    "profit_factor": 0.63,
+    "median_r": -1.03,
+    "worst_r": -1.31
+   },
+   "fit": {
+    "trades": 47,
+    "win_rate": 0.191,
+    "avg_r": -0.186,
+    "sum_r": -8.7,
+    "profit_factor": 0.78,
+    "median_r": -1.04,
+    "worst_r": -1.31
+   },
+   "blind": {
+    "trades": 21,
+    "win_rate": 0.095,
+    "avg_r": -0.659,
+    "sum_r": -13.8,
+    "profit_factor": 0.31,
+    "median_r": -1.03,
+    "worst_r": -1.21
+   },
+   "test": {
+    "n": 68,
+    "mean_r": -0.332,
+    "ci95": [
+     -0.718,
+     0.116
+    ],
+    "p_value": 0.9513,
+    "win_rate": 0.162,
+    "profit_factor": 0.63,
+    "sum_r": -22.6
+   },
+   "by_symbol": {
+    "US500": {
+     "trades": 10,
+     "win_rate": 0.3,
+     "avg_r": 0.387,
+     "sum_r": 3.9,
+     "profit_factor": 1.53,
+     "median_r": -1.02,
+     "worst_r": -1.15
+    },
+    "NAS100": {
+     "trades": 10,
+     "win_rate": 0.2,
+     "avg_r": -0.185,
+     "sum_r": -1.8,
+     "profit_factor": 0.78,
+     "median_r": -1.02,
+     "worst_r": -1.21
+    },
+    "EURUSD": {
+     "trades": 12,
+     "win_rate": 0.083,
+     "avg_r": -0.479,
+     "sum_r": -5.8,
+     "profit_factor": 0.51,
+     "median_r": -1.07,
+     "worst_r": -1.17
+    },
+    "GBPUSD": {
+     "trades": 8,
+     "win_rate": 0.0,
+     "avg_r": -1.111,
+     "sum_r": -8.9,
+     "profit_factor": 0.0,
+     "median_r": -1.06,
+     "worst_r": -1.31
+    },
+    "XAUUSD": {
+     "trades": 11,
+     "win_rate": 0.091,
+     "avg_r": -0.667,
+     "sum_r": -7.3,
+     "profit_factor": 0.29,
+     "median_r": -1.02,
+     "worst_r": -1.08
+    },
+    "XTIUSD": {
+     "trades": 17,
+     "win_rate": 0.235,
+     "avg_r": -0.154,
+     "sum_r": -2.6,
+     "profit_factor": 0.81,
+     "median_r": -1.04,
+     "worst_r": -1.07
+    }
+   },
+   "by_side": {
+    "long": {
+     "trades": 68,
+     "win_rate": 0.162,
+     "avg_r": -0.332,
+     "sum_r": -22.6,
+     "profit_factor": 0.63,
+     "median_r": -1.03,
+     "worst_r": -1.31
+    },
+    "short": {
+     "trades": 0
+    }
+   },
+   "exits": {
+    "stop": 57,
+    "objetivo": 10,
+    "tiempo maximo": 1
+   }
+  },
+  {
+   "name": "toques 3 | R min 3 | memoria 160 | tendencia",
+   "params": {
+    "strategy": "sr",
+    "timeframe": "H4",
+    "max_hold_days": 7.0,
+    "breakeven_r": 0.0,
+    "sr_mode": "bounce",
+    "allow_short": false,
+    "sr_target": "level",
+    "sr_min_rr": 3.0,
+    "sr_min_touches": 3,
+    "sr_lookback": 160,
+    "sr_trend": true
+   },
+   "all": {
+    "trades": 25,
+    "win_rate": 0.24,
+    "avg_r": 0.037,
+    "sum_r": 0.9,
+    "profit_factor": 1.05,
+    "median_r": -1.02,
+    "worst_r": -1.21
+   },
+   "fit": {
+    "trades": 16,
+    "win_rate": 0.25,
+    "avg_r": 0.135,
+    "sum_r": 2.2,
+    "profit_factor": 1.17,
+    "median_r": -1.02,
+    "worst_r": -1.15
+   },
+   "blind": {
+    "trades": 9,
+    "win_rate": 0.222,
+    "avg_r": -0.139,
+    "sum_r": -1.3,
+    "profit_factor": 0.83,
+    "median_r": -1.02,
+    "worst_r": -1.21
+   },
+   "test": {
+    "n": 25,
+    "mean_r": 0.037,
+    "ci95": [
+     -0.69,
+     0.862
+    ],
+    "p_value": 0.4323,
+    "win_rate": 0.24,
+    "profit_factor": 1.05,
+    "sum_r": 0.9
+   },
+   "by_symbol": {
+    "US500": {
+     "trades": 8,
+     "win_rate": 0.375,
+     "avg_r": 0.744,
+     "sum_r": 6.0,
+     "profit_factor": 2.13,
+     "median_r": -1.02,
+     "worst_r": -1.15
+    },
+    "NAS100": {
+     "trades": 6,
+     "win_rate": 0.333,
+     "avg_r": 0.4,
+     "sum_r": 2.4,
+     "profit_factor": 1.56,
+     "median_r": -1.02,
+     "worst_r": -1.21
+    },
+    "EURUSD": {
+     "trades": 1,
+     "win_rate": 0.0,
+     "avg_r": -1.031,
+     "sum_r": -1.0,
+     "profit_factor": 0.0,
+     "median_r": -1.03,
+     "worst_r": -1.03
+    },
+    "GBPUSD": {
+     "trades": 1,
+     "win_rate": 0.0,
+     "avg_r": -1.147,
+     "sum_r": -1.1,
+     "profit_factor": 0.0,
+     "median_r": -1.15,
+     "worst_r": -1.15
+    },
+    "XAUUSD": {
+     "trades": 6,
+     "win_rate": 0.167,
+     "avg_r": -0.357,
+     "sum_r": -2.1,
+     "profit_factor": 0.58,
+     "median_r": -1.02,
+     "worst_r": -1.03
+    },
+    "XTIUSD": {
+     "trades": 3,
+     "win_rate": 0.0,
+     "avg_r": -1.039,
+     "sum_r": -3.1,
+     "profit_factor": 0.0,
+     "median_r": -1.03,
+     "worst_r": -1.07
+    }
+   },
+   "by_side": {
+    "long": {
+     "trades": 25,
+     "win_rate": 0.24,
+     "avg_r": 0.037,
+     "sum_r": 0.9,
+     "profit_factor": 1.05,
+     "median_r": -1.02,
+     "worst_r": -1.21
+    },
+    "short": {
+     "trades": 0
+    }
+   },
+   "exits": {
+    "stop": 19,
+    "objetivo": 6
+   }
+  },
+  {
+   "name": "toques 3 | R min 3 | memoria 240 | libre",
+   "params": {
+    "strategy": "sr",
+    "timeframe": "H4",
+    "max_hold_days": 7.0,
+    "breakeven_r": 0.0,
+    "sr_mode": "bounce",
+    "allow_short": false,
+    "sr_target": "level",
+    "sr_min_rr": 3.0,
+    "sr_min_touches": 3,
+    "sr_lookback": 240,
+    "sr_trend": false
+   },
+   "all": {
+    "trades": 63,
+    "win_rate": 0.175,
+    "avg_r": -0.34,
+    "sum_r": -21.4,
+    "profit_factor": 0.61,
+    "median_r": -1.03,
+    "worst_r": -1.31
+   },
+   "fit": {
+    "trades": 42,
+    "win_rate": 0.238,
+    "avg_r": -0.089,
+    "sum_r": -3.8,
+    "profit_factor": 0.89,
+    "median_r": -1.03,
+    "worst_r": -1.31
+   },
+   "blind": {
+    "trades": 21,
+    "win_rate": 0.048,
+    "avg_r": -0.842,
+    "sum_r": -17.7,
+    "profit_factor": 0.15,
+    "median_r": -1.03,
+    "worst_r": -1.15
+   },
+   "test": {
+    "n": 63,
+    "mean_r": -0.34,
+    "ci95": [
+     -0.705,
+     0.085
+    ],
+    "p_value": 0.9617,
+    "win_rate": 0.175,
+    "profit_factor": 0.61,
+    "sum_r": -21.4
+   },
+   "by_symbol": {
+    "US500": {
+     "trades": 8,
+     "win_rate": 0.125,
+     "avg_r": -0.469,
+     "sum_r": -3.8,
+     "profit_factor": 0.49,
+     "median_r": -1.04,
+     "worst_r": -1.15
+    },
+    "NAS100": {
+     "trades": 7,
+     "win_rate": 0.143,
+     "avg_r": -0.365,
+     "sum_r": -2.6,
+     "profit_factor": 0.59,
+     "median_r": -1.01,
+     "worst_r": -1.1
+    },
+    "EURUSD": {
+     "trades": 7,
+     "win_rate": 0.286,
+     "avg_r": -0.048,
+     "sum_r": -0.3,
+     "profit_factor": 0.94,
+     "median_r": -1.06,
+     "worst_r": -1.17
+    },
+    "GBPUSD": {
+     "trades": 13,
+     "win_rate": 0.154,
+     "avg_r": -0.38,
+     "sum_r": -4.9,
+     "profit_factor": 0.59,
+     "median_r": -1.04,
+     "worst_r": -1.31
+    },
+    "XAUUSD": {
+     "trades": 11,
+     "win_rate": 0.091,
+     "avg_r": -0.66,
+     "sum_r": -7.3,
+     "profit_factor": 0.29,
+     "median_r": -1.02,
+     "worst_r": -1.06
+    },
+    "XTIUSD": {
+     "trades": 17,
+     "win_rate": 0.235,
+     "avg_r": -0.153,
+     "sum_r": -2.6,
+     "profit_factor": 0.81,
+     "median_r": -1.03,
+     "worst_r": -1.07
+    }
+   },
+   "by_side": {
+    "long": {
+     "trades": 63,
+     "win_rate": 0.175,
+     "avg_r": -0.34,
+     "sum_r": -21.4,
+     "profit_factor": 0.61,
+     "median_r": -1.03,
+     "worst_r": -1.31
+    },
+    "short": {
+     "trades": 0
+    }
+   },
+   "exits": {
+    "stop": 52,
+    "objetivo": 9,
+    "tiempo maximo": 2
+   }
+  },
+  {
+   "name": "toques 3 | R min 3 | memoria 240 | tendencia",
+   "params": {
+    "strategy": "sr",
+    "timeframe": "H4",
+    "max_hold_days": 7.0,
+    "breakeven_r": 0.0,
+    "sr_mode": "bounce",
+    "allow_short": false,
+    "sr_target": "level",
+    "sr_min_rr": 3.0,
+    "sr_min_touches": 3,
+    "sr_lookback": 240,
+    "sr_trend": true
+   },
+   "all": {
+    "trades": 30,
+    "win_rate": 0.167,
+    "avg_r": -0.306,
+    "sum_r": -9.2,
+    "profit_factor": 0.65,
+    "median_r": -1.03,
+    "worst_r": -1.15
+   },
+   "fit": {
+    "trades": 19,
+    "win_rate": 0.211,
+    "avg_r": -0.103,
+    "sum_r": -2.0,
+    "profit_factor": 0.87,
+    "median_r": -1.03,
+    "worst_r": -1.08
+   },
+   "blind": {
+    "trades": 11,
+    "win_rate": 0.091,
+    "avg_r": -0.657,
+    "sum_r": -7.2,
+    "profit_factor": 0.31,
+    "median_r": -1.02,
+    "worst_r": -1.15
+   },
+   "test": {
+    "n": 30,
+    "mean_r": -0.306,
+    "ci95": [
+     -0.882,
+     0.3
+    ],
+    "p_value": 0.8663,
+    "win_rate": 0.167,
+    "profit_factor": 0.65,
+    "sum_r": -9.2
+   },
+   "by_symbol": {
+    "US500": {
+     "trades": 6,
+     "win_rate": 0.167,
+     "avg_r": -0.279,
+     "sum_r": -1.7,
+     "profit_factor": 0.69,
+     "median_r": -1.04,
+     "worst_r": -1.15
+    },
+    "NAS100": {
+     "trades": 5,
+     "win_rate": 0.2,
+     "avg_r": -0.1,
+     "sum_r": -0.5,
+     "profit_factor": 0.88,
+     "median_r": -1.01,
+     "worst_r": -1.1
+    },
+    "EURUSD": {
+     "trades": 1,
+     "win_rate": 1.0,
+     "avg_r": 3.213,
+     "sum_r": 3.2,
+     "profit_factor": null,
+     "median_r": 3.21,
+     "worst_r": 3.21
+    },
+    "GBPUSD": {
+     "trades": 3,
+     "win_rate": 0.333,
+     "avg_r": 0.401,
+     "sum_r": 1.2,
+     "profit_factor": 1.58,
+     "median_r": -1.03,
+     "worst_r": -1.03
+    },
+    "XAUUSD": {
+     "trades": 8,
+     "win_rate": 0.125,
+     "avg_r": -0.521,
+     "sum_r": -4.2,
+     "profit_factor": 0.42,
+     "median_r": -1.02,
+     "worst_r": -1.03
+    },
+    "XTIUSD": {
+     "trades": 7,
+     "win_rate": 0.0,
+     "avg_r": -1.036,
+     "sum_r": -7.3,
+     "profit_factor": 0.0,
+     "median_r": -1.03,
+     "worst_r": -1.07
+    }
+   },
+   "by_side": {
+    "long": {
+     "trades": 30,
+     "win_rate": 0.167,
+     "avg_r": -0.306,
+     "sum_r": -9.2,
+     "profit_factor": 0.65,
+     "median_r": -1.03,
+     "worst_r": -1.15
+    },
+    "short": {
+     "trades": 0
+    }
+   },
+   "exits": {
+    "stop": 25,
+    "objetivo": 5
+   }
+  },
+  {
+   "name": "toques 3 | R min 3 | memoria 360 | libre",
+   "params": {
+    "strategy": "sr",
+    "timeframe": "H4",
+    "max_hold_days": 7.0,
+    "breakeven_r": 0.0,
+    "sr_mode": "bounce",
+    "allow_short": false,
+    "sr_target": "level",
+    "sr_min_rr": 3.0,
+    "sr_min_touches": 3,
+    "sr_lookback": 360,
+    "sr_trend": false
+   },
+   "all": {
+    "trades": 71,
+    "win_rate": 0.239,
+    "avg_r": 0.077,
+    "sum_r": 5.5,
+    "profit_factor": 1.1,
+    "median_r": -1.03,
+    "worst_r": -1.31
+   },
+   "fit": {
+    "trades": 44,
+    "win_rate": 0.273,
+    "avg_r": 0.013,
+    "sum_r": 0.6,
+    "profit_factor": 1.02,
+    "median_r": -1.03,
+    "worst_r": -1.31
+   },
+   "blind": {
+    "trades": 27,
+    "win_rate": 0.185,
+    "avg_r": 0.18,
+    "sum_r": 4.9,
+    "profit_factor": 1.21,
+    "median_r": -1.03,
+    "worst_r": -1.15
+   },
+   "test": {
+    "n": 71,
+    "mean_r": 0.077,
+    "ci95": [
+     -0.456,
+     0.746
+    ],
+    "p_value": 0.3728,
+    "win_rate": 0.239,
+    "profit_factor": 1.1,
+    "sum_r": 5.5
+   },
+   "by_symbol": {
+    "US500": {
+     "trades": 7,
+     "win_rate": 0.143,
+     "avg_r": -0.383,
+     "sum_r": -2.7,
+     "profit_factor": 0.58,
+     "median_r": -1.05,
+     "worst_r": -1.15
+    },
+    "NAS100": {
+     "trades": 10,
+     "win_rate": 0.2,
+     "avg_r": -0.18,
+     "sum_r": -1.8,
+     "profit_factor": 0.78,
+     "median_r": -1.02,
+     "worst_r": -1.11
+    },
+    "EURUSD": {
+     "trades": 6,
+     "win_rate": 0.167,
+     "avg_r": -0.29,
+     "sum_r": -1.7,
+     "profit_factor": 0.68,
+     "median_r": -1.06,
+     "worst_r": -1.17
+    },
+    "GBPUSD": {
+     "trades": 11,
+     "win_rate": 0.091,
+     "avg_r": -0.669,
+     "sum_r": -7.4,
+     "profit_factor": 0.34,
+     "median_r": -1.07,
+     "worst_r": -1.31
+    },
+    "XAUUSD": {
+     "trades": 15,
+     "win_rate": 0.267,
+     "avg_r": -0.037,
+     "sum_r": -0.6,
+     "profit_factor": 0.95,
+     "median_r": -1.02,
+     "worst_r": -1.06
+    },
+    "XTIUSD": {
+     "trades": 22,
+     "win_rate": 0.364,
+     "avg_r": 0.89,
+     "sum_r": 19.6,
+     "profit_factor": 2.35,
+     "median_r": -1.03,
+     "worst_r": -1.07
+    }
+   },
+   "by_side": {
+    "long": {
+     "trades": 71,
+     "win_rate": 0.239,
+     "avg_r": 0.077,
+     "sum_r": 5.5,
+     "profit_factor": 1.1,
+     "median_r": -1.03,
+     "worst_r": -1.31
+    },
+    "short": {
+     "trades": 0
+    }
+   },
+   "exits": {
+    "stop": 54,
+    "objetivo": 12,
+    "tiempo maximo": 5
+   }
+  },
+  {
+   "name": "toques 3 | R min 3 | memoria 360 | tendencia",
+   "params": {
+    "strategy": "sr",
+    "timeframe": "H4",
+    "max_hold_days": 7.0,
+    "breakeven_r": 0.0,
+    "sr_mode": "bounce",
+    "allow_short": false,
+    "sr_target": "level",
+    "sr_min_rr": 3.0,
+    "sr_min_touches": 3,
+    "sr_lookback": 360,
+    "sr_trend": true
+   },
+   "all": {
+    "trades": 39,
+    "win_rate": 0.205,
+    "avg_r": -0.161,
+    "sum_r": -6.3,
+    "profit_factor": 0.81,
+    "median_r": -1.03,
+    "worst_r": -1.2
+   },
+   "fit": {
+    "trades": 23,
+    "win_rate": 0.261,
+    "avg_r": 0.059,
+    "sum_r": 1.4,
+    "profit_factor": 1.08,
+    "median_r": -1.03,
+    "worst_r": -1.2
+   },
+   "blind": {
+    "trades": 16,
+    "win_rate": 0.125,
+    "avg_r": -0.477,
+    "sum_r": -7.6,
+    "profit_factor": 0.48,
+    "median_r": -1.03,
+    "worst_r": -1.15
+   },
+   "test": {
+    "n": 39,
+    "mean_r": -0.161,
+    "ci95": [
+     -0.694,
+     0.413
+    ],
+    "p_value": 0.7173,
+    "win_rate": 0.205,
+    "profit_factor": 0.81,
+    "sum_r": -6.3
+   },
+   "by_symbol": {
+    "US500": {
+     "trades": 5,
+     "win_rate": 0.2,
+     "avg_r": -0.121,
+     "sum_r": -0.6,
+     "profit_factor": 0.86,
+     "median_r": -1.05,
+     "worst_r": -1.15
+    },
+    "NAS100": {
+     "trades": 8,
+     "win_rate": 0.25,
+     "avg_r": 0.032,
+     "sum_r": 0.3,
+     "profit_factor": 1.04,
+     "median_r": -1.02,
+     "worst_r": -1.11
+    },
+    "EURUSD": {
+     "trades": 1,
+     "win_rate": 1.0,
+     "avg_r": 3.677,
+     "sum_r": 3.7,
+     "profit_factor": null,
+     "median_r": 3.68,
+     "worst_r": 3.68
+    },
+    "GBPUSD": {
+     "trades": 5,
+     "win_rate": 0.0,
+     "avg_r": -1.087,
+     "sum_r": -5.4,
+     "profit_factor": 0.0,
+     "median_r": -1.07,
+     "worst_r": -1.2
+    },
+    "XAUUSD": {
+     "trades": 11,
+     "win_rate": 0.273,
+     "avg_r": 0.123,
+     "sum_r": 1.4,
+     "profit_factor": 1.16,
+     "median_r": -1.03,
+     "worst_r": -1.06
+    },
+    "XTIUSD": {
+     "trades": 9,
+     "win_rate": 0.111,
+     "avg_r": -0.614,
+     "sum_r": -5.5,
+     "profit_factor": 0.34,
+     "median_r": -1.04,
+     "worst_r": -1.07
+    }
+   },
+   "by_side": {
+    "long": {
+     "trades": 39,
+     "win_rate": 0.205,
+     "avg_r": -0.161,
+     "sum_r": -6.3,
+     "profit_factor": 0.81,
+     "median_r": -1.03,
+     "worst_r": -1.2
+    },
+    "short": {
+     "trades": 0
+    }
+   },
+   "exits": {
+    "stop": 31,
+    "objetivo": 7,
+    "tiempo maximo": 1
+   }
+  }
+ ],
+ "selected": {
+  "params": {
+   "strategy": "sr",
+   "timeframe": "H4",
+   "max_hold_days": 7.0,
+   "breakeven_r": 0.0,
+   "sr_mode": "bounce",
+   "allow_short": false,
+   "sr_target": "level",
+   "sr_min_rr": 2.0,
+   "sr_min_touches": 2,
+   "sr_lookback": 300,
+   "sr_trend": true
+  },
+  "all": {
+   "trades": 94,
+   "win_rate": 0.383,
+   "avg_r": 0.315,
+   "sum_r": 29.6,
+   "profit_factor": 1.49,
+   "median_r": -1.02,
+   "worst_r": -1.16
+  },
+  "fit": {
+   "trades": 62,
+   "win_rate": 0.371,
+   "avg_r": 0.282,
+   "sum_r": 17.5,
+   "profit_factor": 1.43,
+   "median_r": -1.02,
+   "worst_r": -1.13
+  },
+  "blind": {
+   "trades": 32,
+   "win_rate": 0.406,
+   "avg_r": 0.379,
+   "sum_r": 12.1,
+   "profit_factor": 1.61,
+   "median_r": -1.01,
+   "worst_r": -1.16
+  },
+  "by_symbol": {
+   "US500": {
+    "trades": 8,
+    "win_rate": 0.375,
+    "avg_r": 0.087,
+    "sum_r": 0.7,
+    "profit_factor": 1.13,
+    "median_r": -1.02,
+    "worst_r": -1.07
+   },
+   "NAS100": {
+    "trades": 16,
+    "win_rate": 0.125,
+    "avg_r": -0.655,
+    "sum_r": -10.5,
+    "profit_factor": 0.27,
+    "median_r": -1.02,
+    "worst_r": -1.04
+   },
+   "EURUSD": {
+    "trades": 8,
+    "win_rate": 0.5,
+    "avg_r": 0.58,
+    "sum_r": 4.6,
+    "profit_factor": 2.05,
+    "median_r": 0.42,
+    "worst_r": -1.16
+   },
+   "GBPUSD": {
+    "trades": 19,
+    "win_rate": 0.632,
+    "avg_r": 1.137,
+    "sum_r": 21.6,
+    "profit_factor": 3.9,
+    "median_r": 1.97,
+    "worst_r": -1.1
+   },
+   "XAUUSD": {
+    "trades": 22,
+    "win_rate": 0.409,
+    "avg_r": 0.511,
+    "sum_r": 11.2,
+    "profit_factor": 1.84,
+    "median_r": -1.01,
+    "worst_r": -1.13
+   },
+   "XTIUSD": {
+    "trades": 21,
+    "win_rate": 0.286,
+    "avg_r": 0.09,
+    "sum_r": 1.9,
+    "profit_factor": 1.12,
+    "median_r": -1.02,
+    "worst_r": -1.09
+   }
+  },
+  "by_year": {
+   "2023": {
+    "trades": 6,
+    "win_rate": 0.833,
+    "avg_r": 1.584,
+    "sum_r": 9.5,
+    "profit_factor": 10.12,
+    "median_r": 1.93,
+    "worst_r": -1.04
+   },
+   "2024": {
+    "trades": 38,
+    "win_rate": 0.289,
+    "avg_r": -0.02,
+    "sum_r": -0.8,
+    "profit_factor": 0.97,
+    "median_r": -1.03,
+    "worst_r": -1.13
+   },
+   "2025": {
+    "trades": 29,
+    "win_rate": 0.414,
+    "avg_r": 0.473,
+    "sum_r": 13.7,
+    "profit_factor": 1.78,
+    "median_r": -1.02,
+    "worst_r": -1.09
+   },
+   "2026": {
+    "trades": 21,
+    "win_rate": 0.381,
+    "avg_r": 0.34,
+    "sum_r": 7.1,
+    "profit_factor": 1.52,
+    "median_r": -1.01,
+    "worst_r": -1.16
+   }
+  },
+  "exits": {
+   "stop": 58,
+   "objetivo": 33,
+   "tiempo maximo": 3
+  },
+  "min_lot_risk_usd": {
+   "US500": {
+    "median": 0.2,
+    "max": 0.3
+   },
+   "NAS100": {
+    "median": 0.9,
+    "max": 2.5
+   },
+   "EURUSD": {
+    "median": 1.8,
+    "max": 2.9
+   },
+   "GBPUSD": {
+    "median": 2.4,
+    "max": 5.2
+   },
+   "XAUUSD": {
+    "median": 21.6,
+    "max": 56.2
+   },
+   "XTIUSD": {
+    "median": 8.5,
+    "max": 27.4
+   }
+  },
+  "account": [
+   {
+    "risk_pct": 0.03,
+    "max_positions": 2,
+    "historical": {
+     "final": 971.0,
+     "max_dd": -0.185,
+     "taken": 88,
+     "skipped_min_lot": 5,
+     "skipped_full": 1
+    },
+    "montecarlo": {
+     "paths": 800,
+     "final_p10": 513.0,
+     "final_p50": 991.0,
+     "final_p90": 1838.0,
+     "p_loss": 0.087,
+     "p_half": 0.0,
+     "p_brake": 0.007,
+     "max_dd_p50": -0.251,
+     "caveat": "el remuestreo supone que la ventaja historica (R medio) es real; si no lo es, el riesgo de perder es mayor"
+    }
+   },
+   {
+    "risk_pct": 0.06,
+    "max_positions": 2,
+    "historical": {
+     "final": 1742.0,
+     "max_dd": -0.354,
+     "taken": 93,
+     "skipped_min_lot": 0,
+     "skipped_full": 1
+    },
+    "montecarlo": {
+     "paths": 800,
+     "final_p10": 327.0,
+     "final_p50": 1380.0,
+     "final_p90": 5610.0,
+     "p_loss": 0.22,
+     "p_half": 0.034,
+     "p_brake": 0.37,
+     "max_dd_p50": -0.459,
+     "caveat": "el remuestreo supone que la ventaja historica (R medio) es real; si no lo es, el riesgo de perder es mayor"
+    }
+   }
+  ],
+  "significance": {
+   "all": {
+    "n": 94,
+    "mean_r": 0.315,
+    "ci95": [
+     -0.041,
+     0.696
+    ],
+    "p_value": 0.0515,
+    "win_rate": 0.383,
+    "profit_factor": 1.49,
+    "sum_r": 29.6
+   },
+   "blind": {
+    "n": 32,
+    "mean_r": 0.379,
+    "ci95": [
+     -0.236,
+     1.06
+    ],
+    "p_value": 0.134,
+    "win_rate": 0.406,
+    "profit_factor": 1.61,
+    "sum_r": 12.1
+   },
+   "variants_tested": 73,
+   "q_value_all_variants": 0.455,
+   "variants_with_q_below_0_10": 0,
+   "note": "p unilateral (media de R > 0) por bootstrap; q = Benjamini-Hochberg sobre todas las variantes distintas probadas"
+  }
+ },
+ "reading": "No hay ventaja robusta en la version ingenua: los cortos pierden en todas las variantes y los objetivos fijos de 2R/3R ganan algo en el ajuste y pierden en el periodo ciego. Sobrevive una familia: rebote en soporte, solo largos, objetivo en la siguiente resistencia con recorrido minimo; con memoria de 240 barras o mas y 2 toques es positiva en ajuste y ciego en todas las combinaciones probadas, pero son pocas operaciones, concentradas en GBPUSD, y la eleccion se hizo entre ~70 variantes."
+}

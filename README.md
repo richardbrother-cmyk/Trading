@@ -380,7 +380,50 @@ objetivo 2R enviados con la orden; cierre de lo que quede a las 12:00 NY; una op
 la misma cuenta). El bot recalcula el plan del día en cada ciclo a partir de las velas cerradas, así
 que no depende de un estado en memoria; solo entra si la vela del retest es la última cerrada (no persigue entradas
 tardías). Respeta `BOT_HALT` y el freno del 50 % de la cuenta; no aplica las ventanas de eventos (el estudio incluyó
-esos días). El estado de la cuenta agresiva trata las etiquetas `autotrader-aggr` y `autotrader-asia` como propias.
+esos días). El estado de la cuenta agresiva trata las etiquetas `autotrader-aggr`, `autotrader-asia` y `autotrader-sr` como propias.
+
+### Bot de soportes y resistencias (sexto bot, misma cuenta agresiva)
+
+`autotrader/sr.py` (niveles y señales), estrategia `sr` del motor swing (`autotrader/swing.py`, `autotrader/swingbot.py`), workflow
+`ctrader-sr.yml` (cada hora, minuto 14), etiqueta `autotrader-sr`, estado en `docs/sr_state.json` y sección propia en la pestaña
+agresiva. El estado de la cuenta (posiciones, operaciones, equity) lo sigue refrescando `ctrader-aggr.yml`, que ahora reconoce las
+tres etiquetas propias (`autotrader-aggr`, `autotrader-asia`, `autotrader-sr`).
+Regla: sobre barras de 4 h se buscan pivotes (máximo o mínimo que supera a 3 barras a cada lado, confirmado 3 barras después, así que
+nunca se mira al futuro) de las últimas 300 barras; los pivotes (máximos y mínimos juntos, porque un soporte roto pasa a ser
+resistencia) se agrupan en zonas de 0,5 ATR y una zona con al menos 2 pivotes es un nivel. Señal de **rebote**: la última barra
+cerrada se mete en la zona de un soporte (mínimo ≤ nivel + 0,3 ATR, sin pasarse más de 1 ATR por debajo), cierra por encima de la zona
+con vela alcista y el cierre está sobre la EMA200. Stop 0,3 ATR por debajo del nivel (o de la mecha, lo que quede más abajo; entre 0,4 y
+3 ATR de distancia); objetivo en la siguiente resistencia, y la operación solo se hace si hay al menos 2 R de recorrido hasta ella;
+ambos se envían con la orden. Solo largos, máximo 2 posiciones, salida a los 7 días, la señal caduca a las 2 h como en el resto de
+bots. Riesgo **3 %** del equity por operación (la mitad que el bot de rupturas: la ventaja es más fina y está menos probada); el lote
+mínimo se acepta hasta el 4,5 %, así que oro y petróleo entran cuando el lote mínimo cabe y se saltan solos cuando no. Respeta
+`BOT_HALT` y el freno del 50 %, este último medido sobre el historial real de la cuenta agresiva (`docs/aggr_state.json`). Parámetros por
+entorno: `SWING_SR_MODE`, `SWING_SR_LOOKBACK`, `SWING_SR_MIN_TOUCHES`, `SWING_SR_TARGET`, `SWING_SR_MIN_RR`, `SWING_SR_RR`,
+`SWING_SR_TREND`; el tope del lote mínimo, con la variable del repositorio `SR_MAX_RISK_PCT`.
+
+Investigación (`scripts/sr_backtest.py`, resultado completo en `docs/sr_backtest.json`; 3 años de barras de 15 min agregadas a 4 h,
+6 símbolos, spread, comisión y swap; periodo de ajuste hasta el 15-09-2025 y periodo ciego después):
+
+- **Rejilla de 36 variantes** (rebote, retest tras ruptura o ambos; objetivo 2R, 3R o la siguiente zona; con o sin filtro de tendencia;
+  solo largos o largos y cortos). Los **cortos pierden en todas las variantes**, los objetivos fijos de 2R/3R ganan algo en el ajuste y
+  pierden en el ciego, y la ruptura con retest no añade nada al rebote. Sobrevive una familia: rebote en soporte, solo largos,
+  objetivo en la siguiente resistencia.
+- **Vecindad de esa familia** (2 o 3 toques, recorrido mínimo 1,5, 2 o 3 R, memoria de 160, 240 o 360 barras, con o sin tendencia):
+  con 2 toques y memoria de 240 barras o más las 12 combinaciones son positivas en ajuste y ciego; con memoria de 160 barras o con 3
+  toques no lo son. Hay meseta en una zona, no en todo el espacio. Se eligió la zona central (memoria 300, recorrido mínimo 2, con
+  tendencia), no el máximo.
+- **Elegida**: 94 operaciones en 3 años, acierto 38 %, R medio +0,32, PF 1,49 (ajuste +0,28 con 62 operaciones, ciego +0,38 con 32). Por
+  año: 2023 +1,6 R medio con solo 6 operaciones, 2024 −0,02, 2025 +0,47, 2026 +0,34. Por símbolo: GBPUSD +1,14 R medio en 19
+  operaciones (casi la mitad del total), EURUSD +0,58, oro +0,51, petróleo +0,09, US500 +0,09, NAS100 −0,66.
+- **Estadística**: R medio +0,32 con intervalo 95 % de −0,04 a +0,70 y p = 0,05 sin corregir; en el ciego p = 0,13. Con la corrección de
+  Benjamini-Hochberg sobre las 73 variantes probadas, q = 0,46 y ninguna variante baja de 0,10: **no es estadísticamente significativa**.
+  Es una ventaja fina, concentrada en un símbolo y elegida entre muchas; se despliega en demo como experimento, con la mitad del
+  riesgo del bot de rupturas, y no como ventaja demostrada.
+- **Cuenta de 500 USD** (simulador de la cuenta agresiva: lote mínimo, 2 posiciones, freno 50 %): con 3 % de riesgo el histórico termina
+  en 971 USD con caída máxima de −18 % (88 operaciones tomadas, 5 descartadas por lote mínimo); con 6 % en 1.742 USD y −35 %. El Monte Carlo
+  (800 recorridos barajando los R) da, con 3 %, mediana 991 USD, percentil 10 de 513, 9 % de probabilidad de acabar por debajo de 500 y 1 %
+  de que salte el freno; con 6 %, 22 % y 37 %. Ese remuestreo **supone que la ventaja histórica es real**; si no lo es, el riesgo de perder es
+  mayor. Por eso el bot arranca al 3 %.
 
 ### Corrección estadística de los estudios intradía
 
