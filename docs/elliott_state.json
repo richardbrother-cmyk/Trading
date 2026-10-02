@@ -1,15 +1,15 @@
 {
  "traded_signals": {},
- "at": "2026-10-02T19:22Z",
+ "at": "2026-10-02T23:50Z",
  "equity": 7821.99,
  "label": "autotrader-elliott",
  "strategy": "ZigZag 2 ATR, fin de la onda 2, entrada por ruptura del extremo de la onda anterior, stop en el nivel de invalidacion menos 0.25 ATR, objetivo 1.618 x onda 1, solo largos, salida a los 10 dias",
  "last_decision": {
   "symbol": "XAUUSD",
-  "bar": "2026-10-02 13:00",
-  "bar_age_h": 2.38,
-  "close": 4138.97,
-  "atr": 39.76,
+  "bar": "2026-10-02 17:00",
+  "bar_age_h": 2.84,
+  "close": 4140.42,
+  "atr": 38.33,
   "action": "HOLD",
   "phase": "sin patron",
   "pivots": [
