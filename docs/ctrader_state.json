@@ -2,23 +2,23 @@
  "available": true,
  "broker": "Fusion Markets · cTrader demo",
  "account": 10136967,
- "at": "2026-10-02T00:50Z",
- "balance": 7895.96,
- "equity": 7901.96,
- "unrealized_pnl": 6.0,
+ "at": "2026-10-02T02:28Z",
+ "balance": 7585.58,
+ "equity": 7570.58,
+ "unrealized_pnl": -15.0,
  "leverage": 500.0,
  "positions": [
   {
-   "symbol": "XAUUSD",
-   "qty": 20.0,
+   "symbol": "163",
+   "qty": 50.0,
    "side": "buy",
-   "avg": 4159.62,
-   "price": 4159.92,
-   "stop": 4154.53,
-   "target": null,
-   "opened_at": "2026-10-02T00:45Z",
-   "pnl": 6.0,
-   "position_id": 44356974,
+   "avg": 664.76,
+   "price": 664.46,
+   "stop": 659.35,
+   "target": 683.61,
+   "opened_at": "2026-10-02T01:54Z",
+   "pnl": -15.0,
+   "position_id": 44367234,
    "bot": false,
    "label": "",
    "origin": "manual"
@@ -28,6 +28,51 @@
   "XAUUSD"
  ],
  "trades": [
+  {
+   "symbol": "XAUUSD",
+   "at": "2026-10-02T02:17Z",
+   "units": 50.0,
+   "entry": 4153.84,
+   "exit": 4158.58,
+   "gross": -237.0,
+   "swap": 0.0,
+   "commission": -4.99,
+   "net": -241.99,
+   "balance_after": 7585.58,
+   "label": "",
+   "opened_at": "2026-10-02T02:06Z",
+   "origin": "manual"
+  },
+  {
+   "symbol": "XAUUSD",
+   "at": "2026-10-02T01:50Z",
+   "units": 40.0,
+   "entry": 4148.995,
+   "exit": 4147.95,
+   "gross": 41.8,
+   "swap": 0.0,
+   "commission": -3.99,
+   "net": 37.81,
+   "balance_after": 7827.57,
+   "label": "",
+   "opened_at": "2026-10-02T01:32Z",
+   "origin": "manual"
+  },
+  {
+   "symbol": "XAUUSD",
+   "at": "2026-10-02T00:59Z",
+   "units": 20.0,
+   "entry": 4159.62,
+   "exit": 4154.41,
+   "gross": -104.2,
+   "swap": 0.0,
+   "commission": -2.0,
+   "net": -106.2,
+   "balance_after": 7789.76,
+   "label": "",
+   "opened_at": "2026-10-02T00:45Z",
+   "origin": "manual"
+  },
   {
    "symbol": "XAUUSD",
    "at": "2026-10-02T00:45Z",
@@ -466,17 +511,17 @@
   "initial": 10000.0,
   "realized": {
    "bot": -1409.29,
-   "manual": 240.9,
+   "manual": -69.48,
    "excluded": -208.13
   },
   "open": {
    "bot": 0.0,
-   "manual": 6.0,
+   "manual": -15.0,
    "excluded": 0.0
   },
   "counts": {
    "bot": 15,
-   "manual": 7,
+   "manual": 10,
    "excluded": 6
   },
   "adjusted_equity": 8590.71,
@@ -1298,6 +1343,10 @@
   [
    "2026-10-02T00:50Z",
    7901.96
+  ],
+  [
+   "2026-10-02T02:28Z",
+   7570.58
   ]
  ],
  "cycles": [
