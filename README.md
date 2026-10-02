@@ -438,6 +438,30 @@ cero son negativas (vender la ruptura fallida, objetivo 1R o lado contrario, y l
 y 40 intentos, lo que parecía borde entra dentro de lo que produce el azar; el bot de Asia sigue en demo como prueba
 fuera de muestra, sin expectativa de ganancia.
 
+### Investigación: reversión al VWAP y momentum de la primera hora (horario de Nueva York)
+
+`scripts/intraday_vwap_momentum.py` (resultado en `docs/intraday_vwap_momentum.json`): 779 sesiones de Nueva York (09:30-16:00 con su
+horario de verano real), barras M15 de septiembre 2023 a septiembre 2026, seis símbolos (US500, NAS100, XAUUSD, XTIUSD, EURUSD,
+GBPUSD), una operación por símbolo y día, siempre cerrada antes de las 16:00, con spread y comisión. Familias: reversión al VWAP
+anclado a las 09:30 (24 variantes), momentum de la primera hora con salida a las 12:00, 14:00 o 16:00 y su versión contraria (36),
+primera media hora hacia la última (8) y dos controles de deriva (largo y corto fijos). R neto por operación; p-valor e IC por
+bootstrap de días (los símbolos del mismo día están correlacionados) y q-valor de Benjamini-Hochberg sobre las 68 variantes.
+
+- **Reversión al VWAP: sin borde, ni siquiera antes de costes.** Ninguna de las 24 variantes tiene R medio positivo (entre -0,03 y
+  -0,14 R por operación). Sin costes sale en torno a cero (oro, petróleo y EURUSD +0,01; índices -0,06 a -0,08), así que los costes
+  convierten lo plano en pérdida. Saltarse los días de tendencia no cambia nada.
+- **Primera media hora -> última media hora:** las 8 variantes son negativas.
+- **Momentum de la primera hora, las 36 variantes juntas:** 9 positivas pero con R medio de +0,00 a +0,02 y q = 1,0; indistinguible de cero.
+  La versión contraria (fade) pierde.
+- **Pista, no prueba:** el momentum de la primera hora **solo en índices** (US500 + NAS100) da R +0,08 a +0,10, PF 1,17-1,22, n = 1.028
+  operaciones (entrada 10:30 a favor del movimiento si supera 0,5 U, stop 1 U, salida 14:00 o 16:00). Es positivo en las dos mitades de
+  la muestra (primera +0,08/+0,12, segunda +0,04/+0,10), pero el IC al 95 % roza el cero ([-0,02, +0,21]), p 0,02-0,05 y q 0,17 tras corregir
+  por las 18 variantes de momentum. Y ese subconjunto se eligió después de ver que el efecto vive ahí: en oro, petróleo y divisas
+  es cero o negativo. Coincide con lo publicado sobre momentum intradía en índices de EE. UU., pero un 0,1 R por operación
+  se come con un simple cambio de spread.
+- **Lectura:** no hay nada para poner en demo con convicción. Lo más cercano a un candidato es el momentum de la primera hora en índices,
+  y requeriría validarse en datos nuevos (es el tipo de regla que puede probarse en demo a coste bajo). No se creó ningún bot.
+
 ### Cuenta agresiva (500 USD)
 
 Tercera cuenta demo, workflow `ctrader-aggr.yml`, mismo motor que el bot swing con otro perfil
