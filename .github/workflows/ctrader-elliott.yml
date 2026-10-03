@@ -82,7 +82,8 @@ jobs:
       - name: Tests
         run: python -m pytest -q tests/test_elliott.py tests/test_elliottbot.py tests/test_guard.py
       - name: Ciclo Elliott
-        run: python -m autotrader.cli --env /dev/null elliott-run ${{ inputs.dry_run && '--dry-run' || '' }} | tee /tmp/elliott.json
+        # pipefail: sin el, un fallo del ciclo quedaba oculto por el exit 0 de tee (paso en verde sin ciclo)
+        run: set -o pipefail; python -m autotrader.cli --env /dev/null elliott-run ${{ inputs.dry_run && '--dry-run' || '' }} | tee /tmp/elliott.json
       # El estado de la cuenta (docs/edge_state.json) lo publica cada hora ctrader-sr; aqui solo el estado del bot y el panel
       - name: Estado del bot y panel
         if: ${{ !inputs.dry_run }}
