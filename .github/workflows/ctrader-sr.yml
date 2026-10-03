@@ -1,10 +1,12 @@
 name: ctrader-sr
 
 # Bot de SOPORTES Y RESISTENCIAS (rebote en un soporte H4 con al menos 2 toques, solo largos, objetivo en la siguiente resistencia con
-# un minimo de 2 R, stop bajo el nivel, hasta 7 dias) en la MISMA cuenta demo agresiva de cTrader (500 USD, 1:500) que el bot de
-# rupturas y el de Asia. Mismo motor que el bot swing (estrategia "sr", ver autotrader/sr.py y scripts/sr_backtest.py).
-# Corre cada hora y solo entra si la ultima barra de 4 h cerro hace menos de 2 h. Etiqueta propia: autotrader-sr.
-# Secrets: los mismos que ctrader-aggr (CTRADER_CLIENT_ID, CTRADER_CLIENT_SECRET, CTRADER_ACCESS_TOKEN, CTRADER_AGGR_ACCOUNT_LOGIN).
+# un minimo de 2 R, stop bajo el nivel, hasta 7 dias). Mismo motor que el bot swing (estrategia "sr", ver autotrader/sr.py y
+# scripts/sr_backtest.py). Corre cada hora y solo entra si la ultima barra de 4 h cerro hace menos de 2 h. Etiqueta propia: autotrader-sr.
+# Desde el 3-10-2026 opera en la cuenta demo de EVIDENCIA (10142501, 1.000 USD, 1:500), compartida solo con el bot de Elliott: las dos
+# operativas con mejor evidencia, separadas de las apuestas de la cuenta agresiva y de las operaciones manuales. Este workflow es el que
+# publica el estado de esa cuenta (docs/edge_state.json). Secrets: CTRADER_CLIENT_ID, CTRADER_CLIENT_SECRET, CTRADER_ACCESS_TOKEN y,
+# opcionalmente, CTRADER_EDGE_ACCOUNT_LOGIN (si no existe se usa el numero de cuenta escrito aqui).
 on:
   schedule:
     - cron: "14 * * * 0-5"
@@ -49,20 +51,17 @@ jobs:
       CTRADER_DEMO: "true"
       CTRADER_CLIENT_ID: ${{ secrets.CTRADER_CLIENT_ID }}
       CTRADER_CLIENT_SECRET: ${{ secrets.CTRADER_CLIENT_SECRET }}
-      CTRADER_ACCOUNT_LOGIN: ${{ secrets.CTRADER_AGGR_ACCOUNT_LOGIN }}
+      CTRADER_ACCOUNT_LOGIN: ${{ secrets.CTRADER_EDGE_ACCOUNT_LOGIN || '10142501' }}
       CTRADER_ACCESS_TOKEN: ${{ secrets.CTRADER_ACCESS_TOKEN }}
-      # Freno global: BOT_HALT (variable del repositorio: off | freeze | close) y freno por drawdown desde el maximo
-      BOT_HALT: ${{ vars.AGGR_BOT_HALT || vars.BOT_HALT || 'off' }}
-      # Rearme del maximo del freno (3-10-2026): la caida del 40 % desde 735 USD fue de operaciones manuales, no de los bots
-      PEAK_RESET_AT: "2026-10-03T00:00Z"
-      # Freno al 50 % desde el maximo (decidido con la simulacion a 3 anos: con 30 % saltaba a los dos meses en todos
-      # los recorridos). Valor fijo en el workflow: las variables del repositorio ya no lo cambian.
-      MAX_DRAWDOWN_PCT: "0.50"
-      # Indices y forex son operables con 200 USD; oro y petroleo se saltan solos si el lote minimo arriesga
-      # mas de SWING_MAX_RISK_PCT
+      # Freno de la cuenta de evidencia (compartido con el bot de Elliott): interruptor manual y drawdown desde el maximo
+      BOT_HALT: ${{ vars.EDGE_BOT_HALT || vars.BOT_HALT || 'off' }}
+      # Freno al 20 % desde el maximo: cuenta limpia, sin operaciones manuales, con dos bots de 2-3 % de riesgo. La simulacion de S/R
+      # al 3 % da una caida maxima historica del 18 % y un 1 % de probabilidad de llegar al 50 %, asi que un 20 % ya senala algo raro.
+      MAX_DRAWDOWN_PCT: "0.20"
+      # Oro y petroleo se saltan solos si el lote minimo arriesga mas de SWING_MAX_RISK_PCT (con 1.000 USD caben casi siempre)
       SYMBOLS: "US500,NAS100,EURUSD,GBPUSD,XAUUSD,XTIUSD"
-      # Freno por drawdown con el historial REAL de la cuenta agresiva (el bot de Asia hace lo mismo)
-      EQUITY_HISTORY: "docs/aggr_state.json"
+      # Freno por drawdown con el historial REAL de la cuenta de evidencia
+      EQUITY_HISTORY: "docs/edge_state.json"
       # Perfil: rebote en soporte H4 (solo largos). Parametros fijados con scripts/sr_backtest.py (3 anos, 6 simbolos, periodo de ajuste
       # y periodo ciego): 2 toques, memoria de 300 barras, objetivo en la siguiente resistencia con minimo 2 R, sobre la EMA200.
       SWING_STRATEGY: "sr"
@@ -90,11 +89,12 @@ jobs:
         run: python -m pytest -q
       - name: Ciclo de soportes y resistencias
         run: python -m autotrader.cli --env /dev/null swing-run ${{ inputs.dry_run && '--dry-run' || '' }}
-      # El estado de la cuenta (posiciones, operaciones, equity) lo refresca cada hora el workflow ctrader-aggr, que ya reconoce
-      # la etiqueta autotrader-sr; aqui solo se publica el ultimo ciclo del bot, igual que hace el bot de Asia.
-      - name: Estado del bot y panel
+      # Este workflow publica el estado de la cuenta de evidencia (posiciones, operaciones, equity, historial para el freno) con las
+      # etiquetas de los dos bots que la operan, ademas del ultimo ciclo propio.
+      - name: Estado de la cuenta, del bot y panel
         if: ${{ !inputs.dry_run }}
         run: |
+          python scripts/ctrader_state.py --swing --initial 1000 --label autotrader-sr,autotrader-elliott --out docs/edge_state.json
           python scripts/sr_state.py --label autotrader-sr --out docs/sr_state.json
           python scripts/dashboard.py --no-live --out reports/dashboard.html
           cp reports/dashboard.html docs/index.html
@@ -104,7 +104,7 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add docs/sr_state.json docs/index.html docs/dashboard.html
+          git add docs/edge_state.json docs/sr_state.json docs/index.html docs/dashboard.html
           if git diff --cached --quiet; then echo "sin cambios"; exit 0; fi
           git commit -m "Panel: actualización automática (soportes y resistencias)"
           # Los ficheros del panel los regeneran varios workflows: ante conflicto gana la version recien generada.

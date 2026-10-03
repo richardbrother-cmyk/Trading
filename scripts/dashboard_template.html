@@ -131,6 +131,7 @@ footer { color: var(--muted); font-size: 12.5px; }
     <button class="tab" role="tab" id="tab-ctrader" aria-selected="false" aria-controls="panel-ctrader">Fusion Markets · CFDs <span class="badge" id="badge-ctrader"></span></button>
     <button class="tab" role="tab" id="tab-swing" aria-selected="false" aria-controls="panel-swing">Fusion · swing 200 USD <span class="badge" id="badge-swing"></span></button>
     <button class="tab" role="tab" id="tab-aggr" aria-selected="false" aria-controls="panel-aggr">Fusion · agresiva 500 USD <span class="badge" id="badge-aggr"></span></button>
+    <button class="tab" role="tab" id="tab-edge" aria-selected="false" aria-controls="panel-edge">Fusion · evidencia 1.000 USD <span class="badge" id="badge-edge"></span></button>
   </div>
 
   <!-- ============================ ALPACA ============================ -->
@@ -236,21 +237,6 @@ footer { color: var(--muted); font-size: 12.5px; }
       <div class="tbl-wrap"><table id="ct-res-table"></table></div>
       <p class="note" id="ct-res-note" style="margin:10px 0 0"></p>
     </section>
-    <section id="ct-elbot-section" style="display:none">
-      <div class="sec-head"><div><h2>Bot "ondas de Elliott" en oro (misma cuenta)</h2><p class="lede" id="ct-elbot-lede"></p></div></div>
-      <div class="kpis" id="ct-elbot-kpis" style="margin-bottom:12px"></div>
-      <div class="two">
-        <div>
-          <div class="eyebrow" style="margin-bottom:8px">Últimos pivotes del ZigZag (barras de 4 h)</div>
-          <div class="tbl-wrap"><table id="ct-elbot-pivots"></table></div>
-        </div>
-        <div>
-          <div class="eyebrow" style="margin-bottom:8px">Operaciones cerradas</div>
-          <div class="tbl-wrap"><table id="ct-elbot-trades"></table></div>
-        </div>
-      </div>
-      <p class="note" id="ct-elbot-note" style="margin:10px 0 0"></p>
-    </section>
   </div>
 
   <!-- ============================ FUSION / SWING ============================ -->
@@ -330,6 +316,21 @@ footer { color: var(--muted); font-size: 12.5px; }
       <div class="tbl-wrap"><table id="sw-wl-trades"></table></div>
       <p class="note" id="sw-wl-note" style="margin:10px 0 0"></p>
     </section>
+    <section id="sw-elbot-section" style="display:none">
+      <div class="sec-head"><div><h2>Bot "ondas de Elliott" en oro (misma cuenta)</h2><p class="lede" id="sw-elbot-lede"></p></div></div>
+      <div class="kpis" id="sw-elbot-kpis" style="margin-bottom:12px"></div>
+      <div class="two">
+        <div>
+          <div class="eyebrow" style="margin-bottom:8px">Últimos pivotes del ZigZag (barras de 4 h)</div>
+          <div class="tbl-wrap"><table id="sw-elbot-pivots"></table></div>
+        </div>
+        <div>
+          <div class="eyebrow" style="margin-bottom:8px">Operaciones cerradas</div>
+          <div class="tbl-wrap"><table id="sw-elbot-trades"></table></div>
+        </div>
+      </div>
+      <p class="note" id="sw-elbot-note" style="margin:10px 0 0"></p>
+    </section>
     <section id="sw-sr-section" style="display:none">
       <div class="sec-head"><div><h2>Bot de soportes y resistencias (misma cuenta)</h2><p class="lede" id="sw-sr-lede"></p></div></div>
       <div class="kpis" id="sw-sr-kpis" style="margin-bottom:12px"></div>
@@ -385,9 +386,20 @@ const nice = r => { const p = Math.pow(10, Math.floor(Math.log10(r))); const m =
   clone.id = "panel-aggr"; clone.setAttribute("aria-labelledby", "tab-aggr"); clone.hidden = true;
   clone.querySelectorAll("[id]").forEach(el => { el.id = el.id.replace(/^sw-/, "ag-"); });
   // sin secciones de investigacion (walk-forward, Kronos) en la cuenta agresiva
-  clone.querySelectorAll("#ag-walkforward, #ag-kronos, #ag-elliott").forEach(el => { const sec = el.closest("section"); if (sec) sec.remove(); });
+  clone.querySelectorAll("#ag-walkforward, #ag-kronos, #ag-elliott, #ag-elbot-section, #ag-sr-section").forEach(el => { const sec = el.closest("section"); if (sec) sec.remove(); });
   const lede = clone.querySelector("#ag-track-lede"); if (lede) lede.textContent = "Capital (saldo más resultado abierto) registrado en cada ciclo del bot agresivo desde GitHub Actions. Cuenta demo de 500 USD con apalancamiento 1:500.";
   src.parentNode.insertBefore(clone, src.nextSibling);
+})();
+
+// --- Panel de la cuenta de evidencia (S/R + Elliott): clon del panel swing con ids ed-* ---
+(function(){
+  const src = document.getElementById("panel-swing");
+  const clone = src.cloneNode(true);
+  clone.id = "panel-edge"; clone.setAttribute("aria-labelledby", "tab-edge"); clone.hidden = true;
+  clone.querySelectorAll("[id]").forEach(el => { el.id = el.id.replace(/^sw-/, "ed-"); });
+  clone.querySelectorAll("#ed-walkforward, #ed-kronos, #ed-elliott, #ed-asia-section, #ed-fh-section, #ed-wl-section").forEach(el => { const sec = el.closest("section"); if (sec) sec.remove(); });
+  const lede = clone.querySelector("#ed-track-lede"); if (lede) lede.textContent = "Capital (saldo más resultado abierto) registrado en cada ciclo desde GitHub Actions. Cuenta demo de 1.000 USD con apalancamiento 1:500 reservada a las dos operativas con mejor evidencia (soportes y resistencias, ondas de Elliott), sin operaciones manuales.";
+  document.getElementById("panel-aggr").parentNode.insertBefore(clone, document.getElementById("panel-aggr").nextSibling);
 })();
 
 // --- Tabs ---
@@ -684,8 +696,8 @@ function cyclesTable(cycles){
 })();
 
 // ============================ BOT DE ELLIOTT (cuenta demo principal) ============================
-function renderElliottBot(EB){
-  const $ = id => document.getElementById(id);
+function renderElliottBot(prefix, EB){
+  const $ = id => document.getElementById(id.replace(/^ct-/, prefix + "-"));
   const pfTxt = v => v==null ? "—" : Number(v).toFixed(2);
   if (EB && EB.last_decision) {
     $("ct-elbot-section").style.display = "";
@@ -707,10 +719,9 @@ function renderElliottBot(EB){
     const sv = EB.study; const svm = sv ? sv.metrics : null, svs = sv ? sv.stats : null, svr = sv ? sv.random : null;
     $("ct-elbot-note").textContent = sv
       ? `Origen: variante con más operaciones entre las que baten a las entradas al azar en el estudio de Elliott (pestaña swing): ${svm.trades} operaciones en 3 años, acierto ${pct(svm.win_rate||0,0).replace("+","")}, PF ${pfTxt(svm.profit_factor)}, ${pct(svm.return||0)}, R medio ${Number(svs.mean_r).toFixed(2)} frente a ${Number(svr.avg_r_mean).toFixed(2)} del azar (p ${Number(svr.share_random_avg_r_at_least_real).toFixed(2)}). El walk-forward en 4 h es débil y con pocas operaciones, así que se evalúa en demo antes de creer en ella.`
-      : "Origen: estudio de ondas de Elliott (pestaña swing). Se evalúa en demo antes de creer en ella.";
+      : "Origen: estudio de ondas de Elliott (pestaña swing). Se evalúa en demo antes de creer en ella. Desde el 3-10-2026 opera en la cuenta de evidencia (1.000 USD), separada de la principal.";
   }
 }
-renderElliottBot((D.ctrader||{}).elliott_bot);
 
 // ============================ SALIDA EN RESISTENCIAS (investigacion) ============================
 (function(){
@@ -971,4 +982,6 @@ function renderSwingTab(prefix, SW, badgeId, base0, research){
 }
 renderSwingTab("sw", SW, "badge-swing", 200, true);
 renderSwingTab("ag", D.aggr || {available:false}, "badge-aggr", 500, false);
+renderSwingTab("ed", D.edge || {available:false}, "badge-edge", 1000, false);
+renderElliottBot("ed", (D.edge||{}).elliott_bot);
 </script>

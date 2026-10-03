@@ -382,14 +382,15 @@ lote mínimo de 1 onza se acepta hasta el 4,5 % (`ASIA_MAX_RISK_PCT`), porque co
 días en una cuenta de 440 USD. El bot recalcula el plan del día en cada ciclo a partir de las velas cerradas, así
 que no depende de un estado en memoria; solo entra si la vela del retest es la última cerrada (no persigue entradas
 tardías). Respeta `BOT_HALT` y el freno del 50 % de la cuenta; no aplica las ventanas de eventos (el estudio incluyó
-esos días). El estado de la cuenta agresiva trata las etiquetas `autotrader-aggr`, `autotrader-asia`, `autotrader-sr`, `autotrader-fh` y `autotrader-wl` como propias.
+esos días). El estado de la cuenta agresiva trata las etiquetas `autotrader-aggr`, `autotrader-asia`, `autotrader-fh` y `autotrader-wl` como propias.
 
-### Bot de soportes y resistencias (sexto bot, misma cuenta agresiva)
+### Bot de soportes y resistencias (sexto bot; desde el 3-10-2026 en la cuenta de evidencia)
 
 `autotrader/sr.py` (niveles y señales), estrategia `sr` del motor swing (`autotrader/swing.py`, `autotrader/swingbot.py`), workflow
 `ctrader-sr.yml` (cada hora, minuto 14), etiqueta `autotrader-sr`, estado en `docs/sr_state.json` y sección propia en la pestaña
-agresiva. El estado de la cuenta (posiciones, operaciones, equity) lo sigue refrescando `ctrader-aggr.yml`, que ahora reconoce las
-cinco etiquetas propias (`autotrader-aggr`, `autotrader-asia`, `autotrader-sr`, `autotrader-fh`, `autotrader-wl`).
+de la cuenta de evidencia. Hasta el 3-10-2026 operó en la cuenta agresiva (sin llegar a abrir ninguna operación); desde entonces opera
+en la cuenta de evidencia (ver más abajo) y es el workflow que publica el estado de esa cuenta (`docs/edge_state.json`, con las
+etiquetas `autotrader-sr` y `autotrader-elliott`).
 Regla: sobre barras de 4 h se buscan pivotes (máximo o mínimo que supera a 3 barras a cada lado, confirmado 3 barras después, así que
 nunca se mira al futuro) de las últimas 300 barras; los pivotes (máximos y mínimos juntos, porque un soporte roto pasa a ser
 resistencia) se agrupan en zonas de 0,5 ATR y una zona con al menos 2 pivotes es un nivel. Señal de **rebote**: la última barra
@@ -492,6 +493,21 @@ posición que sobreviva a la semana por un ciclo perdido se cierra al empezar la
 se acepta hasta el 15 % (`WL_MAX_RISK_PCT`) y, si el equity cae y el mínimo supera ese tope, el bot se salta la semana. **No hay ventaja demostrada:**
 el largo semanal fijo ganó en 2023–2025 con la subida del oro y va negativo en 2026 (backtest con stop 0,5 ATR: +1.032 USD por onza en 146 semanas,
 pero −511 en 2026 con 92 stops de 146). Es una apuesta direccional al oro; criterio sugerido para revisarla: 12 semanas o un drawdown propio de 25 %.
+
+### Cuenta de evidencia (1.000 USD, desde el 3-10-2026)
+
+Cuarta cuenta demo de cTrader (10142501, 1.000 USD, 1:500), abierta tras la revisión de operativas para separar las dos con mejor
+evidencia de las apuestas de la cuenta agresiva y de las operaciones manuales: el **bot de ondas de Elliott** en oro (workflow
+`ctrader-elliott.yml`, 2 % de riesgo, tope 3 % para el lote mínimo de 1 oz; antes en la cuenta principal, donde el freno del bot
+tendencial lo tuvo bloqueado sin operar) y el **bot de soportes y resistencias** (`ctrader-sr.yml`, 3 %, tope 4,5 %). Freno propio del
+20 % desde el máximo medido sobre `docs/edge_state.json` (la simulación de S/R al 3 % da una caída máxima histórica del 18 % y un 1 % de
+probabilidad de llegar al 50 %, así que un 20 % ya señala algo raro) e interruptor `EDGE_BOT_HALT`. El estado de la cuenta lo publica
+`ctrader-sr.yml` cada hora con `scripts/ctrader_state.py --swing --initial 1000 --label autotrader-sr,autotrader-elliott`; el panel tiene
+pestaña propia ("Fusion · evidencia 1.000 USD") con las secciones de los dos bots. El número de cuenta se toma del secret
+`CTRADER_EDGE_ACCOUNT_LOGIN` si existe y, si no, del valor escrito en los workflows. Regla de la cuenta: no se opera a mano en ella.
+Expectativa realista con la que se juzga: Elliott 1–2 operaciones al mes con PF en torno a 1,5 (el 3,45 del estudio está inflado por la
+selección entre 864 variantes); S/R 2–3 operaciones al mes con PF ~1,5 y q 0,46. Hacen falta 20–30 operaciones de cada uno, es decir,
+un año, antes de sacar conclusiones.
 
 ### Cuenta agresiva (500 USD)
 
@@ -615,8 +631,8 @@ Análisis por cuenta de las ocho operativas con sus estudios y sus resultados en
   ganadoras y −1.617 USD, con 18 stops seguidos en energía, agrícolas y metales entre el 21-09 y el 1-10; no tiene backtest propio
   en este universo (el de referencia es de ETFs en Alpaca) y el freno del 15 % ya lo tenía parado a −24 %. Queda **congelado**
   (`BOT_HALT=freeze` por defecto en `ctrader-demo.yml`; se reactiva con la variable `DEMO_BOT_HALT=off`); el ciclo sigue corriendo
-  para publicar el estado de la cuenta. El bot de Elliott, que compartía ese freno y nunca había operado, lo mide ahora desde el
-  rearme del 3-10-2026 con sus propios 2 % de riesgo y 15 % de freno.
+  para publicar el estado de la cuenta. El bot de Elliott, que compartía ese freno y nunca había operado, se mudó el mismo día a la
+  cuenta de evidencia nueva (abajo).
 - **cTrader swing (500 USD):** bandas H4 al 5 % con freno del 10 %; 7 operaciones, −5,5 USD. Sin cambios: el borde es débil y el
   freno equivale a dos stops seguidos, así que si salta será varianza y no veredicto.
 - **cTrader agresiva (440 USD, cinco bots):** el máximo de 735 USD y la caída del 40 % hasta 440 vinieron de 36 operaciones manuales
@@ -625,7 +641,9 @@ Análisis por cuenta de las ocho operativas con sus estudios y sus resultados en
   en los cinco workflows; rupturas del 6 % al **2 %** y Asia del 6 % al **3 %** (lote mínimo hasta 4,5 %), con la simulación y el
   estudio como motivo; y el bot de rupturas pasa a medir el freno sobre su propia cuenta. SR (3 %), momentum de la primera hora (2 %)
   y largo semanal (lote mínimo, ~12 %) se quedan como estaban; el largo semanal es ahora el que más probabilidades tiene de
-  disparar el freno.
+  disparar el freno. S/R se mudó ese mismo día a la cuenta de evidencia.
+- **cTrader evidencia (1.000 USD, nueva):** cuenta abierta por el usuario a propuesta de la revisión; Elliott (2 %) y S/R (3 %) con freno
+  propio del 20 %, sin operaciones manuales, para medir las dos operativas con mejor evidencia en un historial limpio.
 - **Alpaca paper (100.000 USD):** tendencial en ETFs, −0,3 % ajustado en 3 semanas y 4 operaciones; sin cambios, hace falta medio
   año para juzgarlo.
 

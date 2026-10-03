@@ -33,6 +33,7 @@ ALPACA_CACHE = "docs/alpaca_state.json"
 CTRADER_STATE = "docs/ctrader_state.json"
 SWING_STATE = "docs/swing_state.json"
 AGGR_STATE = "docs/aggr_state.json"
+EDGE_STATE = "docs/edge_state.json"
 AGGR_BREAKEVEN = "docs/aggr_breakeven.json"
 AGGR_SIMULATION = "docs/aggr_simulation.json"
 ASIA_STATE = "docs/asia_state.json"
@@ -154,9 +155,13 @@ def collect(no_live: bool) -> dict:
     if os.path.exists(ASIA_STATE):
         with open(ASIA_STATE, encoding="utf-8") as fh:
             aggr["asia"] = json.load(fh)
+    edge = {"available": False}
+    if os.path.exists(EDGE_STATE):
+        with open(EDGE_STATE, encoding="utf-8") as fh:
+            edge = json.load(fh)
     if os.path.exists(SR_STATE):
         with open(SR_STATE, encoding="utf-8") as fh:
-            aggr["sr"] = json.load(fh)
+            edge["sr"] = json.load(fh)
     if os.path.exists(FH_STATE):
         with open(FH_STATE, encoding="utf-8") as fh:
             aggr["fh"] = json.load(fh)
@@ -165,7 +170,7 @@ def collect(no_live: bool) -> dict:
             aggr["wl"] = json.load(fh)
     if os.path.exists(ELLIOTT_STATE):
         with open(ELLIOTT_STATE, encoding="utf-8") as fh:
-            ctrader["elliott_bot"] = json.load(fh)
+            edge["elliott_bot"] = json.load(fh)
     if os.path.exists(RESISTANCE_STUDY):
         with open(RESISTANCE_STUDY, encoding="utf-8") as fh:
             ctrader["resistance"] = json.load(fh)
@@ -202,8 +207,8 @@ def collect(no_live: bool) -> dict:
             lg.pop("rows", None)  # al panel solo va el resumen por variante
             es["long_indices"] = lg
         swing["elliott"] = es
-        if "elliott_bot" in ctrader and es.get("deployed_variant"):
-            ctrader["elliott_bot"]["study"] = es["deployed_variant"]
+        if "elliott_bot" in edge and es.get("deployed_variant"):
+            edge["elliott_bot"]["study"] = es["deployed_variant"]
     last_run = None
     cycles = []
     log = os.path.join(s.state_dir, "run_log.jsonl")
@@ -258,7 +263,7 @@ def collect(no_live: bool) -> dict:
         "min_gain": s.event_min_gain, "trail_pct": s.event_trail_pct}, "settings": {
         "fast_sma": s.fast_sma, "slow_sma": s.slow_sma, "rsi_max_entry": s.rsi_max_entry, "risk_per_trade": s.risk_per_trade,
         "stop_loss_pct": s.stop_loss_pct, "max_daily_loss_pct": s.max_daily_loss_pct, "initial_cash": s.initial_cash},
-        "backtests": backtests, "live": live, "last_run": last_run, "cycles": cycles, "ctrader": ctrader, "swing": swing, "aggr": aggr,
+        "backtests": backtests, "live": live, "last_run": last_run, "cycles": cycles, "ctrader": ctrader, "swing": swing, "aggr": aggr, "edge": edge,
         "alpaca_variants": (json.load(open(ALPACA_VARIANTS, encoding="utf-8")) if os.path.exists(ALPACA_VARIANTS) else None)}
 
 
