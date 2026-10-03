@@ -554,6 +554,17 @@ predicciones se guardan en `data/research/kronos_predictions.json` y los informe
 Lectura honesta: sugerente pero no robusto con 126 señales de un solo año; no se despliega. Merece
 repetirse con más historia y con Kronos-base cuando la demo lleve unos meses.
 
+### Investigación: máximos y mínimos semanales del oro por día de la semana
+
+Verificación de un hilo público que afirma que el máximo y el mínimo semanal del XAUUSD se forman sobre todo el lunes y el viernes (`scripts/gold_weekly_extremes.py`, salida en `docs/gold_weekly_extremes.json`). Datos: 146 semanas completas de M15 (oct 2023 – sep 2026), semana de domingo 18:00 a viernes 17:00 NY.
+
+- **El patrón existe en los datos, pero no es nada raro.** Máximo: lunes 31, martes 19, miércoles 21, jueves 20, viernes 55. Mínimo: 62, 20, 25, 14, 25. Lunes o viernes hacen algún extremo en 131 de 146 semanas.
+- **Un paseo aleatorio con la deriva alcista del oro lo reproduce.** Permutando los incrementos dentro de cada semana, el esperado es máximo en viernes 54, mínimo en lunes 54 y 129 semanas con lunes o viernes. Ninguna cuenta se separa del nulo con deriva (p entre 0,04 y 0,97 sin corrección; el único p bajo, mínimo en viernes, p 0,042, no resiste hacer 25 comparaciones). Solo se separa del paseo sin deriva, y eso es la tendencia del oro, no un calendario.
+- **Doce reglas operables** (fade del extremo semanal el viernes, ruptura del viernes, compra del lunes tras una caída hacia el mínimo, fade de ruptura lunes-martes) con spread y comisión. Las de fade pierden (R entre −0,03 y −0,14). La única con q < 0,05 tras Benjamini–Hochberg es comprar el lunes 08:00 NY cerca del mínimo del lunes y salir el viernes (k 0,5: n 95, R +0,52, q 0,023).
+- **Esa regla es deriva, no calendario.** Comprar todas las semanas el lunes 08:00 con el mismo stop y salir el viernes da R +0,40 (n 146); las semanas sin caída dan +0,18 y las de caída +0,52. El filtro aporta unas 0,1 R sobre la deriva, sin significación. Un largo semanal simple da R +0,20 con stop de 2 ATR, y 2026 ya sale negativo (−0,04).
+
+Conclusión: no hay ventaja de calendario explotable; lo que se cobra es la subida del oro en 2023–2025. No se monta bot.
+
 ### Vencimientos de opciones
 
 El calendario genera solo el tercer viernes de cada mes (trimestral en marzo, junio, septiembre y
