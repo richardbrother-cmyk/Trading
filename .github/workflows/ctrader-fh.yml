@@ -1,0 +1,121 @@
+name: ctrader-fh
+
+# Bot intradia "momentum de la primera hora" en indices (US500 y NAS100) en la MISMA cuenta demo agresiva de cTrader (500 USD):
+# sentido de la primera hora de Nueva York (09:30-10:30); si el movimiento supera 0,5 U (U = 2 ATR M15) se entra a las 10:30 a favor
+# con stop a 1 U y se cierra a las 16:00 NY. Una operacion por simbolo y dia, 2 % de riesgo. Es una PRUEBA en demo de un efecto que no
+# supero la correccion por multiplicidad (ver README, "momentum de la primera hora"), no una estrategia con ventaja demostrada.
+# Un run diario que arranca hacia las 10:20 NY (dos crons: horario de verano 14:20 UTC y de invierno 15:20 UTC; la puerta descarta el
+# que cae fuera de 10:00-11:00 NY) y repite el ciclo cada cuarto de hora dentro del propio job hasta las 16:06 NY. Si el cron falla,
+# el vigilante de la sesion de Claude lo lanza a mano (workflow_dispatch). Secrets: los mismos que ctrader-aggr.
+on:
+  schedule:
+    - cron: "20 14 * * 1-5"
+    - cron: "20 15 * * 1-5"
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "Solo decidir, sin enviar ordenes"
+        type: boolean
+        default: false
+
+# Un solo run a la vez: si un ciclo se retrasa y se solapa con el siguiente, el nuevo espera en cola.
+concurrency:
+  group: ${{ github.workflow }}
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+env:
+  SCHEDULE_ENABLED: "true"
+
+jobs:
+  gate:
+    runs-on: ubuntu-latest
+    outputs:
+      enabled: ${{ steps.check.outputs.enabled }}
+    steps:
+      - id: check
+        run: |
+          # el cron "de la otra estacion" cae fuera de 10:00-11:00 NY y se descarta; el lanzamiento manual siempre pasa
+          ny=$(TZ=America/New_York date +%H%M)
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then echo "enabled=true" >> "$GITHUB_OUTPUT"
+          elif [ "$SCHEDULE_ENABLED" = "true" ] && [ "$ny" -ge 1000 ] && [ "$ny" -lt 1100 ]; then echo "enabled=true" >> "$GITHUB_OUTPUT"
+          else echo "enabled=false" >> "$GITHUB_OUTPUT"; echo "cron descartado: son las $ny en Nueva York"; fi
+
+  fh:
+    needs: gate
+    if: ${{ needs.gate.outputs.enabled == 'true' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 355
+    env:
+      BROKER: ctrader
+      DATA_PROVIDER: ctrader
+      CTRADER_DEMO: "true"
+      CTRADER_CLIENT_ID: ${{ secrets.CTRADER_CLIENT_ID }}
+      CTRADER_CLIENT_SECRET: ${{ secrets.CTRADER_CLIENT_SECRET }}
+      CTRADER_ACCOUNT_LOGIN: ${{ secrets.CTRADER_AGGR_ACCOUNT_LOGIN }}
+      CTRADER_ACCESS_TOKEN: ${{ secrets.CTRADER_ACCESS_TOKEN }}
+      # Freno compartido con el bot agresivo (misma cuenta): interruptor manual y drawdown desde el maximo
+      BOT_HALT: ${{ vars.AGGR_BOT_HALT || vars.BOT_HALT || 'off' }}
+      MAX_DRAWDOWN_PCT: "0.50"
+      SYMBOLS: "US500,NAS100"
+      # 2 % de riesgo por operacion y simbolo (hasta 4 % en total, porque los dos indices van muy correlacionados); lote minimo hasta 3 %
+      RISK_PER_TRADE: "0.02"
+      FH_THRESHOLD: "0.5"
+      FH_STOP_U: "1.0"
+      FH_MAX_LATE_MIN: "30"
+      FH_LABEL: "autotrader-fh"
+      FH_STATE_PATH: "docs/fh_state.json"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install -r requirements.txt
+      - name: Tests
+        run: python -m pytest -q tests/test_fhbot.py tests/test_guard.py
+      - name: Ciclos de la sesion de NY (bucle cada 15 min hasta las 16:06 NY)
+        env:
+          DRY_RUN: ${{ inputs.dry_run && '--dry-run' || '' }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          publish_state() {
+            python scripts/dashboard.py --no-live --out reports/dashboard.html
+            cp reports/dashboard.html docs/index.html
+            cp reports/dashboard.html docs/dashboard.html
+            git add docs/fh_state.json docs/index.html docs/dashboard.html
+            if git diff --cached --quiet; then echo "sin cambios que publicar"; return 0; fi
+            git commit -q -m "Panel: actualización automática (momentum primera hora)"
+            for i in 1 2 3 4; do
+              if git pull --rebase -X theirs -q origin "${GITHUB_REF_NAME}" && git push -q; then echo "estado publicado"; return 0; fi
+              git rebase --abort 2>/dev/null || true
+              sleep $((i * 5))
+            done
+            echo "::warning::no se pudo publicar el estado tras 4 intentos"
+          }
+          while true; do
+            python -m autotrader.cli --env /dev/null fh-run $DRY_RUN | tee /tmp/fh.json
+            read -r publish nyhm < <(python - <<'PY'
+          import json
+          from datetime import datetime
+          from zoneinfo import ZoneInfo
+          txt = open("/tmp/fh.json").read()
+          d = json.loads(txt[txt.index("{"):])
+          print("true" if d.get("publish") else "false", datetime.now(ZoneInfo("America/New_York")).strftime("%H%M"))
+          PY
+          )
+            if [ -z "$DRY_RUN" ] && [ "$publish" = "true" ]; then publish_state; fi
+            if [ -n "$DRY_RUN" ]; then echo "dry run: un solo ciclo"; break; fi
+            if [ "$(TZ=America/New_York date +%u)" -ge 6 ]; then echo "fin de semana: sin sesion"; break; fi
+            if [ "$nyhm" -ge 1606 ]; then echo "fin de la ventana (16:06 NY)"; break; fi
+            # dormir hasta el siguiente cuarto de hora (+40 s para que la vela este cerrada en el servidor)
+            sleep $(python -c "import time; t=time.time(); print(int(900 - (t % 900)) + 40)")
+          done
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: fh-log-${{ github.run_id }}
+          path: state/run_log.jsonl
+          if-no-files-found: ignore

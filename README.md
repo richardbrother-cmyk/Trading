@@ -380,14 +380,14 @@ objetivo 2R enviados con la orden; cierre de lo que quede a las 12:00 NY; una op
 la misma cuenta). El bot recalcula el plan del día en cada ciclo a partir de las velas cerradas, así
 que no depende de un estado en memoria; solo entra si la vela del retest es la última cerrada (no persigue entradas
 tardías). Respeta `BOT_HALT` y el freno del 50 % de la cuenta; no aplica las ventanas de eventos (el estudio incluyó
-esos días). El estado de la cuenta agresiva trata las etiquetas `autotrader-aggr`, `autotrader-asia` y `autotrader-sr` como propias.
+esos días). El estado de la cuenta agresiva trata las etiquetas `autotrader-aggr`, `autotrader-asia`, `autotrader-sr` y `autotrader-fh` como propias.
 
 ### Bot de soportes y resistencias (sexto bot, misma cuenta agresiva)
 
 `autotrader/sr.py` (niveles y señales), estrategia `sr` del motor swing (`autotrader/swing.py`, `autotrader/swingbot.py`), workflow
 `ctrader-sr.yml` (cada hora, minuto 14), etiqueta `autotrader-sr`, estado en `docs/sr_state.json` y sección propia en la pestaña
 agresiva. El estado de la cuenta (posiciones, operaciones, equity) lo sigue refrescando `ctrader-aggr.yml`, que ahora reconoce las
-tres etiquetas propias (`autotrader-aggr`, `autotrader-asia`, `autotrader-sr`).
+cuatro etiquetas propias (`autotrader-aggr`, `autotrader-asia`, `autotrader-sr`, `autotrader-fh`).
 Regla: sobre barras de 4 h se buscan pivotes (máximo o mínimo que supera a 3 barras a cada lado, confirmado 3 barras después, así que
 nunca se mira al futuro) de las últimas 300 barras; los pivotes (máximos y mínimos juntos, porque un soporte roto pasa a ser
 resistencia) se agrupan en zonas de 0,5 ATR y una zona con al menos 2 pivotes es un nivel. Señal de **rebote**: la última barra
@@ -461,6 +461,21 @@ bootstrap de días (los símbolos del mismo día están correlacionados) y q-val
   se come con un simple cambio de spread.
 - **Lectura:** no hay nada para poner en demo con convicción. Lo más cercano a un candidato es el momentum de la primera hora en índices,
   y requeriría validarse en datos nuevos (es el tipo de regla que puede probarse en demo a coste bajo). No se creó ningún bot.
+
+### Bot de momentum de la primera hora en índices (séptimo bot, misma cuenta agresiva, PRUEBA)
+
+`autotrader/fhbot.py`, comando `fh-run`, workflow `ctrader-fh.yml` (un run diario que arranca hacia las 10:20 de Nueva York con dos crons,
+14:20 UTC en horario de verano y 15:20 UTC en invierno; la puerta descarta el que cae fuera de 10:00-11:00 NY; repite el ciclo cada
+15 minutos dentro del mismo job hasta las 16:06 NY; el vigilante de la sesión de Claude lo lanza a mano si el cron falla), etiqueta
+`autotrader-fh`, estado en `docs/fh_state.json` y sección propia en la pestaña agresiva.
+Regla (variante "umbral 0,5 U, stop 1 U, salida 16:00" del estudio de arriba): r = cierre de la vela de las 10:15 menos apertura de la de las
+09:30 en US500 y NAS100; U = 2 ATR(14) de M15 en la vela de las 10:15; si |r| ≥ 0,5 U se entra a mercado a las 10:30 a favor de r, con stop a
+1 U enviado con la orden y sin objetivo; solo se entra si la señal tiene menos de 30 minutos (no persigue); a las 16:00 NY se cierra lo
+que siga abierto. Una operación por símbolo y día. Riesgo 2 % del equity por símbolo (hasta 4 % si entran los dos, que van muy correlacionados);
+lote mínimo aceptado hasta el 3 %. Respeta `BOT_HALT` y el freno del 50 % de la cuenta.
+**Es una prueba, no una estrategia con ventaja:** el efecto en índices no superó la corrección por multiplicidad (q 0,17, IC 95 % [-0,02, +0,21] R)
+y el subconjunto se eligió después de ver los datos. Se deja en demo para obtener datos fuera de muestra; criterio sugerido para revisarla:
+al menos 60 operaciones (unas 30 sesiones con señal en los dos índices) antes de sacar conclusiones, y descartarla si el R medio sale ≤ 0.
 
 ### Cuenta agresiva (500 USD)
 

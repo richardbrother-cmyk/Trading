@@ -161,6 +161,28 @@ def cmd_asia_run(args) -> int:
     return 0
 
 
+def cmd_fh_run(args) -> int:
+    """Ciclo del bot intradia 'momentum de la primera hora' (US500 y NAS100) en la cuenta demo de cTrader."""
+    from .ctrader import CTraderSession
+    from .ctrader_auth import load_access_token
+    from .fhbot import FH_LABEL, params_from_env, run_fh_cycle
+
+    s = _settings(args)
+    s.broker = "ctrader"
+    s.validate()
+    token = load_access_token(os.path.join(s.state_dir, "ctrader_tokens.json"), s.ctrader_client_id,
+                              s.ctrader_client_secret, s.ctrader_access_token, s.ctrader_refresh_token)
+    session = CTraderSession(s.ctrader_client_id, s.ctrader_client_secret, token, s.ctrader_account_login or None, demo=s.ctrader_demo)
+    try:
+        session.load_symbols(s.symbols)
+        summary = run_fh_cycle(s, session, p=params_from_env(s), dry_run=args.dry_run, label=os.getenv("FH_LABEL", FH_LABEL),
+                               state_path=os.getenv("FH_STATE_PATH", "docs/fh_state.json"))
+    finally:
+        session.close()
+    print(json.dumps(summary, indent=2, default=str, ensure_ascii=False))
+    return 0
+
+
 def cmd_elliott_run(args) -> int:
     """Ciclo del bot de ondas de Elliott (XAUUSD, 4 h) en la cuenta demo agresiva de cTrader."""
     from .ctrader import CTraderSession
@@ -255,6 +277,9 @@ def main(argv: list[str] | None = None) -> int:
     asb = sub.add_parser("asia-run", help="ciclo del bot intradia 'retest de Asia' (XAUUSD) en cTrader")
     asb.add_argument("--dry-run", action="store_true")
     asb.set_defaults(func=cmd_asia_run)
+    fhp = sub.add_parser("fh-run", help="ciclo del bot intradia 'momentum de la primera hora' (US500, NAS100) en cTrader")
+    fhp.add_argument("--dry-run", action="store_true")
+    fhp.set_defaults(func=cmd_fh_run)
     el = sub.add_parser("elliott-run", help="ciclo del bot de ondas de Elliott (XAUUSD, 4 h) en cTrader")
     el.add_argument("--dry-run", action="store_true")
     el.set_defaults(func=cmd_elliott_run)
