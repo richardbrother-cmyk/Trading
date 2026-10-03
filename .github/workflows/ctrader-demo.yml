@@ -56,8 +56,10 @@ jobs:
       CTRADER_CLIENT_SECRET: ${{ secrets.CTRADER_CLIENT_SECRET }}
       CTRADER_ACCOUNT_LOGIN: ${{ secrets.CTRADER_ACCOUNT_LOGIN }}
       CTRADER_ACCESS_TOKEN: ${{ secrets.CTRADER_ACCESS_TOKEN }}
-      # Freno global: BOT_HALT (variable del repositorio: off | freeze | close) y freno por drawdown desde el maximo
-      BOT_HALT: ${{ vars.BOT_HALT || 'off' }}
+      # Congelado desde el 3-10-2026 (revision de operativas): 21 operaciones, 3 ganadoras, -1.617 USD en CFDs sin backtest
+      # propio. El ciclo sigue corriendo para publicar el estado de la cuenta (lo usan el bot de Elliott y el panel), pero no
+      # abre posiciones. Se reactiva con la variable del repositorio DEMO_BOT_HALT=off.
+      BOT_HALT: ${{ vars.DEMO_BOT_HALT || 'freeze' }}
       MAX_DRAWDOWN_PCT: ${{ vars.MAX_DRAWDOWN_PCT || '0.15' }}
       # Parametros para CFDs: stop mas corto que en acciones y exposicion nominal hasta 5x el equity
       # (el riesgo por operacion sigue siendo el 2 % del equity; el apalancamiento solo amplia el tamano).

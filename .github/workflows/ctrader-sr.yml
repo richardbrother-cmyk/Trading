@@ -53,6 +53,8 @@ jobs:
       CTRADER_ACCESS_TOKEN: ${{ secrets.CTRADER_ACCESS_TOKEN }}
       # Freno global: BOT_HALT (variable del repositorio: off | freeze | close) y freno por drawdown desde el maximo
       BOT_HALT: ${{ vars.AGGR_BOT_HALT || vars.BOT_HALT || 'off' }}
+      # Rearme del maximo del freno (3-10-2026): la caida del 40 % desde 735 USD fue de operaciones manuales, no de los bots
+      PEAK_RESET_AT: "2026-10-03T00:00Z"
       # Freno al 50 % desde el maximo (decidido con la simulacion a 3 anos: con 30 % saltaba a los dos meses en todos
       # los recorridos). Valor fijo en el workflow: las variables del repositorio ya no lo cambian.
       MAX_DRAWDOWN_PCT: "0.50"

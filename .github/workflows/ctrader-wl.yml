@@ -51,6 +51,8 @@ jobs:
       # Freno compartido con el bot agresivo (misma cuenta): interruptor manual y drawdown desde el maximo
       BOT_HALT: ${{ vars.AGGR_BOT_HALT || vars.BOT_HALT || 'off' }}
       MAX_DRAWDOWN_PCT: "0.50"
+      # Rearme del maximo del freno (3-10-2026): la caida del 40 % desde 735 USD fue de operaciones manuales, no de los bots
+      PEAK_RESET_AT: "2026-10-03T00:00Z"
       SYMBOLS: "XAUUSD"
       # Lote minimo de 1 onza con stop de ~50 USD arriesga ~12 % de 440 USD: se acepta hasta el 15 % (WL_MAX_RISK_PCT)
       RISK_PER_TRADE: "0.06"

@@ -65,6 +65,7 @@ class Settings:
     halt_mode: str = "off"  # off | freeze | close: interruptor manual (BOT_HALT)
     max_drawdown_pct: float = 0.0  # 0 = sin freno; si el equity cae este % desde su maximo, no se abren posiciones
     equity_history_path: str = ""  # JSON del panel con "history" [[fecha, equity], ...]; vacio = segun broker
+    peak_reset_at: str = ""  # fecha ISO (PEAK_RESET_AT): el freno solo mira el historial posterior (rearme manual del maximo)
 
     @classmethod
     def from_env(cls, dotenv_path: str | None = None) -> "Settings":
@@ -110,6 +111,7 @@ class Settings:
             halt_mode=_env("BOT_HALT", "off").lower(),
             max_drawdown_pct=float(_env("MAX_DRAWDOWN_PCT", "0")),
             equity_history_path=_env("EQUITY_HISTORY", ""),
+            peak_reset_at=_env("PEAK_RESET_AT", ""),
         )
         settings.validate()
         return settings

@@ -6,6 +6,8 @@
 - MAX_DRAWDOWN_PCT freno automatico: si el equity cae ese porcentaje desde su maximo historico, el bot
   pasa a `freeze` hasta que alguien lo revise. El maximo se toma del historial publicado del panel
   (docs/*_state.json), del fichero state/peak_equity.json y del equity actual, lo que sea mayor.
+- PEAK_RESET_AT (fecha ISO) rearma el maximo: solo cuenta el historial posterior a esa fecha y el equity actual, igual que
+  tras un retiro. Para cuando la caida la causo algo ajeno al bot (operaciones manuales, otro bot de la misma cuenta ya parado).
 """
 
 from __future__ import annotations
@@ -46,26 +48,32 @@ def _load(path: str) -> dict:
         return {}
 
 
-def _history_peak(path: str) -> tuple[float, str]:
-    """(maximo del historial publicado, marca del ultimo retiro). Tras un retiro solo cuenta el historial posterior y la
-    base (saldo tras el retiro) sustituye al capital inicial: sacar dinero no es una caida."""
+def _history_peak(path: str, reset_at: str = "") -> tuple[float, str]:
+    """(maximo del historial publicado, marca del ultimo retiro o rearme). Tras un retiro solo cuenta el historial posterior y
+    la base (saldo tras el retiro) sustituye al capital inicial: sacar dinero no es una caida. Un rearme manual (`reset_at`,
+    variable PEAK_RESET_AT) posterior al retiro descarta ademas la base y el capital inicial: el maximo vuelve a ser el equity
+    desde esa fecha, para que una caida ajena al bot (operaciones manuales, otro bot ya parado) no lo deje congelado."""
     raw = _load(path)
+    reset_at = str(reset_at or "")
     if not raw:
-        return 0.0, ""
+        return 0.0, reset_at
     wd = raw.get("withdrawal") or {}
-    since = str(wd.get("last_at") or "")
+    wd_since = str(wd.get("last_at") or "")
+    since = max(wd_since, reset_at)
     values = [float(v) for t, v in raw.get("history", []) if v is not None and (not since or str(t) >= since)]
-    if since and wd.get("base"):
+    if reset_at and reset_at >= wd_since:
+        pass  # rearme manual: ni la base ni el capital inicial cuentan como maximo
+    elif since and wd.get("base"):
         values.append(float(wd["base"]))
     elif raw.get("initial"):  # capital inicial de la cuenta, por si el historial empieza tras las primeras perdidas
         values.append(float(raw["initial"]))
     return (max(values) if values else 0.0), since
 
 
-def peak_equity(equity_now: float, history_path: str, state_dir: str) -> float:
-    """Maximo historico del equity y lo persiste en state/peak_equity.json (se descarta si es anterior a un retiro)."""
+def peak_equity(equity_now: float, history_path: str, state_dir: str, reset_at: str = "") -> float:
+    """Maximo historico del equity y lo persiste en state/peak_equity.json (se descarta si es anterior a un retiro o rearme)."""
     peak_file = os.path.join(state_dir, "peak_equity.json")
-    hist_peak, since = _history_peak(history_path)
+    hist_peak, since = _history_peak(history_path, reset_at)
     stored = 0.0
     if os.path.exists(peak_file):
         try:
@@ -106,11 +114,11 @@ def withdrawal_status(equity: float, base: float, trigger_pct: float, withdraw_p
             "equity_after": round(equity * (1 - withdraw_pct), 2) if alert else None}
 
 
-def evaluate(equity_now: float, halt_mode: str, max_drawdown_pct: float, history_path: str, state_dir: str) -> Guard:
+def evaluate(equity_now: float, halt_mode: str, max_drawdown_pct: float, history_path: str, state_dir: str, reset_at: str = "") -> Guard:
     mode = (halt_mode or "off").lower()
     if mode not in HALT_MODES:
         raise ValueError(f"BOT_HALT debe ser uno de {HALT_MODES}, no {halt_mode!r}")
-    peak = peak_equity(equity_now, history_path, state_dir)
+    peak = peak_equity(equity_now, history_path, state_dir, reset_at)
     dd = equity_now / peak - 1 if peak > 0 else 0.0
     if mode != "off":
         return Guard(mode, f"interruptor manual BOT_HALT={mode}", peak, dd)

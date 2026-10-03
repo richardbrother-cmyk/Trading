@@ -118,7 +118,8 @@ def run_wl_cycle(settings, session: CTraderSession, p: WLParams | None = None, d
                 summary["skipped"].append(f"{pos.symbol}: error al cerrar: {exc}")
         own = []
 
-    guard = evaluate_guard(equity, settings.halt_mode, settings.max_drawdown_pct, settings.history_path("docs/aggr_state.json"), settings.state_dir)
+    guard = evaluate_guard(equity, settings.halt_mode, settings.max_drawdown_pct, settings.history_path("docs/aggr_state.json"), settings.state_dir,
+                           reset_at=settings.peak_reset_at)
     summary["guard"] = guard.as_dict()
 
     # 2) entrada: primer ciclo de la semana de negociacion (lunes de negociacion = domingo 18:00 a lunes 17:00 NY)

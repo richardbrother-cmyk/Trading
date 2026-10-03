@@ -166,7 +166,8 @@ def run_swing_cycle(settings, session: CTraderSession, params: SwingParams | Non
         summary["event_window"] = [e.name for e in events_now]
     opex_times = [e.at for e in all_events if e.is_opex]
     # Freno global: interruptor manual (BOT_HALT) o drawdown acumulado desde el maximo
-    guard = evaluate_guard(equity, settings.halt_mode, settings.max_drawdown_pct, settings.history_path("docs/swing_state.json"), settings.state_dir)
+    guard = evaluate_guard(equity, settings.halt_mode, settings.max_drawdown_pct, settings.history_path("docs/swing_state.json"), settings.state_dir,
+                           reset_at=settings.peak_reset_at)
     summary["guard"] = guard.as_dict()
     if guard.blocks_entries:
         summary["skipped"].append(f"freno activo: {guard.reason}")

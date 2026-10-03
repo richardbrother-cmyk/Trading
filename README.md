@@ -157,6 +157,7 @@ universos) se hace con `backtest` antes de cambiar lo que opera en `run`.
 El mismo bot puede operar una cuenta **demo** de cTrader a través de la Open API de Spotware.
 Sirve para brokers como Fusion Markets, que ofrecen oro, plata, petróleo e índices como CFD
 con apalancamiento alto. El bot rechaza cuentas reales (`CTRADER_DEMO` debe ser `true`).
+Desde el 3 de octubre de 2026 este bot tendencial está congelado en la cuenta principal (ver "Revisión de operativas").
 
 Pasos:
 
@@ -272,7 +273,7 @@ Monte Carlo que conservan fechas y distancias al stop pero barajan los resultado
 
 | Escenario | Histórico (3 años) | Monte Carlo p10 / mediana / p90 | P(freno) | Caída máx. mediana |
 |---|---|---|---|---|
-| Con freno 30 %, riesgo 6 % (config. actual) | 462 USD (−8 %), freno a los 2 meses | 335 / 457 / 1.192 | 100 % | −33 % |
+| Con freno 30 %, riesgo 6 % (config. hasta el 3-10-2026) | 462 USD (−8 %), freno a los 2 meses | 335 / 457 / 1.192 | 100 % | −33 % |
 | Sin freno, riesgo 6 % | 178 USD (−64 %), caída −99 % | 78 / 5.967 / 367.845 | — | −92 % |
 | Con freno, riesgo 2 % | 650 USD (+30 %) | 367 / 658 / — | 99 % | −31 % |
 | Sin freno, riesgo 2 % | 1.522 USD (+204 %), caída −65 % | 726 / 3.217 / — | — | −49 % |
@@ -375,9 +376,10 @@ hasta las 12:06 de Nueva York; el cron de GitHub resultó demasiado poco fiable 
 Regla: rango de Asia (19:00 a 03:00 de Nueva York) de XAUUSD; en la mañana de NY (08:00 a 12:00) la primera vela de 15
 min que cierra fuera del rango marca el lado; después el precio debe volver a tocar el nivel en las 8 velas siguientes
 sin que ninguna cierre de vuelta dentro; entrada a mercado en la vela siguiente al retest, stop en la mitad del rango y
-objetivo 2R enviados con la orden; cierre de lo que quede a las 12:00 NY; una operación al día. Riesgo 6 % del equity
-(lote mínimo aceptado hasta 9 %; al ser demo se prueba la regla de forma agresiva, igual que el bot de rupturas de
-la misma cuenta). El bot recalcula el plan del día en cada ciclo a partir de las velas cerradas, así
+objetivo 2R enviados con la orden; cierre de lo que quede a las 12:00 NY; una operación al día. Riesgo **3 %** del equity desde
+el 3-10-2026 (antes 6 %: la ventaja del estudio son 7 USD por cada 100 arriesgados y el riesgo alto solo añadía varianza); el
+lote mínimo de 1 onza se acepta hasta el 4,5 % (`ASIA_MAX_RISK_PCT`), porque con 2 % y tope 3 % se saltaría casi todos los
+días en una cuenta de 440 USD. El bot recalcula el plan del día en cada ciclo a partir de las velas cerradas, así
 que no depende de un estado en memoria; solo entra si la vela del retest es la última cerrada (no persigue entradas
 tardías). Respeta `BOT_HALT` y el freno del 50 % de la cuenta; no aplica las ventanas de eventos (el estudio incluyó
 esos días). El estado de la cuenta agresiva trata las etiquetas `autotrader-aggr`, `autotrader-asia`, `autotrader-sr`, `autotrader-fh` y `autotrader-wl` como propias.
@@ -497,11 +499,13 @@ Tercera cuenta demo, workflow `ctrader-aggr.yml`, mismo motor que el bot swing c
 (`SWING_STRATEGY`, `SWING_STOP_ATR`, `SWING_TP_ATR`, `SWING_PURE_RR`, `SWING_MAX_HOLD_DAYS`,
 `SWING_LABEL`, `SWING_MAX_POSITIONS`): ruptura de 4 h (cierre sobre el máximo de 20 barras y sobre la
 EMA200), solo largos, stop a 0,75 ATR y objetivo fijo a 6 veces el stop enviados con la orden, salida a
-los 7 días, máximo 3 posiciones abiertas, etiqueta `autotrader-aggr`. Riesgo por operación 6 % y freno
-por drawdown al 50 % desde el máximo, fijados en el workflow (al ser demo se prueba de forma agresiva junto con la
-regla de retiros; la simulación a 3 años con 6 % y freno 30 % mostraba el freno saltando a los dos meses, con 50 %
-salta de mediana al cuarto mes); las variables `AGGR_RISK_PER_TRADE` y `AGGR_MAX_DRAWDOWN_PCT` ya no se leen. Estado en `docs/aggr_state.json` y pestaña propia
-en el panel.
+los 7 días, máximo 3 posiciones abiertas, etiqueta `autotrader-aggr`. Riesgo por operación **2 % desde el 3-10-2026**
+(del 18 de septiembre al 3 de octubre operó al 6 %) y freno por drawdown al 50 % desde el máximo, fijados en el workflow.
+La simulación a 3 años con 6 % y freno 50 % da una mediana final de 433 USD, freno en el 100 % de los recorridos y 54 % de
+probabilidad de pérdida; con 2 %, mediana 2.280 USD, freno en el 46 % y pérdida en el 17 %: es la misma estrategia y solo
+cambia si la cuenta sobrevive para probarla. Las variables `AGGR_RISK_PER_TRADE` y `AGGR_MAX_DRAWDOWN_PCT` ya no se leen.
+El freno se mide sobre el historial de esta cuenta (`EQUITY_HISTORY=docs/aggr_state.json`; hasta el 3-10-2026 leía por error
+el de la cuenta swing). Estado en `docs/aggr_state.json` y pestaña propia en el panel.
 
 **Stop a break even** (`SWING_BREAKEVEN_R`, variable `AGGR_BREAKEVEN_R`, 2 R por defecto; `SWING_BREAKEVEN_LOCK_R`,
 variable `AGGR_BREAKEVEN_LOCK_R`, 0,1 R): en cada ciclo el bot pide el último precio de 1 minuto de cada posición
@@ -598,6 +602,32 @@ en las otras). El máximo se lee del historial publicado del panel y se persiste
 `state/peak_equity.json`. En GitHub Actions ambos se controlan con variables del repositorio
 (Settings → Secrets and variables → Actions → Variables) sin tocar el código; en la rutina de Alpaca,
 con las mismas variables de entorno. El freno nunca toca posiciones abiertas a mano.
+
+**Rearme del máximo** (`PEAK_RESET_AT`, fecha ISO en el workflow): el freno solo mira el historial posterior a esa fecha y el
+equity actual, igual que hace tras un retiro; ni la base ni el capital inicial cuentan. Sirve cuando la caída la causó algo ajeno
+al bot: operaciones manuales o un bot de la misma cuenta que ya se congeló. Un retiro posterior al rearme vuelve a mandar.
+
+### Revisión de operativas del 3 de octubre de 2026
+
+Análisis por cuenta de las ocho operativas con sus estudios y sus resultados en vivo, y lo que se cambió a raíz de él:
+
+- **cTrader principal (10.000 USD):** el bot tendencial en CFDs (SMA/RSI, stop 3 %, 13 símbolos) llevaba 21 operaciones, 3
+  ganadoras y −1.617 USD, con 18 stops seguidos en energía, agrícolas y metales entre el 21-09 y el 1-10; no tiene backtest propio
+  en este universo (el de referencia es de ETFs en Alpaca) y el freno del 15 % ya lo tenía parado a −24 %. Queda **congelado**
+  (`BOT_HALT=freeze` por defecto en `ctrader-demo.yml`; se reactiva con la variable `DEMO_BOT_HALT=off`); el ciclo sigue corriendo
+  para publicar el estado de la cuenta. El bot de Elliott, que compartía ese freno y nunca había operado, lo mide ahora desde el
+  rearme del 3-10-2026 con sus propios 2 % de riesgo y 15 % de freno.
+- **cTrader swing (500 USD):** bandas H4 al 5 % con freno del 10 %; 7 operaciones, −5,5 USD. Sin cambios: el borde es débil y el
+  freno equivale a dos stops seguidos, así que si salta será varianza y no veredicto.
+- **cTrader agresiva (440 USD, cinco bots):** el máximo de 735 USD y la caída del 40 % hasta 440 vinieron de 36 operaciones manuales
+  del 30-09 en oro (los bots suman +120 USD); con 73 USD de margen hasta el freno del 50 % y hasta un 46 % de riesgo abierto
+  simultáneo entre los cinco bots, el freno iba a saltar en semanas y congelarlos a todos. Cambios: rearme del máximo el 3-10-2026
+  en los cinco workflows; rupturas del 6 % al **2 %** y Asia del 6 % al **3 %** (lote mínimo hasta 4,5 %), con la simulación y el
+  estudio como motivo; y el bot de rupturas pasa a medir el freno sobre su propia cuenta. SR (3 %), momentum de la primera hora (2 %)
+  y largo semanal (lote mínimo, ~12 %) se quedan como estaban; el largo semanal es ahora el que más probabilidades tiene de
+  disparar el freno.
+- **Alpaca paper (100.000 USD):** tendencial en ETFs, −0,3 % ajustado en 3 semanas y 4 operaciones; sin cambios, hace falta medio
+  año para juzgarlo.
 
 ### Atribución: bot, manual y excluidas
 

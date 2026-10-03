@@ -122,7 +122,8 @@ def run_cycle(settings: Settings, broker: Broker, provider: DataProvider, dry_ru
     if halted:
         summary["skipped"].append(f"limite de perdida diaria alcanzado ({account.equity:.2f} vs {day_start:.2f})")
     # Freno global: interruptor manual (BOT_HALT) o drawdown acumulado desde el maximo
-    guard = evaluate_guard(account.equity, settings.halt_mode, settings.max_drawdown_pct, settings.history_path(), settings.state_dir)
+    guard = evaluate_guard(account.equity, settings.halt_mode, settings.max_drawdown_pct, settings.history_path(), settings.state_dir,
+                           reset_at=settings.peak_reset_at)
     summary["guard"] = guard.as_dict()
     if guard.blocks_entries:
         summary["skipped"].append(f"freno activo: {guard.reason}")

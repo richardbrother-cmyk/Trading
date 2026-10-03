@@ -57,6 +57,8 @@ jobs:
       BOT_HALT: ${{ vars.BOT_HALT || 'off' }}
       MAX_DRAWDOWN_PCT: ${{ vars.MAX_DRAWDOWN_PCT || '0.15' }}
       EQUITY_HISTORY: "docs/ctrader_state.json"
+      # Rearme del maximo del freno (3-10-2026): la caida del 24 % fue del bot tendencial, ya congelado, no de este bot
+      PEAK_RESET_AT: "2026-10-03T00:00Z"
       SYMBOLS: "XAUUSD"
       # 2 % de riesgo por operacion, como el bot tendencial; el lote minimo (1 oz) se acepta si no arriesga mas del 3 %
       RISK_PER_TRADE: "0.02"

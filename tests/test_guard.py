@@ -56,3 +56,25 @@ def test_detect_cash_flow_from_balance_reconciliation():
     assert detect_cash_flow(900.0, 630.0, 0.0) == -270.0  # retiro
     assert detect_cash_flow(900.0, 660.0, 30.0) == -270.0  # retiro con una operacion ganadora entre medias
     assert detect_cash_flow(500.0, 700.0, 0.0) == 200.0  # deposito
+
+
+def test_peak_manual_reset_ignores_earlier_history_initial_and_base(tmp_path):
+    hist = tmp_path / "aggr_state.json"
+    # maximo 735 por operaciones manuales y hoy 440: sin rearme seria una caida del 40 %; con rearme el maximo es el equity actual
+    hist.write_text(json.dumps({"initial": 500, "history": [["2026-09-20T00:00Z", 735.0], ["2026-10-02T23:45Z", 440.0]],
+                                "withdrawal": {"base": 998.0, "last_at": None}}), encoding="utf-8")
+    assert evaluate(440.0, "off", 0.50, str(hist), str(tmp_path)).peak == 735.0  # sin rearme manda el maximo historico
+    g = evaluate(440.0, "off", 0.50, str(hist), str(tmp_path), reset_at="2026-10-03T00:00Z")
+    assert g.mode == "off" and g.peak == 440.0 and g.drawdown == 0.0
+    # un maximo persistido con otra marca se descarta; con la marca del rearme se conserva
+    (tmp_path / "peak_equity.json").write_text(json.dumps({"peak": 735.0, "reset_at": ""}), encoding="utf-8")
+    assert evaluate(430.0, "off", 0.50, str(hist), str(tmp_path), reset_at="2026-10-03T00:00Z").peak == 430.0
+    assert evaluate(420.0, "off", 0.50, str(hist), str(tmp_path), reset_at="2026-10-03T00:00Z").peak == 430.0
+    # el historial posterior al rearme si cuenta
+    hist.write_text(json.dumps({"initial": 500, "history": [["2026-09-20T00:00Z", 735.0], ["2026-10-05T00:00Z", 600.0]]}), encoding="utf-8")
+    g = evaluate(290.0, "off", 0.50, str(hist), str(tmp_path), reset_at="2026-10-03T00:00Z")
+    assert g.peak == 600.0 and g.mode == "freeze"
+    # un retiro posterior al rearme manda sobre el rearme (la base vuelve a contar)
+    hist.write_text(json.dumps({"initial": 500, "history": [["2026-09-20T00:00Z", 735.0], ["2026-10-05T00:00Z", 600.0], ["2026-10-20T00:00Z", 500.0]],
+                                "withdrawal": {"base": 520.0, "last_at": "2026-10-10T00:00Z"}}), encoding="utf-8")
+    assert evaluate(500.0, "off", 0.50, str(hist), str(tmp_path), reset_at="2026-10-03T00:00Z").peak == 520.0

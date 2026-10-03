@@ -91,7 +91,8 @@ def run_elliott_cycle(settings, session: CTraderSession, p: ElliottParams | None
         events_now = active_events(all_events, now, settings.event_hours_before, settings.event_hours_after)
     if events_now:
         summary["event_window"] = [e.name for e in events_now]
-    guard = evaluate_guard(equity, settings.halt_mode, settings.max_drawdown_pct, settings.history_path("docs/ctrader_state.json"), settings.state_dir)
+    guard = evaluate_guard(equity, settings.halt_mode, settings.max_drawdown_pct, settings.history_path("docs/ctrader_state.json"), settings.state_dir,
+                           reset_at=settings.peak_reset_at)
     summary["guard"] = guard.as_dict()
     if guard.blocks_entries:
         summary["skipped"].append(f"freno activo: {guard.reason}")

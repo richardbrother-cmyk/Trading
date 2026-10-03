@@ -59,6 +59,8 @@ jobs:
       # Freno compartido con el bot agresivo (misma cuenta): interruptor manual y drawdown desde el maximo
       BOT_HALT: ${{ vars.AGGR_BOT_HALT || vars.BOT_HALT || 'off' }}
       MAX_DRAWDOWN_PCT: "0.50"
+      # Rearme del maximo del freno (3-10-2026): la caida del 40 % desde 735 USD fue de operaciones manuales, no de los bots
+      PEAK_RESET_AT: "2026-10-03T00:00Z"
       SYMBOLS: "US500,NAS100"
       # 2 % de riesgo por operacion y simbolo (hasta 4 % en total, porque los dos indices van muy correlacionados); lote minimo hasta 3 %
       RISK_PER_TRADE: "0.02"

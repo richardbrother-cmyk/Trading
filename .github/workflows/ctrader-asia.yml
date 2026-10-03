@@ -55,9 +55,14 @@ jobs:
       # Freno compartido con el bot agresivo (misma cuenta): interruptor manual y drawdown desde el maximo
       BOT_HALT: ${{ vars.AGGR_BOT_HALT || vars.BOT_HALT || 'off' }}
       MAX_DRAWDOWN_PCT: "0.50"
+      # Rearme del maximo del freno (3-10-2026): la caida del 40 % desde 735 USD fue de operaciones manuales, no de los bots
+      PEAK_RESET_AT: "2026-10-03T00:00Z"
       SYMBOLS: "XAUUSD"
-      # 6 % de riesgo por operacion (cuenta demo: se prueba la regla de forma agresiva); lote minimo aceptado hasta 9 %
-      RISK_PER_TRADE: "0.06"
+      # 3 % de riesgo por operacion desde el 3-10-2026 (antes 6 %): la ventaja del estudio son 7 USD por cada 100 arriesgados,
+      # asi que el riesgo alto solo anade varianza. El lote minimo (1 onza) se acepta hasta el 4,5 %, como en el bot de S/R:
+      # con 2 % y tope 3 % se saltaria casi todos los dias en una cuenta de 440 USD.
+      RISK_PER_TRADE: "0.03"
+      ASIA_MAX_RISK_PCT: "0.045"
       ASIA_RR: "2.0"
       ASIA_MAX_WAIT_BARS: "8"
       ASIA_LABEL: "autotrader-asia"
