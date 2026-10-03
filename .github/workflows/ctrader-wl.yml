@@ -1,0 +1,101 @@
+name: ctrader-wl
+
+# Bot "largo semanal" del oro (XAUUSD) en la MISMA cuenta demo agresiva de cTrader (500 USD): compra en la apertura semanal (domingo 18:00 NY),
+# stop a 0,5 ATR diario, cierre el viernes a las 16:00 NY. Una operacion por semana. Es una PRUEBA de la deriva alcista del oro (control del
+# estudio de extremos semanales: ver README), no una estrategia con ventaja de calendario; en 2026 la regla va negativa.
+# Corre cada hora (domingo a viernes); el ciclo es idempotente y decide por la hora de Nueva York. Si el cron falla, el vigilante de la
+# sesion de Claude lo lanza a mano (workflow_dispatch). Secrets: los mismos que ctrader-aggr.
+on:
+  schedule:
+    - cron: "12 * * * 0-5"
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "Solo decidir, sin enviar ordenes"
+        type: boolean
+        default: false
+
+concurrency:
+  group: ${{ github.workflow }}
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+env:
+  SCHEDULE_ENABLED: "true"
+
+jobs:
+  gate:
+    runs-on: ubuntu-latest
+    outputs:
+      enabled: ${{ steps.check.outputs.enabled }}
+    steps:
+      - id: check
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ] || [ "$SCHEDULE_ENABLED" = "true" ]; then echo "enabled=true" >> "$GITHUB_OUTPUT"; else echo "enabled=false" >> "$GITHUB_OUTPUT"; fi
+
+  wl:
+    needs: gate
+    if: ${{ needs.gate.outputs.enabled == 'true' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      BROKER: ctrader
+      DATA_PROVIDER: ctrader
+      CTRADER_DEMO: "true"
+      CTRADER_CLIENT_ID: ${{ secrets.CTRADER_CLIENT_ID }}
+      CTRADER_CLIENT_SECRET: ${{ secrets.CTRADER_CLIENT_SECRET }}
+      CTRADER_ACCOUNT_LOGIN: ${{ secrets.CTRADER_AGGR_ACCOUNT_LOGIN }}
+      CTRADER_ACCESS_TOKEN: ${{ secrets.CTRADER_ACCESS_TOKEN }}
+      # Freno compartido con el bot agresivo (misma cuenta): interruptor manual y drawdown desde el maximo
+      BOT_HALT: ${{ vars.AGGR_BOT_HALT || vars.BOT_HALT || 'off' }}
+      MAX_DRAWDOWN_PCT: "0.50"
+      SYMBOLS: "XAUUSD"
+      # Lote minimo de 1 onza con stop de ~50 USD arriesga ~12 % de 440 USD: se acepta hasta el 15 % (WL_MAX_RISK_PCT)
+      RISK_PER_TRADE: "0.06"
+      WL_MAX_RISK_PCT: "0.15"
+      WL_STOP_ATR: "0.5"
+      WL_LABEL: "autotrader-wl"
+      WL_STATE_PATH: "docs/wl_state.json"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install -r requirements.txt
+      - name: Tests
+        run: python -m pytest -q tests/test_wlbot.py tests/test_guard.py
+      - name: Ciclo largo semanal
+        run: python -m autotrader.cli --env /dev/null wl-run ${{ inputs.dry_run && '--dry-run' || '' }} | tee /tmp/wl.json
+      - name: Publicar estado y panel
+        if: ${{ !inputs.dry_run }}
+        run: |
+          publish=$(python - <<'PY'
+          import json
+          txt = open("/tmp/wl.json").read()
+          print("true" if json.loads(txt[txt.index("{"):]).get("publish") else "false")
+          PY
+          )
+          [ "$publish" = "true" ] || { echo "sin cambios que publicar"; exit 0; }
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          python scripts/dashboard.py --no-live --out reports/dashboard.html
+          cp reports/dashboard.html docs/index.html
+          cp reports/dashboard.html docs/dashboard.html
+          git add docs/wl_state.json docs/index.html docs/dashboard.html
+          if git diff --cached --quiet; then echo "sin cambios"; exit 0; fi
+          git commit -q -m "Panel: actualización automática (largo semanal)"
+          ok=0
+          for i in 1 2 3 4; do
+            if git pull --rebase -X theirs -q origin "${GITHUB_REF_NAME}" && git push -q; then ok=1; break; fi
+            git rebase --abort 2>/dev/null || true
+            sleep $((i * 5))
+          done
+          [ "$ok" = "1" ] || { echo "::error::no se pudo publicar el estado tras 4 intentos"; exit 1; }
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: wl-log-${{ github.run_id }}
+          path: state/run_log.jsonl
+          if-no-files-found: ignore

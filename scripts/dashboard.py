@@ -38,6 +38,7 @@ AGGR_SIMULATION = "docs/aggr_simulation.json"
 ASIA_STATE = "docs/asia_state.json"
 SR_STATE = "docs/sr_state.json"
 FH_STATE = "docs/fh_state.json"
+WL_STATE = "docs/wl_state.json"
 SWING_WALKFORWARD = "docs/swing_walkforward.json"
 KRONOS_REPORT = "docs/kronos_report.json"
 ELLIOTT_STUDY = "docs/elliott_study.json"
@@ -159,6 +160,9 @@ def collect(no_live: bool) -> dict:
     if os.path.exists(FH_STATE):
         with open(FH_STATE, encoding="utf-8") as fh:
             aggr["fh"] = json.load(fh)
+    if os.path.exists(WL_STATE):
+        with open(WL_STATE, encoding="utf-8") as fh:
+            aggr["wl"] = json.load(fh)
     if os.path.exists(ELLIOTT_STATE):
         with open(ELLIOTT_STATE, encoding="utf-8") as fh:
             ctrader["elliott_bot"] = json.load(fh)

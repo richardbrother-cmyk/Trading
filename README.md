@@ -380,14 +380,14 @@ objetivo 2R enviados con la orden; cierre de lo que quede a las 12:00 NY; una op
 la misma cuenta). El bot recalcula el plan del día en cada ciclo a partir de las velas cerradas, así
 que no depende de un estado en memoria; solo entra si la vela del retest es la última cerrada (no persigue entradas
 tardías). Respeta `BOT_HALT` y el freno del 50 % de la cuenta; no aplica las ventanas de eventos (el estudio incluyó
-esos días). El estado de la cuenta agresiva trata las etiquetas `autotrader-aggr`, `autotrader-asia`, `autotrader-sr` y `autotrader-fh` como propias.
+esos días). El estado de la cuenta agresiva trata las etiquetas `autotrader-aggr`, `autotrader-asia`, `autotrader-sr`, `autotrader-fh` y `autotrader-wl` como propias.
 
 ### Bot de soportes y resistencias (sexto bot, misma cuenta agresiva)
 
 `autotrader/sr.py` (niveles y señales), estrategia `sr` del motor swing (`autotrader/swing.py`, `autotrader/swingbot.py`), workflow
 `ctrader-sr.yml` (cada hora, minuto 14), etiqueta `autotrader-sr`, estado en `docs/sr_state.json` y sección propia en la pestaña
 agresiva. El estado de la cuenta (posiciones, operaciones, equity) lo sigue refrescando `ctrader-aggr.yml`, que ahora reconoce las
-cuatro etiquetas propias (`autotrader-aggr`, `autotrader-asia`, `autotrader-sr`, `autotrader-fh`).
+cinco etiquetas propias (`autotrader-aggr`, `autotrader-asia`, `autotrader-sr`, `autotrader-fh`, `autotrader-wl`).
 Regla: sobre barras de 4 h se buscan pivotes (máximo o mínimo que supera a 3 barras a cada lado, confirmado 3 barras después, así que
 nunca se mira al futuro) de las últimas 300 barras; los pivotes (máximos y mínimos juntos, porque un soporte roto pasa a ser
 resistencia) se agrupan en zonas de 0,5 ATR y una zona con al menos 2 pivotes es un nivel. Señal de **rebote**: la última barra
@@ -477,6 +477,20 @@ lote mínimo aceptado hasta el 3 %. Respeta `BOT_HALT` y el freno del 50 % de la
 y el subconjunto se eligió después de ver los datos. Se deja en demo para obtener datos fuera de muestra; criterio sugerido para revisarla:
 al menos 60 operaciones (unas 30 sesiones con señal en los dos índices) antes de sacar conclusiones, y descartarla si el R medio sale ≤ 0.
 
+### Bot largo semanal del oro (octavo bot, misma cuenta agresiva, PRUEBA)
+
+Pedido por el usuario tras el estudio de extremos semanales (más abajo): comprar XAUUSD en la apertura semanal y mantener hasta el viernes.
+`autotrader/wlbot.py`, comando `wl-run`, workflow `ctrader-wl.yml` (cada hora, minuto 12, domingo a viernes; el ciclo es idempotente y decide por la
+hora de Nueva York; el vigilante lo lanza a mano si el cron falla), etiqueta `autotrader-wl`, estado en `docs/wl_state.json` y sección propia en la
+pestaña agresiva. Regla: primer ciclo de la semana de negociación (domingo 18:00 NY a lunes 17:00) → compra a mercado con stop a 0,5 ATR diario
+(media de los rangos de los 10 días de negociación anteriores) enviado con la orden, sin objetivo; una operación por semana (si salta el stop no
+se repite hasta la semana siguiente); el viernes desde las 16:00 NY se cierra (el oro cierra a las 17:00; el estudio salía a las 17:00); una
+posición que sobreviva a la semana por un ciclo perdido se cierra al empezar la siguiente. Respeta `BOT_HALT` y el freno del 50 % de la cuenta.
+**Riesgo alto por operación:** con el lote mínimo de 1 onza y un ATR diario de ~106 USD, el stop de 0,5 ATR (~53 USD) arriesga ~12 % de 440 USD;
+se acepta hasta el 15 % (`WL_MAX_RISK_PCT`) y, si el equity cae y el mínimo supera ese tope, el bot se salta la semana. **No hay ventaja demostrada:**
+el largo semanal fijo ganó en 2023–2025 con la subida del oro y va negativo en 2026 (backtest con stop 0,5 ATR: +1.032 USD por onza en 146 semanas,
+pero −511 en 2026 con 92 stops de 146). Es una apuesta direccional al oro; criterio sugerido para revisarla: 12 semanas o un drawdown propio de 25 %.
+
 ### Cuenta agresiva (500 USD)
 
 Tercera cuenta demo, workflow `ctrader-aggr.yml`, mismo motor que el bot swing con otro perfil
@@ -563,7 +577,7 @@ Verificación de un hilo público que afirma que el máximo y el mínimo semanal
 - **Doce reglas operables** (fade del extremo semanal el viernes, ruptura del viernes, compra del lunes tras una caída hacia el mínimo, fade de ruptura lunes-martes) con spread y comisión. Las de fade pierden (R entre −0,03 y −0,14). La única con q < 0,05 tras Benjamini–Hochberg es comprar el lunes 08:00 NY cerca del mínimo del lunes y salir el viernes (k 0,5: n 95, R +0,52, q 0,023).
 - **Esa regla es deriva, no calendario.** Comprar todas las semanas el lunes 08:00 con el mismo stop y salir el viernes da R +0,40 (n 146); las semanas sin caída dan +0,18 y las de caída +0,52. El filtro aporta unas 0,1 R sobre la deriva, sin significación. Un largo semanal simple da R +0,20 con stop de 2 ATR, y 2026 ya sale negativo (−0,04).
 
-Conclusión: no hay ventaja de calendario explotable; lo que se cobra es la subida del oro en 2023–2025. No se monta bot.
+Conclusión: no hay ventaja de calendario explotable; lo que se cobra es la subida del oro en 2023–2025. A petición del usuario se montó igualmente el largo semanal simple como prueba (ver el bot largo semanal, arriba).
 
 ### Vencimientos de opciones
 

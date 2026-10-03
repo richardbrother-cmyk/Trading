@@ -324,6 +324,12 @@ footer { color: var(--muted); font-size: 12.5px; }
       <div class="tbl-wrap"><table id="sw-fh-trades"></table></div>
       <p class="note" id="sw-fh-note" style="margin:10px 0 0"></p>
     </section>
+    <section id="sw-wl-section" style="display:none">
+      <div class="sec-head"><div><h2>Bot largo semanal del oro (misma cuenta)</h2><p class="lede" id="sw-wl-lede"></p></div></div>
+      <div class="kpis" id="sw-wl-kpis" style="margin-bottom:12px"></div>
+      <div class="tbl-wrap"><table id="sw-wl-trades"></table></div>
+      <p class="note" id="sw-wl-note" style="margin:10px 0 0"></p>
+    </section>
     <section id="sw-sr-section" style="display:none">
       <div class="sec-head"><div><h2>Bot de soportes y resistencias (misma cuenta)</h2><p class="lede" id="sw-sr-lede"></p></div></div>
       <div class="kpis" id="sw-sr-kpis" style="margin-bottom:12px"></div>
@@ -864,6 +870,22 @@ function renderSwingTab(prefix, SW, badgeId, base0, research){
     const tr = FHB.trades || [];
     $("sw-fh-trades").innerHTML = tr.length ? `<thead><tr><th>Cierre (UTC)</th><th>Símbolo</th><th class="num">Unidades</th><th class="num">Entrada</th><th class="num">Salida</th><th class="num">Neto</th></tr></thead><tbody>` + [...tr].reverse().map(t=>`<tr><td class="mono" style="font-size:12px">${esc(t.at)}</td><td>${esc(t.symbol)}</td><td class="num">${t.units}</td><td class="num">${fx(t.entry,t.symbol)}</td><td class="num">${fx(t.exit,t.symbol)}</td><td class="num ${t.net>=0?"pos":"neg"}">${fmtUSD2(t.net)}</td></tr>`).join("") + "</tbody>" : `<tbody><tr><td class="empty">Sin operaciones cerradas todavía.</td></tr></tbody>`;
     $("sw-fh-note").textContent = "Prueba en demo de un efecto que NO superó la corrección por multiplicidad: R medio +0,08 a +0,10 en índices (1.028 operaciones), IC 95 % [-0,02, +0,21], q 0,17; el subconjunto de índices se eligió tras ver los datos. No hay ventaja demostrada.";
+  }
+  const WLB = SW.wl;
+  if (WLB && WLB.params) {
+    $("sw-wl-section").style.display = "";
+    const wp = WLB.params || {}, st = WLB.stats || {}, pl = WLB.plan || {};
+    const ph = {entrada:"entrando", operada:"operada esta semana", fuera_de_ventana:"esperando la apertura semanal", sin_datos:"sin datos suficientes"};
+    $("sw-wl-lede").textContent = `Compra XAUUSD en la apertura semanal (domingo 18:00 NY), stop a ${wp.stop_atr} ATR diario y cierre el viernes a las 16:00 NY. Una operación por semana, ${((wp.risk_pct||0)*100).toFixed(0)} % de riesgo (hasta ${((wp.max_risk_pct||0)*100).toFixed(0)} % con el lote mínimo), etiqueta ${esc(WLB.label||"")}. Último ciclo ${esc(WLB.ny_time||"")} NY.`;
+    const op = WLB.open_positions || [];
+    const tiles = [{label:"Semana", value: esc(pl.week||"—"), sub: esc(ph[pl.phase]||(WLB.plan&&WLB.plan.outside?ph.fuera_de_ventana:"—")) + (pl.atr!=null?` · ATR diario ${pl.atr}`:"")}];
+    tiles.push({label:"Posición abierta", value: op.length ? op.map(x=>`${x.symbol} ${x.side==="buy"?"L":"C"} ${x.units}`).join(" · ") : "ninguna", sub:"se cierra el viernes a las 16:00 NY"});
+    tiles.push({label:"Operaciones cerradas", value:String(st.trades||0), sub: st.trades ? `${st.wins} ganadoras · neto ${fmtUSD2(st.net_usd)}` : "todavía ninguna", cls:(st.net_usd||0)>=0?"good":"bad"});
+    if (WLB.guard && WLB.guard.mode && WLB.guard.mode!=="off") tiles.push({label:"Freno", value:"activo", sub:esc(WLB.guard.reason||""), cls:"bad"});
+    $("sw-wl-kpis").innerHTML = tiles.map(k => `<div class="tile"><div class="label">${esc(k.label)}</div><div class="value">${esc(k.value)}</div><div class="sub ${k.cls||""}">${k.sub}</div></div>`).join("");
+    const tr = WLB.trades || [];
+    $("sw-wl-trades").innerHTML = tr.length ? `<thead><tr><th>Cierre (UTC)</th><th class="num">Unidades</th><th class="num">Entrada</th><th class="num">Salida</th><th class="num">Neto</th></tr></thead><tbody>` + [...tr].reverse().map(t=>`<tr><td class="mono" style="font-size:12px">${esc(t.at)}</td><td class="num">${t.units}</td><td class="num">${fx(t.entry,"XAUUSD")}</td><td class="num">${fx(t.exit,"XAUUSD")}</td><td class="num ${t.net>=0?"pos":"neg"}">${fmtUSD2(t.net)}</td></tr>`).join("") + "</tbody>" : `<tbody><tr><td class="empty">Sin operaciones cerradas todavía.</td></tr></tbody>`;
+    $("sw-wl-note").textContent = "Prueba pedida por el usuario sobre la deriva alcista del oro: el estudio de extremos semanales (146 semanas) no halló ventaja de calendario, y el largo semanal fijo ganó en 2023–2025 pero va negativo en 2026. Con el lote mínimo de 1 onza cada operación arriesga ~12 % de la cuenta.";
   }
   const SRB = SW.sr;
   if (SRB && SRB.decisions) {
