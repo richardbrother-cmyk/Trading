@@ -1,0 +1,28 @@
+{
+ "at": "2026-10-04T05:46Z",
+ "ny_time": "2026-10-04 01:46",
+ "equity": 440.59,
+ "plan": {
+  "week": "2026-09-28",
+  "phase": "fuera_de_ventana",
+  "atr": null
+ },
+ "open_positions": [],
+ "last_orders": [],
+ "last_trade_week": null,
+ "trades": [],
+ "params": {
+  "stop_atr": 0.5,
+  "risk_pct": 0.06,
+  "max_risk_pct": 0.15,
+  "atr_days": 10
+ },
+ "guard": {
+  "mode": "off",
+  "reason": "",
+  "peak": 440.59,
+  "drawdown": 0.0
+ },
+ "label": "autotrader-wl",
+ "symbol": "XAUUSD"
+}
