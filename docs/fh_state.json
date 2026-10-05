@@ -1,0 +1,49 @@
+{
+ "at": "2026-10-05T14:30Z",
+ "ny_time": "2026-10-05 10:30",
+ "equity": 1.61,
+ "plans": {
+  "US500": {
+   "day": "2026-10-05",
+   "phase": "ready",
+   "side": 1,
+   "r": 29.5,
+   "u": 16.84,
+   "entry_ref": 7755.24,
+   "first_hour_open": 7725.74,
+   "ratio": 1.75
+  },
+  "NAS100": {
+   "day": "2026-10-05",
+   "phase": "ready",
+   "side": 1,
+   "r": 176.38,
+   "u": 110.31,
+   "entry_ref": 30999.7,
+   "first_hour_open": 30823.32,
+   "ratio": 1.6
+  }
+ },
+ "open_positions": [],
+ "last_orders": [],
+ "last_trade_day": {},
+ "trades": [],
+ "params": {
+  "threshold": 0.5,
+  "stop_u": 1.0,
+  "max_late_min": 30,
+  "risk_pct": 0.02,
+  "max_risk_pct": 0.03
+ },
+ "guard": {
+  "mode": "off",
+  "reason": "",
+  "peak": 1.61,
+  "drawdown": 0.0
+ },
+ "label": "autotrader-fh",
+ "symbols": [
+  "US500",
+  "NAS100"
+ ]
+}
