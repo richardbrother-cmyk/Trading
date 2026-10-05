@@ -1,11 +1,12 @@
 {
- "at": "2026-10-04T22:45Z",
- "ny_time": "2026-10-04 18:45",
- "equity": 496.6,
+ "at": "2026-10-05T22:26Z",
+ "ny_time": "2026-10-05 18:26",
+ "equity": 1.61,
  "plan": {
   "week": "2026-10-05",
   "phase": "operada",
-  "atr": 82.24
+  "atr": 82.24,
+  "outside": true
  },
  "open_positions": [],
  "last_orders": [
@@ -21,7 +22,17 @@
   }
  ],
  "last_trade_week": "2026-10-05",
- "trades": [],
+ "trades": [
+  {
+   "at": "2026-10-05T04:29Z",
+   "symbol": "XAUUSD",
+   "units": 1.0,
+   "entry": 4144.11,
+   "exit": 4128.37,
+   "net": -15.84,
+   "opened_at": "2026-10-04T22:45Z"
+  }
+ ],
  "params": {
   "stop_atr": 0.5,
   "risk_pct": 0.06,
@@ -31,9 +42,14 @@
  "guard": {
   "mode": "off",
   "reason": "",
-  "peak": 496.6,
+  "peak": 1.61,
   "drawdown": 0.0
  },
  "label": "autotrader-wl",
- "symbol": "XAUUSD"
+ "symbol": "XAUUSD",
+ "stats": {
+  "trades": 1,
+  "wins": 0,
+  "net_usd": -15.84
+ }
 }
