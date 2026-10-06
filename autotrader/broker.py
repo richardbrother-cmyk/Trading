@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 import os
+import time
 from dataclasses import asdict, dataclass, field
 from datetime import datetime, timezone
 from typing import Protocol
@@ -207,14 +208,32 @@ class AlpacaBroker:
             placed.append({"symbol": p["symbol"], "qty": qty, "stop_price": stop_price, "status": order.get("status")})
         return placed
 
-    def cancel_symbol_orders(self, symbol: str) -> int:
-        """Cancela las ordenes abiertas de un simbolo (p.ej. el stop vinculado antes de vender por senal)."""
+    def cancel_symbol_orders(self, symbol: str, wait_s: float = 10.0) -> int:
+        """Cancela las ordenes abiertas de un simbolo (p.ej. el stop vinculado antes de vender por senal).
+
+        La cancelacion en Alpaca es asincrona: la orden pasa por "pending_cancel" y mientras tanto sigue reteniendo
+        las acciones. Se espera (hasta wait_s segundos) a que el simbolo no tenga ordenes abiertas antes de volver;
+        si no, una venta enviada justo despues es rechazada por "insufficient qty available" (paso el 6-10-2026).
+        """
         n = 0
         for o in self._get("/v2/orders", status="open", symbols=symbol, nested="false"):
             if o["symbol"] == symbol:
                 self._delete(f"/v2/orders/{o['id']}")
                 n += 1
+        if n:
+            self._wait_no_open_orders(symbol, wait_s)
         return n
+
+    def _wait_no_open_orders(self, symbol: str, wait_s: float, step_s: float = 0.5) -> bool:
+        """Espera a que el simbolo no tenga ordenes abiertas (ni en pending_cancel). Devuelve True si se vacio a tiempo."""
+        deadline = time.monotonic() + wait_s
+        while True:
+            pending = [o for o in self._get("/v2/orders", status="open", symbols=symbol, nested="false") if o["symbol"] == symbol]
+            if not pending:
+                return True
+            if time.monotonic() >= deadline:
+                return False
+            time.sleep(step_s)
 
     def account(self, prices: dict[str, float] | None = None) -> Account:
         acct = self._get("/v2/account")
@@ -245,7 +264,14 @@ class AlpacaBroker:
             payload.update({"order_class": "oto", "time_in_force": "gtc", "stop_loss": {"stop_price": f"{stop_price:.2f}"}})
         elif side == "sell":
             self.cancel_symbol_orders(symbol)
-        order = self._post("/v2/orders", payload)
+        try:
+            order = self._post("/v2/orders", payload)
+        except RuntimeError as exc:
+            # Si aun asi el broker retiene las acciones (cancelacion todavia en curso), se espera y se reintenta una vez.
+            if side != "sell" or "insufficient qty available" not in str(exc):
+                raise
+            self._wait_no_open_orders(symbol, 10.0)
+            order = self._post("/v2/orders", payload)
         order["broker"] = self.name
         return order
 

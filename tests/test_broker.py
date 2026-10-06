@@ -71,6 +71,8 @@ class _FakeSession:
 
     def delete(self, url, timeout=None):
         self.deleted.append(url)
+        # como en Alpaca, la orden cancelada deja de aparecer entre las abiertas
+        self.open_orders = [o for o in self.open_orders if not url.endswith(f"/v2/orders/{o.get('id')}")]
         return _FakeResp({}, 204)
 
 
@@ -104,3 +106,54 @@ def test_ensure_stops_places_missing_gtc_stops():
     placed = b.ensure_stops()
     assert [p["symbol"] for p in placed] == ["GLD"]
     assert sess.posted[0]["type"] == "stop" and sess.posted[0]["time_in_force"] == "gtc" and sess.posted[0]["stop_price"] == "372.17"
+
+
+def test_alpaca_sell_waits_for_pending_cancel(monkeypatch):
+    """La cancelacion del stop es asincrona: no se vende hasta que el simbolo no tiene ordenes abiertas."""
+    import autotrader.broker as broker_mod
+
+    class Sess(_FakeSession):
+        def __init__(self):
+            super().__init__([{"id": "stop1", "symbol": "GLD", "side": "sell", "type": "stop"}])
+            self.polls = 0
+
+        def delete(self, url, timeout=None):
+            self.deleted.append(url)  # queda en pending_cancel: sigue apareciendo como abierta un rato
+            return _FakeResp({}, 204)
+
+        def get(self, url, params=None, timeout=None):
+            if "/v2/orders" in url:
+                self.polls += 1
+                # la orden sigue abierta (pending_cancel) en las dos primeras consultas tras el delete
+                return _FakeResp(self.open_orders if self.polls <= 3 else [])
+            return _FakeResp({})
+
+    sleeps = []
+    monkeypatch.setattr(broker_mod.time, "sleep", lambda s: sleeps.append(s))
+    sess = Sess()
+    b = AlpacaBroker("k", "s", session=sess, stop_loss_pct=0.05)
+    b.submit_market_order("GLD", 10, "sell", price_hint=390.0)
+    assert sess.deleted == [f"{PAPER_URL}/v2/orders/stop1"]
+    assert sleeps and sess.posted[0]["side"] == "sell"  # espero antes de vender
+
+
+def test_alpaca_sell_retries_once_when_qty_still_held(monkeypatch):
+    import autotrader.broker as broker_mod
+
+    class Sess(_FakeSession):
+        def __init__(self):
+            super().__init__([])
+            self.attempts = 0
+
+        def post(self, url, json=None, timeout=None):
+            self.attempts += 1
+            self.posted.append(json)
+            if self.attempts == 1:
+                return _FakeResp({"code": 40310000, "message": "insufficient qty available for order"}, 403)
+            return _FakeResp({"id": "o2", "status": "accepted", **json})
+
+    monkeypatch.setattr(broker_mod.time, "sleep", lambda s: None)
+    sess = Sess()
+    b = AlpacaBroker("k", "s", session=sess, stop_loss_pct=0.05)
+    order = b.submit_market_order("GLD", 10, "sell", price_hint=390.0)
+    assert sess.attempts == 2 and order["status"] == "accepted"
