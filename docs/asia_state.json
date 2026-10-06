@@ -1,9 +1,9 @@
 {
- "at": "2026-10-06T14:00Z",
- "ny_time": "2026-10-06 10:00",
+ "at": "2026-10-06T14:15Z",
+ "ny_time": "2026-10-06 10:15",
  "equity": 1.61,
  "plan": {
-  "phase": "ready",
+  "phase": "retest",
   "side": 1,
   "level": 4152.28,
   "break_at": "08:00",
@@ -12,7 +12,7 @@
   "day": "2026-10-06",
   "asia_hi": 4152.28,
   "asia_lo": 4100.54,
-  "bars_seen": 8
+  "bars_seen": 9
  },
  "open_position": null,
  "last_orders": [
