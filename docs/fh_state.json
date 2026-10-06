@@ -1,27 +1,27 @@
 {
- "at": "2026-10-05T15:15Z",
- "ny_time": "2026-10-05 11:15",
+ "at": "2026-10-06T14:30Z",
+ "ny_time": "2026-10-06 10:30",
  "equity": 1.61,
  "plans": {
   "US500": {
-   "day": "2026-10-05",
-   "phase": "late",
-   "side": 1,
-   "r": 29.5,
-   "u": 16.84,
-   "entry_ref": 7755.24,
-   "first_hour_open": 7725.74,
-   "ratio": 1.75
+   "day": "2026-10-06",
+   "phase": "sin_senal",
+   "side": 0,
+   "r": 6.5,
+   "u": 13.57,
+   "entry_ref": 7817.17,
+   "first_hour_open": 7810.67,
+   "ratio": 0.48
   },
   "NAS100": {
-   "day": "2026-10-05",
-   "phase": "late",
-   "side": 1,
-   "r": 176.38,
-   "u": 110.31,
-   "entry_ref": 30999.7,
-   "first_hour_open": 30823.32,
-   "ratio": 1.6
+   "day": "2026-10-06",
+   "phase": "sin_senal",
+   "side": 0,
+   "r": -10.63,
+   "u": 83.96,
+   "entry_ref": 31271.719999999998,
+   "first_hour_open": 31282.350000000002,
+   "ratio": 0.13
   }
  },
  "open_positions": [],
