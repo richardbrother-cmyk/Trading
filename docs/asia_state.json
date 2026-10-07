@@ -1,18 +1,9 @@
 {
- "at": "2026-10-07T14:15Z",
- "ny_time": "2026-10-07 10:15",
+ "at": "2026-10-07T16:00Z",
+ "ny_time": "2026-10-07 12:00",
  "equity": 1.61,
  "plan": {
-  "phase": "expired",
-  "side": -1,
-  "level": 4126.91,
-  "break_at": "08:00",
-  "retest_at": null,
-  "stop": 4148.465,
-  "day": "2026-10-07",
-  "asia_hi": 4170.02,
-  "asia_lo": 4126.91,
-  "bars_seen": 9
+  "phase": "fuera de horario"
  },
  "open_position": null,
  "last_orders": [
