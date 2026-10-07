@@ -1,7 +1,7 @@
 {
- "at": "2026-10-07T18:27Z",
- "ny_time": "2026-10-07 14:27",
- "equity": 1.61,
+ "at": "2026-10-07T20:27Z",
+ "ny_time": "2026-10-07 16:27",
+ "equity": 500.0,
  "plan": {
   "week": "2026-10-05",
   "phase": "operada",
@@ -42,7 +42,7 @@
  "guard": {
   "mode": "off",
   "reason": "",
-  "peak": 1.61,
+  "peak": 500.0,
   "drawdown": 0.0
  },
  "label": "autotrader-wl",
