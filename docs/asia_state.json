@@ -1,9 +1,18 @@
 {
- "at": "2026-10-07T16:00Z",
- "ny_time": "2026-10-07 12:00",
- "equity": 1.61,
+ "at": "2026-10-08T12:27Z",
+ "ny_time": "2026-10-08 08:27",
+ "equity": 500.0,
  "plan": {
-  "phase": "fuera de horario"
+  "phase": "waiting_break",
+  "side": 0,
+  "level": null,
+  "break_at": null,
+  "retest_at": null,
+  "stop": 4124.43,
+  "day": "2026-10-08",
+  "asia_hi": 4143.25,
+  "asia_lo": 4105.61,
+  "bars_seen": 1
  },
  "open_position": null,
  "last_orders": [
@@ -50,7 +59,7 @@
  "guard": {
   "mode": "off",
   "reason": "",
-  "peak": 1.61,
+  "peak": 500.0,
   "drawdown": 0.0
  },
  "label": "autotrader-asia",
