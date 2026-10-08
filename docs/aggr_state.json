@@ -2,7 +2,7 @@
  "available": true,
  "broker": "Fusion Markets · cTrader demo · swing",
  "account": 10138759,
- "at": "2026-10-08T17:52Z",
+ "at": "2026-10-08T19:26Z",
  "balance": 469.25,
  "equity": 469.25,
  "unrealized_pnl": 0,
@@ -1021,21 +1021,6 @@
    "label": "",
    "opened_at": "2026-09-30T00:33Z",
    "origin": "manual"
-  },
-  {
-   "symbol": "XAUUSD",
-   "at": "2026-09-24T18:35Z",
-   "units": 20.0,
-   "entry": 4270.7,
-   "exit": 4270.16,
-   "gross": -10.8,
-   "swap": 0.0,
-   "commission": -2.04,
-   "net": -12.84,
-   "balance_after": 659.41,
-   "label": "",
-   "opened_at": "2026-09-24T18:35Z",
-   "origin": "manual"
   }
  ],
  "settings": {
@@ -1060,7 +1045,7 @@
   "initial": 500.0,
   "realized": {
    "bot": -106.0,
-   "manual": -1093.86,
+   "manual": -1081.02,
    "excluded": 0.0
   },
   "open": {
@@ -1070,7 +1055,7 @@
   },
   "counts": {
    "bot": 6,
-   "manual": 62,
+   "manual": 61,
    "excluded": 0
   },
   "adjusted_equity": 394.0,
@@ -1118,7 +1103,7 @@
   "equity_after": null
  },
  "last_run": {
-  "at": "2026-10-08 17:51",
+  "at": "2026-10-08 19:26",
   "equity": 469.25,
   "positions": 0,
   "buys": 0,
@@ -1134,7 +1119,7 @@
     "bb_lo": 7735.48,
     "bb_mid": 7792.33,
     "bar": "2026-10-08 13:00",
-    "bar_age_h": 0.86,
+    "bar_age_h": 2.44,
     "reason": null
    },
    {
@@ -1145,7 +1130,7 @@
     "bb_lo": 30811.31,
     "bb_mid": 31111.19,
     "bar": "2026-10-08 13:00",
-    "bar_age_h": 0.86,
+    "bar_age_h": 2.44,
     "reason": null
    },
    {
@@ -1156,7 +1141,7 @@
     "bb_lo": 1.1162,
     "bb_mid": 1.12155,
     "bar": "2026-10-08 13:00",
-    "bar_age_h": 0.86,
+    "bar_age_h": 2.44,
     "reason": null
    },
    {
@@ -1167,7 +1152,7 @@
     "bb_lo": 1.31767,
     "bb_mid": 1.32282,
     "bar": "2026-10-08 13:00",
-    "bar_age_h": 0.86,
+    "bar_age_h": 2.44,
     "reason": null
    },
    {
@@ -1178,7 +1163,7 @@
     "bb_lo": 4091.51,
     "bb_mid": 4134.45,
     "bar": "2026-10-08 13:00",
-    "bar_age_h": 0.86,
+    "bar_age_h": 2.44,
     "reason": null
    },
    {
@@ -1189,7 +1174,7 @@
     "bb_lo": 89.709,
     "bb_mid": 91.955,
     "bar": "2026-10-08 13:00",
-    "bar_age_h": 0.86,
+    "bar_age_h": 2.44,
     "reason": null
    }
   ],
@@ -2145,96 +2130,13 @@
   [
    "2026-10-08T17:52Z",
    469.25
+  ],
+  [
+   "2026-10-08T19:26Z",
+   469.25
   ]
  ],
  "cycles": [
-  {
-   "at": "2026-10-02 23:45",
-   "equity": 440.59,
-   "positions": 0,
-   "buys": 0,
-   "sells": 0,
-   "errors": 0,
-   "note": "sin cambios",
-   "decisions": [
-    {
-     "symbol": "US500",
-     "action": "HOLD",
-     "rsi": 55.1,
-     "close": 7720.4,
-     "bb_lo": 7640.48,
-     "bb_mid": 7689.03,
-     "bar": "2026-10-02 17:00",
-     "bar_age_h": 2.75,
-     "reason": null
-    },
-    {
-     "symbol": "NAS100",
-     "action": "HOLD",
-     "rsi": 59.3,
-     "close": 30808.43,
-     "bb_lo": 30208.98,
-     "bb_mid": 30566.97,
-     "bar": "2026-10-02 17:00",
-     "bar_age_h": 2.75,
-     "reason": null
-    },
-    {
-     "symbol": "EURUSD",
-     "action": "HOLD",
-     "rsi": 34.2,
-     "close": 1.1252,
-     "bb_lo": 1.12037,
-     "bb_mid": 1.12958,
-     "bar": "2026-10-02 17:00",
-     "bar_age_h": 2.75,
-     "reason": null
-    },
-    {
-     "symbol": "GBPUSD",
-     "action": "HOLD",
-     "rsi": 51.2,
-     "close": 1.32399,
-     "bb_lo": 1.31718,
-     "bb_mid": 1.32315,
-     "bar": "2026-10-02 17:00",
-     "bar_age_h": 2.75,
-     "reason": null
-    },
-    {
-     "symbol": "XAUUSD",
-     "action": "HOLD",
-     "rsi": 42.8,
-     "close": 4140.42,
-     "bb_lo": 4126.96,
-     "bb_mid": 4170.81,
-     "bar": "2026-10-02 17:00",
-     "bar_age_h": 2.75,
-     "reason": null
-    },
-    {
-     "symbol": "XTIUSD",
-     "action": "HOLD",
-     "rsi": 47.7,
-     "close": 94.175,
-     "bb_lo": 91.356,
-     "bb_mid": 93.945,
-     "bar": "2026-10-02 17:00",
-     "bar_age_h": 2.75,
-     "reason": null
-    }
-   ],
-   "orders": [],
-   "stops_moved": [],
-   "closed": [],
-   "event_window": [],
-   "guard": {
-    "mode": "off",
-    "reason": "",
-    "peak": 512.61,
-    "drawdown": -0.1405
-   }
-  },
   {
    "at": "2026-10-04 05:45",
    "equity": 440.59,
@@ -7364,6 +7266,93 @@
      "bb_mid": 91.955,
      "bar": "2026-10-08 13:00",
      "bar_age_h": 0.86,
+     "reason": null
+    }
+   ],
+   "orders": [],
+   "stops_moved": [],
+   "closed": [],
+   "event_window": [],
+   "guard": {
+    "mode": "off",
+    "reason": "",
+    "peak": 500.0,
+    "drawdown": -0.0615
+   }
+  },
+  {
+   "at": "2026-10-08 19:26",
+   "equity": 469.25,
+   "positions": 0,
+   "buys": 0,
+   "sells": 0,
+   "errors": 0,
+   "note": "sin cambios",
+   "decisions": [
+    {
+     "symbol": "US500",
+     "action": "HOLD",
+     "rsi": 46.1,
+     "close": 7759.61,
+     "bb_lo": 7735.48,
+     "bb_mid": 7792.33,
+     "bar": "2026-10-08 13:00",
+     "bar_age_h": 2.44,
+     "reason": null
+    },
+    {
+     "symbol": "NAS100",
+     "action": "HOLD",
+     "rsi": 40.2,
+     "close": 30776.69,
+     "bb_lo": 30811.31,
+     "bb_mid": 31111.19,
+     "bar": "2026-10-08 13:00",
+     "bar_age_h": 2.44,
+     "reason": null
+    },
+    {
+     "symbol": "EURUSD",
+     "action": "HOLD",
+     "rsi": 40.8,
+     "close": 1.11956,
+     "bb_lo": 1.1162,
+     "bb_mid": 1.12155,
+     "bar": "2026-10-08 13:00",
+     "bar_age_h": 2.44,
+     "reason": null
+    },
+    {
+     "symbol": "GBPUSD",
+     "action": "HOLD",
+     "rsi": 46.1,
+     "close": 1.32136,
+     "bb_lo": 1.31767,
+     "bb_mid": 1.32282,
+     "bar": "2026-10-08 13:00",
+     "bar_age_h": 2.44,
+     "reason": null
+    },
+    {
+     "symbol": "XAUUSD",
+     "action": "HOLD",
+     "rsi": 46.0,
+     "close": 4123.89,
+     "bb_lo": 4091.51,
+     "bb_mid": 4134.45,
+     "bar": "2026-10-08 13:00",
+     "bar_age_h": 2.44,
+     "reason": null
+    },
+    {
+     "symbol": "XTIUSD",
+     "action": "HOLD",
+     "rsi": 51.5,
+     "close": 92.978,
+     "bb_lo": 89.709,
+     "bb_mid": 91.955,
+     "bar": "2026-10-08 13:00",
+     "bar_age_h": 2.44,
      "reason": null
     }
    ],
