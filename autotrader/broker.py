@@ -184,8 +184,12 @@ class AlpacaBroker:
                 return {"symbol": symbol, "stop_price": stop_price, "status": order.get("status")}
         raise ValueError(f"Sin posicion en {symbol}")
 
-    def ensure_stops(self) -> list[dict]:
-        """Coloca un stop GTC para toda posicion larga que no tenga ya una orden de venta stop abierta."""
+    def ensure_stops(self, only: set[str] | None = None) -> list[dict]:
+        """Coloca un stop GTC para toda posicion larga que no tenga ya una orden de venta stop abierta.
+
+        Con `only` se limita a esos simbolos: el bot SMA solo protege su universo y no toca las posiciones de otros
+        bots de la misma cuenta (p.ej. los ETF del bot GEM, que no llevan stop) ni las abiertas a mano.
+        """
         if not self.stop_loss_pct:
             return []
         open_orders = self._get("/v2/orders", status="open", nested="false")
@@ -197,6 +201,8 @@ class AlpacaBroker:
         for p in self._get("/v2/positions"):
             qty = int(float(p["qty"]))
             if p["symbol"] in open_stops or p["symbol"] in pending_buys or qty <= 0:
+                continue
+            if only is not None and p["symbol"] not in only:
                 continue
             stop_price = round(float(p["avg_entry_price"]) * (1 - self.stop_loss_pct), 2)
             try:

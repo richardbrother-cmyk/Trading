@@ -74,6 +74,47 @@ def yahoo_bars(symbol: str, range_: str = "2y", interval: str = "1d", session: r
     return _validate(df, symbol)
 
 
+def yahoo_monthly_adjclose(symbol: str, session: requests.Session | None = None) -> pd.Series:
+    """Cierres mensuales AJUSTADOS (dividendos y splits) de Yahoo, solo meses completos, indexados a fin de mes.
+
+    Para momentum a 12 meses hace falta el retorno total: con el cierre sin ajustar BIL o AGG parecen planos aunque
+    rindan un 4 %. Yahoo diezma la serie diaria con range=max, asi que se piden barras mensuales explicitas desde 1970;
+    anade el mes en curso (parcial) y a veces una barra extra con la ultima sesion, que se descartan.
+    """
+    sess = session or requests.Session()
+    url = f"https://query1.finance.yahoo.com/v8/finance/chart/{symbol}"
+    params = {"period1": 0, "period2": int(time.time()), "interval": "1mo", "events": "div,splits"}
+    headers = {"User-Agent": "Mozilla/5.0 (autotrader)"}
+    last_err: Exception | None = None
+    for attempt in range(3):
+        try:
+            resp = sess.get(url, params=params, headers=headers, timeout=30)
+            resp.raise_for_status()
+            payload = resp.json()
+            break
+        except (requests.RequestException, ValueError) as exc:
+            last_err = exc
+            time.sleep(1.5 * (attempt + 1))
+    else:
+        raise RuntimeError(f"Yahoo no respondio para {symbol}: {last_err}")
+    result = payload.get("chart", {}).get("result")
+    if not result:
+        raise ValueError(f"Yahoo sin resultados para {symbol}: {payload.get('chart', {}).get('error')}")
+    node = result[0]
+    ind = node["indicators"]
+    values = ind["adjclose"][0]["adjclose"] if ind.get("adjclose") else ind["quote"][0]["close"]
+    idx = pd.to_datetime(node["timestamp"], unit="s", utc=True).tz_convert(None).normalize()
+    s = pd.Series(values, index=idx, name=symbol, dtype=float).dropna()
+    s = s[~s.index.duplicated(keep="last")].sort_index()
+    cutoff = pd.Timestamp.now("UTC").tz_localize(None).normalize().replace(day=1)
+    s = s[s.index < cutoff]
+    if s.empty:
+        raise ValueError(f"Sin meses completos para {symbol}")
+    s = s.resample("ME").last().dropna()
+    s.index.name = "date"
+    return s
+
+
 def yahoo_quote(symbol: str, session: requests.Session | None = None) -> dict:
     """Ultimo precio disponible de Yahoo incluyendo pre y post mercado (velas de 1 minuto de hoy).
 

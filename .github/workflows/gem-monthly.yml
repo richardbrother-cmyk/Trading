@@ -1,0 +1,66 @@
+name: gem-monthly
+
+# Bot DUAL MOMENTUM (GEM, Antonacci) sobre ETFs en la cuenta PAPER de Alpaca: una sola posicion (IVV, VEU o AGG) elegida
+# con el momentum de 12 meses al cierre de cada mes, sin stop (la salida es la propia senal). Ver autotrader/gem.py y
+# scripts/gem_backtest.py. Capital asignado: GEM_NOTIONAL (porcion fija de la cuenta paper que comparte con el bot SMA).
+# Corre los primeros dias habiles de cada mes; si ya esta en el activo que toca, no hace nada. El estado (capital, historial
+# de senales) se publica en docs/gem_state.json porque state/ no sobrevive entre ejecuciones.
+# Requiere los secrets ALPACA_API_KEY y ALPACA_SECRET_KEY de una cuenta PAPER (sin ellos corre con el broker simulado).
+on:
+  schedule:
+    # Dias 1-5 de cada mes a las 14:45 UTC (10:45 NY en verano, 9:45 en invierno; si el mercado esta cerrado no hace nada)
+    - cron: "45 14 1-5 * *"
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "Solo decidir, sin enviar ordenes ni guardar estado"
+        type: boolean
+        default: false
+
+concurrency:
+  group: ${{ github.workflow }}
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  gem:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      ALPACA_API_KEY: ${{ secrets.ALPACA_API_KEY }}
+      ALPACA_SECRET_KEY: ${{ secrets.ALPACA_SECRET_KEY }}
+      ALPACA_BASE_URL: https://paper-api.alpaca.markets
+      BROKER: ${{ secrets.ALPACA_API_KEY != '' && 'alpaca' || 'sim' }}
+      DATA_PROVIDER: yahoo
+      # Mismo freno global que el bot SMA de la cuenta paper (interruptor manual y drawdown desde el maximo)
+      BOT_HALT: ${{ vars.BOT_HALT || 'off' }}
+      MAX_DRAWDOWN_PCT: ${{ vars.MAX_DRAWDOWN_PCT || '0.15' }}
+      GEM_NOTIONAL: ${{ vars.GEM_NOTIONAL || '20000' }}
+      GEM_STATE: docs/gem_state.json
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install -r requirements.txt
+      - name: Tests
+        run: python -m pytest -q
+      - name: Ciclo GEM (paper)
+        run: python -m autotrader.cli --env /dev/null gem-run ${{ inputs.dry_run && '--dry-run' || '' }}
+      - name: Publicar estado
+        if: ${{ !inputs.dry_run }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add docs/gem_state.json
+          if git diff --cached --quiet; then echo "sin cambios"; exit 0; fi
+          git commit -m "GEM: actualización mensual"
+          ok=0
+          for i in 1 2 3 4; do
+            if git pull --rebase -X theirs -q origin "${GITHUB_REF_NAME}" && git push; then ok=1; break; fi
+            git rebase --abort 2>/dev/null || true
+            sleep $((i * 5))
+          done
+          [ "$ok" = "1" ] || { echo "::error::no se pudo publicar el estado tras 4 intentos"; exit 1; }

@@ -218,6 +218,33 @@ Hay una copia estática en `docs/index.html`, publicada con GitHub Pages en
 <https://richardbrother-cmyk.github.io/Trading/>. El workflow de Alpaca la regenera en cada ciclo y la adjunta como
 artefacto de la ejecución.
 
+## Bot Dual Momentum (GEM) en la cuenta paper de Alpaca
+
+Estrategia de Gary Antonacci ("Global Equities Momentum"), una sola comprobación al mes con el cierre del último mes
+completo (`autotrader/gem.py`, workflow `gem-monthly.yml`, días 1-5 de cada mes a las 14:45 UTC):
+
+- **Momentum absoluto**: si la renta variable USA (IVV) no supera a las letras del Tesoro (`^IRX`) a 12 meses, bonos
+  agregados (AGG).
+- **Momentum relativo**: si los supera, el mejor a 12 meses entre USA (IVV) e internacional ex-USA (VEU).
+- Una sola posición, sin stop (la salida es la propia señal); capital fijo `GEM_NOTIONAL` (20.000 USD por defecto,
+  nunca por encima del efectivo disponible: no usa margen). Convive con el bot SMA en la misma cuenta: usa IVV en lugar
+  de SPY y el bot SMA solo pone stops a su propio universo. IVV, VEU y AGG no deben operarse a mano en esa cuenta.
+- Estado y historial de señales en `docs/gem_state.json`; retornos totales mensuales de Yahoo (ajustados por dividendos).
+
+Backtest (`scripts/gem_backtest.py`, resultado en `docs/gem_backtest.json`, fondos indexados VFINX/VGTSX/VBMFX desde
+1997, 39 cambios en 29 años):
+
+| 1997-2026 | CAGR | Caída máx. | Sharpe | Peor año |
+|---|---|---|---|---|
+| GEM | 10,8 % | −19,7 % | 0,71 | −18,3 % |
+| S&P 500 comprar y mantener | 9,6 % | −51,0 % | 0,54 | −37,0 % |
+| 60/40 | 7,6 % | −32,5 % | 0,59 | −22,1 % |
+| SMA 10 meses sobre S&P | 9,9 % | −25,8 % | 0,71 | −25,8 % |
+
+La ventaja está en 2000-2009 (12,9 % frente a 3,9 % del S&P). Desde 2010 GEM rinde menos que el S&P (9-10 % frente a
+14-15 %) con la mitad de caída máxima; las cifras de 13-16 % que se citan vienen de 1974-2013 y no se repiten desde
+entonces. Es una estrategia de protección de caídas, no de rentabilidad superior.
+
 ## Investigación intradía
 
 `autotrader/intraday.py` es un backtester sobre barras de 15 minutos con dos estrategias de sesión

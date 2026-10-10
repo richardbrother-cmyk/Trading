@@ -251,10 +251,11 @@ def run_cycle(settings: Settings, broker: Broker, provider: DataProvider, dry_ru
             json.dump(res_state, fh, ensure_ascii=False, indent=1)
         summary["resistance_waiting"] = sorted(res_state)
 
-    # Red de seguridad: toda posicion abierta debe tener su stop vivo en el broker
+    # Red de seguridad: toda posicion abierta del universo del bot debe tener su stop vivo en el broker. Solo su universo:
+    # en la misma cuenta pueden convivir posiciones manuales o de otro bot (GEM) que no llevan stop.
     if hasattr(broker, "ensure_stops") and not dry_run:
         try:
-            placed = broker.ensure_stops()
+            placed = broker.ensure_stops(only=set(settings.symbols))
             if placed:
                 summary["stops_placed"] = placed
         except Exception as exc:  # noqa: BLE001

@@ -457,11 +457,13 @@ class CTraderBroker:
                 n += 1
         return {"symbol": symbol, "stop_price": stop_price, "status": f"amended x{n}"}
 
-    def ensure_stops(self) -> list[dict]:
+    def ensure_stops(self, only: set[str] | None = None) -> list[dict]:
         """Pone stop a toda posicion larga que no lo tenga (p.ej. si el broker rechazo el stop de la orden)."""
         placed = []
         for p in self.session.positions():
             if p.side != "buy" or p.stop_loss > 0 or p.symbol not in self.session.symbols:
+                continue
+            if only is not None and p.symbol not in only:
                 continue
             info = self.session.symbols[p.symbol]
             stop_price = round(p.price * (1 - self.stop_loss_pct), info.digits)

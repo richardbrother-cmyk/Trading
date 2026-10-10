@@ -230,6 +230,37 @@ def cmd_elliott_run(args) -> int:
     return 0
 
 
+def cmd_gem_run(args) -> int:
+    """Ciclo mensual del bot Dual Momentum (GEM) sobre ETFs en Alpaca paper."""
+    from .gem import GemParams, fetch_signal, run_gem
+
+    s = _settings(args)
+    params = GemParams.from_env()
+    if args.notional:
+        params.notional = float(args.notional)
+    if args.state:
+        params.state_path = args.state
+    broker = build_broker(s)
+    if hasattr(broker, "stop_loss_pct"):
+        broker.stop_loss_pct = 0.0  # GEM no lleva stop: la salida es la senal mensual
+    provider = _provider(s, broker)
+    signal = fetch_signal(params, session=provider.session)
+    prices: dict[str, float] = {}
+    for sym in params.symbols.values():
+        q = provider.quote(sym)
+        if q and q.get("last"):
+            prices[sym] = float(q["last"])
+            continue
+        try:
+            prices[sym] = float(provider.bars(sym)["close"].iloc[-1])
+        except Exception as exc:  # noqa: BLE001
+            print(f"[gem] {sym}: sin precio: {exc}", file=sys.stderr)
+    print(f"Broker: {broker.name} | GEM {params.symbols} | capital {params.notional:,.0f} | dry_run={args.dry_run}")
+    summary = run_gem(s, broker, params, prices, signal, dry_run=args.dry_run, force=args.force)
+    print(json.dumps(summary, indent=2, default=str, ensure_ascii=False))
+    return 0
+
+
 def cmd_ctrader_check(args) -> int:
     """Verifica autorizacion, cuenta y simbolos de cTrader sin operar."""
     s = _settings(args)
@@ -308,6 +339,13 @@ def main(argv: list[str] | None = None) -> int:
     el = sub.add_parser("elliott-run", help="ciclo del bot de ondas de Elliott (XAUUSD, 4 h) en cTrader")
     el.add_argument("--dry-run", action="store_true")
     el.set_defaults(func=cmd_elliott_run)
+
+    gm = sub.add_parser("gem-run", help="ciclo mensual del bot Dual Momentum (GEM: IVV/VEU/AGG) en Alpaca paper")
+    gm.add_argument("--dry-run", action="store_true", help="decidir sin enviar ordenes ni guardar estado")
+    gm.add_argument("--force", action="store_true", help="operar aunque el mercado este cerrado")
+    gm.add_argument("--notional", type=float, help="capital asignado en USD (sobreescribe GEM_NOTIONAL)")
+    gm.add_argument("--state", help="fichero de estado (sobreescribe GEM_STATE, por defecto docs/gem_state.json)")
+    gm.set_defaults(func=cmd_gem_run)
 
     cc = sub.add_parser("ctrader-check", help="verifica autorizacion, cuenta y simbolos de cTrader")
     cc.set_defaults(func=cmd_ctrader_check)
