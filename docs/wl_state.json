@@ -1,12 +1,11 @@
 {
- "at": "2026-10-11T21:53Z",
- "ny_time": "2026-10-11 17:53",
+ "at": "2026-10-11T23:26Z",
+ "ny_time": "2026-10-11 19:26",
  "equity": 465.36,
  "plan": {
-  "week": "2026-10-05",
+  "week": "2026-10-12",
   "phase": "operada",
-  "atr": 82.24,
-  "outside": true
+  "atr": 81.59
  },
  "open_positions": [],
  "last_orders": [
@@ -14,14 +13,14 @@
    "symbol": "XAUUSD",
    "side": "buy",
    "units": 1.0,
-   "entry_ref": 4143.16,
-   "stop": 4102.04,
-   "risk_usd": 41.12,
-   "atr": 82.24,
+   "entry_ref": 4190.45,
+   "stop": 4149.66,
+   "risk_usd": 40.79,
+   "atr": 81.59,
    "status": "order_accepted"
   }
  ],
- "last_trade_week": "2026-10-05",
+ "last_trade_week": "2026-10-12",
  "trades": [
   {
    "at": "2026-10-05T04:29Z",
