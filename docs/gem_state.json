@@ -1,0 +1,43 @@
+{
+ "capital": 19934.51,
+ "holding": "VEU",
+ "last_rebalance": "2026-10-14",
+ "history": [
+  {
+   "as_of": "2026-09-30",
+   "choice": "intl",
+   "symbol": "VEU",
+   "momentum": {
+    "us": 0.1578,
+    "intl": 0.1929,
+    "tbill": 0.0373
+   },
+   "gem_equity": 20000.0
+  }
+ ],
+ "last_signal": {
+  "as_of": "2026-09-30",
+  "choice": "intl",
+  "reason": "internacional 19.3 % > USA 15.8 %",
+  "momentum": {
+   "us": 0.1578,
+   "intl": 0.1929,
+   "tbill": 0.0373
+  }
+ },
+ "last_run": {
+  "timestamp": "2026-10-14T13:49:41+00:00",
+  "target": "VEU",
+  "orders": [
+   {
+    "symbol": "VEU",
+    "side": "buy",
+    "qty": 243,
+    "price": 82.03500366210938,
+    "status": "filled"
+   }
+  ],
+  "skipped": [],
+  "gem_equity": 20000.0
+ }
+}
