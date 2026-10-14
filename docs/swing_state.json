@@ -2,12 +2,28 @@
  "available": true,
  "broker": "Fusion Markets · cTrader demo · swing",
  "account": 10137828,
- "at": "2026-10-14T15:27Z",
+ "at": "2026-10-14T17:27Z",
  "balance": 500.0,
- "equity": 500.0,
- "unrealized_pnl": 0,
+ "equity": 499.51,
+ "unrealized_pnl": -0.49,
  "leverage": 500.0,
- "positions": [],
+ "positions": [
+  {
+   "symbol": "NAS100",
+   "qty": 0.06,
+   "side": "buy",
+   "avg": 29990.14,
+   "price": 29981.973333,
+   "stop": 29623.25,
+   "target": 30557.16,
+   "opened_at": "2026-10-14T17:27Z",
+   "pnl": -0.49,
+   "position_id": 44828746,
+   "bot": true,
+   "label": "autotrader-swing",
+   "origin": "bot"
+  }
+ ],
  "symbols": [
   "US500",
   "NAS100",
@@ -314,7 +330,7 @@
    "excluded": 0.0
   },
   "open": {
-   "bot": 0.0,
+   "bot": -0.49,
    "manual": 0.0,
    "excluded": 0.0
   },
@@ -323,90 +339,100 @@
    "manual": 17,
    "excluded": 0
   },
-  "adjusted_equity": 211.58,
-  "adjusted_return": 0.0579
+  "adjusted_equity": 211.09,
+  "adjusted_return": 0.0554
  },
  "exclusions": {
   "reason": "Entradas del 14 de septiembre de 2026: el filtro de huecos comparaba el precio en vivo con la barra diaria parcial y dejo pasar compras que no debia. Se excluyen de las metricas del bot para medir la operativa corregida.",
   "entries_before": "2026-09-15T00:00Z"
  },
  "last_run": {
-  "at": "2026-10-14 15:27",
+  "at": "2026-10-14 17:27",
   "equity": 500.0,
   "positions": 0,
-  "buys": 0,
+  "buys": 1,
   "sells": 0,
   "errors": 0,
-  "note": "sin cambios",
+  "note": "compra NAS100",
   "decisions": [
    {
     "symbol": "US500",
     "action": "HOLD",
-    "rsi": 43.0,
-    "close": 7778.76,
-    "bb_lo": 7780.77,
-    "bb_mid": 7809.37,
-    "bar": "2026-10-14 09:00",
-    "bar_age_h": 2.45,
+    "rsi": 32.9,
+    "close": 7731.51,
+    "bb_lo": 7760.97,
+    "bb_mid": 7805.98,
+    "bar": "2026-10-14 13:00",
+    "bar_age_h": 0.45,
     "reason": null
    },
    {
     "symbol": "NAS100",
-    "action": "HOLD",
-    "rsi": 34.6,
-    "close": 30353.72,
-    "bb_lo": 30276.05,
-    "bb_mid": 30706.29,
-    "bar": "2026-10-14 09:00",
-    "bar_age_h": 2.45,
+    "action": "BUY",
+    "rsi": 28.3,
+    "close": 30092.97,
+    "bb_lo": 30175.55,
+    "bb_mid": 30659.99,
+    "bar": "2026-10-14 13:00",
+    "bar_age_h": 0.45,
     "reason": null
    },
    {
     "symbol": "EURUSD",
     "action": "HOLD",
-    "rsi": 33.0,
-    "close": 1.11289,
-    "bb_lo": 1.11418,
-    "bb_mid": 1.11873,
-    "bar": "2026-10-14 09:00",
-    "bar_age_h": 2.45,
+    "rsi": 32.2,
+    "close": 1.11237,
+    "bb_lo": 1.11313,
+    "bb_mid": 1.11826,
+    "bar": "2026-10-14 13:00",
+    "bar_age_h": 0.45,
     "reason": null
    },
    {
     "symbol": "GBPUSD",
     "action": "HOLD",
-    "rsi": 41.3,
-    "close": 1.32042,
-    "bb_lo": 1.31943,
-    "bb_mid": 1.32351,
-    "bar": "2026-10-14 09:00",
-    "bar_age_h": 2.45,
+    "rsi": 32.5,
+    "close": 1.31553,
+    "bb_lo": 1.31768,
+    "bb_mid": 1.3231,
+    "bar": "2026-10-14 13:00",
+    "bar_age_h": 0.45,
     "reason": null
    },
    {
     "symbol": "XAUUSD",
     "action": "HOLD",
-    "rsi": 35.7,
-    "close": 4097.85,
-    "bb_lo": 4122.46,
-    "bb_mid": 4171.15,
-    "bar": "2026-10-14 09:00",
-    "bar_age_h": 2.45,
+    "rsi": 33.5,
+    "close": 4083.62,
+    "bb_lo": 4104.21,
+    "bb_mid": 4165.94,
+    "bar": "2026-10-14 13:00",
+    "bar_age_h": 0.45,
     "reason": null
    },
    {
     "symbol": "XTIUSD",
     "action": "HOLD",
-    "rsi": 63.8,
-    "close": 96.672,
-    "bb_lo": 91.2,
-    "bb_mid": 94.183,
-    "bar": "2026-10-14 09:00",
-    "bar_age_h": 2.45,
+    "rsi": 64.4,
+    "close": 96.802,
+    "bb_lo": 91.395,
+    "bb_mid": 94.42,
+    "bar": "2026-10-14 13:00",
+    "bar_age_h": 0.45,
     "reason": null
    }
   ],
-  "orders": [],
+  "orders": [
+   {
+    "symbol": "NAS100",
+    "units": 0.06,
+    "entry": 30092.97,
+    "stop": 29726.08,
+    "target": 30659.99,
+    "risk_usd": 22.01,
+    "status": "order_accepted"
+   }
+  ],
   "stops_moved": [],
   "closed": [],
   "event_window": [],
@@ -490,11 +516,23 @@
     "slip_price": 0.00104,
     "slip_bps": 9.27,
     "slip_usd": 4.16
+   },
+   {
+    "symbol": "NAS100",
+    "at": "2026-10-14 17:27",
+    "bar": null,
+    "bar_age_h": null,
+    "signal": 30092.97,
+    "fill": 29990.14,
+    "units": 0.06,
+    "slip_price": -102.83,
+    "slip_bps": -34.17,
+    "slip_usd": -6.17
    }
   ],
-  "total_usd": 1.91,
-  "avg_bps": -0.16,
-  "count": 6
+  "total_usd": -4.26,
+  "avg_bps": -5.02,
+  "count": 7
  },
  "guard": {
   "mode": "off",
@@ -1514,96 +1552,13 @@
   [
    "2026-10-14T15:27Z",
    500.0
+  ],
+  [
+   "2026-10-14T17:27Z",
+   499.51
   ]
  ],
  "cycles": [
-  {
-   "at": "2026-10-06 21:34",
-   "equity": 1.11,
-   "positions": 0,
-   "buys": 0,
-   "sells": 0,
-   "errors": 0,
-   "note": "freno freeze: drawdown -99.8 % desde el maximo de 548.33 (limite 10 %)",
-   "decisions": [
-    {
-     "symbol": "US500",
-     "action": "HOLD",
-     "rsi": 71.0,
-     "close": 7828.14,
-     "bb_lo": 7634.85,
-     "bb_mid": 7741.22,
-     "bar": "2026-10-06 17:00",
-     "bar_age_h": 0.58,
-     "reason": null
-    },
-    {
-     "symbol": "NAS100",
-     "action": "HOLD",
-     "rsi": 67.3,
-     "close": 31270.92,
-     "bb_lo": 30384.49,
-     "bb_mid": 30910.63,
-     "bar": "2026-10-06 17:00",
-     "bar_age_h": 0.58,
-     "reason": null
-    },
-    {
-     "symbol": "EURUSD",
-     "action": "HOLD",
-     "rsi": 49.4,
-     "close": 1.126,
-     "bb_lo": 1.11898,
-     "bb_mid": 1.12351,
-     "bar": "2026-10-06 17:00",
-     "bar_age_h": 0.58,
-     "reason": null
-    },
-    {
-     "symbol": "GBPUSD",
-     "action": "HOLD",
-     "rsi": 60.4,
-     "close": 1.32748,
-     "bb_lo": 1.31735,
-     "bb_mid": 1.32261,
-     "bar": "2026-10-06 17:00",
-     "bar_age_h": 0.58,
-     "reason": null
-    },
-    {
-     "symbol": "XAUUSD",
-     "action": "HOLD",
-     "rsi": 50.0,
-     "close": 4163.77,
-     "bb_lo": 4113.32,
-     "bb_mid": 4158.06,
-     "bar": "2026-10-06 17:00",
-     "bar_age_h": 0.58,
-     "reason": null
-    },
-    {
-     "symbol": "XTIUSD",
-     "action": "HOLD",
-     "rsi": 46.7,
-     "close": 92.207,
-     "bb_lo": 89.374,
-     "bb_mid": 92.962,
-     "bar": "2026-10-06 17:00",
-     "bar_age_h": 0.58,
-     "reason": null
-    }
-   ],
-   "orders": [],
-   "stops_moved": [],
-   "closed": [],
-   "event_window": [],
-   "guard": {
-    "mode": "freeze",
-    "reason": "drawdown -99.8 % desde el maximo de 548.33 (limite 10 %)",
-    "peak": 548.33,
-    "drawdown": -0.998
-   }
-  },
   {
    "at": "2026-10-06 23:26",
    "equity": 1.11,
@@ -6727,6 +6682,103 @@
     }
    ],
    "orders": [],
+   "stops_moved": [],
+   "closed": [],
+   "event_window": [],
+   "guard": {
+    "mode": "off",
+    "reason": "",
+    "peak": 548.33,
+    "drawdown": -0.0881
+   }
+  },
+  {
+   "at": "2026-10-14 17:27",
+   "equity": 500.0,
+   "positions": 0,
+   "buys": 1,
+   "sells": 0,
+   "errors": 0,
+   "note": "compra NAS100",
+   "decisions": [
+    {
+     "symbol": "US500",
+     "action": "HOLD",
+     "rsi": 32.9,
+     "close": 7731.51,
+     "bb_lo": 7760.97,
+     "bb_mid": 7805.98,
+     "bar": "2026-10-14 13:00",
+     "bar_age_h": 0.45,
+     "reason": null
+    },
+    {
+     "symbol": "NAS100",
+     "action": "BUY",
+     "rsi": 28.3,
+     "close": 30092.97,
+     "bb_lo": 30175.55,
+     "bb_mid": 30659.99,
+     "bar": "2026-10-14 13:00",
+     "bar_age_h": 0.45,
+     "reason": null
+    },
+    {
+     "symbol": "EURUSD",
+     "action": "HOLD",
+     "rsi": 32.2,
+     "close": 1.11237,
+     "bb_lo": 1.11313,
+     "bb_mid": 1.11826,
+     "bar": "2026-10-14 13:00",
+     "bar_age_h": 0.45,
+     "reason": null
+    },
+    {
+     "symbol": "GBPUSD",
+     "action": "HOLD",
+     "rsi": 32.5,
+     "close": 1.31553,
+     "bb_lo": 1.31768,
+     "bb_mid": 1.3231,
+     "bar": "2026-10-14 13:00",
+     "bar_age_h": 0.45,
+     "reason": null
+    },
+    {
+     "symbol": "XAUUSD",
+     "action": "HOLD",
+     "rsi": 33.5,
+     "close": 4083.62,
+     "bb_lo": 4104.21,
+     "bb_mid": 4165.94,
+     "bar": "2026-10-14 13:00",
+     "bar_age_h": 0.45,
+     "reason": null
+    },
+    {
+     "symbol": "XTIUSD",
+     "action": "HOLD",
+     "rsi": 64.4,
+     "close": 96.802,
+     "bb_lo": 91.395,
+     "bb_mid": 94.42,
+     "bar": "2026-10-14 13:00",
+     "bar_age_h": 0.45,
+     "reason": null
+    }
+   ],
+   "orders": [
+    {
+     "symbol": "NAS100",
+     "units": 0.06,
+     "entry": 30092.97,
+     "stop": 29726.08,
+     "target": 30659.99,
+     "risk_usd": 22.01,
+     "status": "order_accepted"
+    }
+   ],
    "stops_moved": [],
    "closed": [],
    "event_window": [],
