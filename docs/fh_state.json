@@ -1,27 +1,27 @@
 {
- "at": "2026-10-15T14:30Z",
- "ny_time": "2026-10-15 10:30",
- "equity": 475.0,
+ "at": "2026-10-16T14:30Z",
+ "ny_time": "2026-10-16 10:30",
+ "equity": 478.49,
  "plans": {
   "US500": {
-   "day": "2026-10-15",
-   "phase": "sin_senal",
-   "side": 0,
-   "r": 11.75,
-   "u": 23.77,
-   "entry_ref": 7701.43,
-   "first_hour_open": 7689.68,
-   "ratio": 0.49
+   "day": "2026-10-16",
+   "phase": "ready",
+   "side": -1,
+   "r": -24.0,
+   "u": 16.36,
+   "entry_ref": 7734.32,
+   "first_hour_open": 7758.32,
+   "ratio": 1.47
   },
   "NAS100": {
-   "day": "2026-10-15",
-   "phase": "sin_senal",
-   "side": 0,
-   "r": 69.25,
-   "u": 171.81,
-   "entry_ref": 29615.989999999998,
-   "first_hour_open": 29546.739999999998,
-   "ratio": 0.4
+   "day": "2026-10-16",
+   "phase": "ready",
+   "side": -1,
+   "r": -210.0,
+   "u": 128.67,
+   "entry_ref": 29619.41,
+   "first_hour_open": 29829.41,
+   "ratio": 1.63
   }
  },
  "open_positions": [],
@@ -29,29 +29,29 @@
   {
    "symbol": "US500",
    "side": "sell",
-   "units": 0.39,
-   "entry_ref": 7757.51,
-   "stop": 7779.48,
-   "risk_usd": 8.57,
-   "first_hour_move": -20.0,
-   "u": 21.97,
+   "units": 0.58,
+   "entry_ref": 7734.32,
+   "stop": 7750.68,
+   "risk_usd": 9.49,
+   "first_hour_move": -24.0,
+   "u": 16.36,
    "status": "order_accepted"
   },
   {
    "symbol": "NAS100",
    "side": "sell",
-   "units": 0.06,
-   "entry_ref": 30274.34,
-   "stop": 30418.41,
-   "risk_usd": 8.64,
-   "first_hour_move": -73.75,
-   "u": 144.07,
+   "units": 0.07,
+   "entry_ref": 29619.41,
+   "stop": 29748.08,
+   "risk_usd": 9.01,
+   "first_hour_move": -210.0,
+   "u": 128.67,
    "status": "order_accepted"
   }
  ],
  "last_trade_day": {
-  "US500": "2026-10-14",
-  "NAS100": "2026-10-14"
+  "US500": "2026-10-16",
+  "NAS100": "2026-10-16"
  },
  "trades": [
   {
@@ -111,7 +111,7 @@
   "mode": "off",
   "reason": "",
   "peak": 500.0,
-  "drawdown": -0.05
+  "drawdown": -0.043
  },
  "label": "autotrader-fh",
  "symbols": [
