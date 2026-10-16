@@ -1,9 +1,18 @@
 {
- "at": "2026-10-15T16:16Z",
- "ny_time": "2026-10-15 12:16",
- "equity": 488.5,
+ "at": "2026-10-16T12:28Z",
+ "ny_time": "2026-10-16 08:28",
+ "equity": 479.51,
  "plan": {
-  "phase": "fuera de horario"
+  "phase": "waiting_break",
+  "side": 0,
+  "level": null,
+  "break_at": null,
+  "retest_at": null,
+  "stop": 4166.8099999999995,
+  "day": "2026-10-16",
+  "asia_hi": 4186.38,
+  "asia_lo": 4147.24,
+  "bars_seen": 1
  },
  "open_position": null,
  "last_orders": [
@@ -51,7 +60,7 @@
   "mode": "off",
   "reason": "",
   "peak": 500.0,
-  "drawdown": -0.023
+  "drawdown": -0.041
  },
  "label": "autotrader-asia",
  "symbol": "XAUUSD",
