@@ -1,11 +1,11 @@
 {
- "at": "2026-10-19T14:30Z",
- "ny_time": "2026-10-19 10:30",
- "equity": 458.6,
+ "at": "2026-10-19T15:15Z",
+ "ny_time": "2026-10-19 11:15",
+ "equity": 463.1,
  "plans": {
   "US500": {
    "day": "2026-10-19",
-   "phase": "ready",
+   "phase": "late",
    "side": 1,
    "r": 11.25,
    "u": 16.26,
@@ -15,7 +15,7 @@
   },
   "NAS100": {
    "day": "2026-10-19",
-   "phase": "ready",
+   "phase": "late",
    "side": 1,
    "r": 61.0,
    "u": 108.23,
@@ -24,7 +24,20 @@
    "ratio": 0.56
   }
  },
- "open_positions": [],
+ "open_positions": [
+  {
+   "symbol": "US500",
+   "side": "buy",
+   "units": 0.56,
+   "entry": 7710.77
+  },
+  {
+   "symbol": "NAS100",
+   "side": "buy",
+   "units": 0.08,
+   "entry": 29641.13
+  }
+ ],
  "last_orders": [
   {
    "symbol": "US500",
@@ -129,7 +142,7 @@
   "mode": "off",
   "reason": "",
   "peak": 500.0,
-  "drawdown": -0.0828
+  "drawdown": -0.0738
  },
  "label": "autotrader-fh",
  "symbols": [
