@@ -1,13 +1,13 @@
 {
- "at": "2026-10-19T17:27Z",
+ "at": "2026-10-19T19:26Z",
  "label": "autotrader-sr",
  "strategy": "rebote en soporte H4 (>= 2 toques, memoria 300 barras) sobre la EMA200; stop bajo el nivel, objetivo siguiente resistencia (minimo 2 R), salida a los 7 dias",
- "equity": 500.0,
+ "equity": 408.62,
  "guard": {
   "mode": "freeze",
-  "reason": "drawdown -50.0 % desde el maximo de 1,000.00 (limite 20 %)",
+  "reason": "drawdown -59.1 % desde el maximo de 1,000.00 (limite 20 %)",
   "peak": 1000.0,
-  "drawdown": -0.5
+  "drawdown": -0.5914
  },
  "dry_run": false,
  "positions": {},
@@ -24,7 +24,7 @@
    "support": 7697.35,
    "resistance": 7715.59,
    "levels": 14,
-   "bar_age_h": 0.45
+   "bar_age_h": 2.44
   },
   {
    "symbol": "NAS100",
@@ -38,7 +38,7 @@
    "support": 29538.47,
    "resistance": 29691.37,
    "levels": 16,
-   "bar_age_h": 0.45
+   "bar_age_h": 2.44
   },
   {
    "symbol": "EURUSD",
@@ -52,7 +52,7 @@
    "support": 1.11766,
    "resistance": 1.12161,
    "levels": 19,
-   "bar_age_h": 0.45
+   "bar_age_h": 2.44
   },
   {
    "symbol": "GBPUSD",
@@ -66,7 +66,7 @@
    "support": 1.32804,
    "resistance": 1.33069,
    "levels": 17,
-   "bar_age_h": 0.45
+   "bar_age_h": 2.44
   },
   {
    "symbol": "XAUUSD",
@@ -80,7 +80,7 @@
    "support": 4105.55,
    "resistance": 4144.4,
    "levels": 17,
-   "bar_age_h": 0.45
+   "bar_age_h": 2.44
   },
   {
    "symbol": "XTIUSD",
@@ -94,13 +94,13 @@
    "support": 99.372,
    "resistance": 100.436,
    "levels": 21,
-   "bar_age_h": 0.45
+   "bar_age_h": 2.44
   }
  ],
  "orders": [],
  "closed": [],
  "skipped": [
-  "freno activo: drawdown -50.0 % desde el maximo de 1,000.00 (limite 20 %)"
+  "freno activo: drawdown -59.1 % desde el maximo de 1,000.00 (limite 20 %)"
  ],
  "events": []
 }
