@@ -2,10 +2,10 @@
  "available": true,
  "broker": "Fusion Markets · cTrader demo · swing",
  "account": 10138759,
- "at": "2026-10-19T00:26Z",
+ "at": "2026-10-19T01:12Z",
  "balance": 425.82,
- "equity": 468.67,
- "unrealized_pnl": 42.85,
+ "equity": 466.68,
+ "unrealized_pnl": 40.86,
  "leverage": 500.0,
  "positions": [
   {
@@ -13,11 +13,11 @@
    "qty": 10.0,
    "side": "buy",
    "avg": 95.316,
-   "price": 99.521,
+   "price": 99.971,
    "stop": 95.419,
    "target": 101.477,
    "opened_at": "2026-10-13T17:34Z",
-   "pnl": 42.05,
+   "pnl": 46.55,
    "position_id": 44783577,
    "bot": true,
    "label": "autotrader-aggr",
@@ -28,11 +28,11 @@
    "qty": 1.0,
    "side": "buy",
    "avg": 4176.83,
-   "price": 4177.63,
+   "price": 4171.14,
    "stop": 4142.01,
    "target": null,
    "opened_at": "2026-10-18T22:26Z",
-   "pnl": 0.8,
+   "pnl": -5.69,
    "position_id": 44951242,
    "bot": true,
    "label": "autotrader-wl",
@@ -630,7 +630,7 @@
    "excluded": 0.0
   },
   "open": {
-   "bot": 42.85,
+   "bot": 40.86,
    "manual": 0.0,
    "excluded": 0.0
   },
@@ -639,8 +639,8 @@
    "manual": 26,
    "excluded": 0
   },
-  "adjusted_equity": 452.83,
-  "adjusted_return": -0.0943
+  "adjusted_equity": 450.84,
+  "adjusted_return": -0.0983
  },
  "exclusions": {
   "reason": "Entradas del 14 de septiembre de 2026: el filtro de huecos comparaba el precio en vivo con la barra diaria parcial y dejo pasar compras que no debia. Se excluyen de las metricas del bot para medir la operativa corregida.",
@@ -678,14 +678,14 @@
   "trigger_pct": 0.8,
   "withdraw_pct": 0.3,
   "target": 900.0,
-  "progress": -0.078,
+  "progress": -0.083,
   "alert": false,
   "suggested_amount": 0.0,
   "equity_after": null
  },
  "last_run": {
-  "at": "2026-10-19 00:26",
-  "equity": 469.13,
+  "at": "2026-10-19 01:12",
+  "equity": 466.18,
   "positions": 1,
   "buys": 0,
   "sells": 0,
@@ -695,67 +695,67 @@
    {
     "symbol": "US500",
     "action": "HOLD",
-    "rsi": 29.0,
-    "close": 7658.04,
-    "bb_lo": 7648.5,
-    "bb_mid": 7746.76,
-    "bar": "2026-10-16 17:00",
-    "bar_age_h": 51.44,
+    "rsi": 39.7,
+    "close": 7696.19,
+    "bb_lo": 7644.22,
+    "bb_mid": 7741.55,
+    "bar": "2026-10-18 21:00",
+    "bar_age_h": 0.2,
     "reason": null
    },
    {
     "symbol": "NAS100",
     "action": "HOLD",
-    "rsi": 24.7,
-    "close": 29191.86,
-    "bb_lo": 29152.49,
-    "bb_mid": 30000.35,
-    "bar": "2026-10-16 17:00",
-    "bar_age_h": 51.44,
+    "rsi": 34.2,
+    "close": 29445.28,
+    "bb_lo": 29102.54,
+    "bb_mid": 29945.91,
+    "bar": "2026-10-18 21:00",
+    "bar_age_h": 0.2,
     "reason": null
    },
    {
     "symbol": "EURUSD",
     "action": "HOLD",
-    "rsi": 58.0,
-    "close": 1.12391,
-    "bb_lo": 1.1137,
-    "bb_mid": 1.12032,
-    "bar": "2026-10-16 17:00",
-    "bar_age_h": 51.44,
+    "rsi": 54.3,
+    "close": 1.12261,
+    "bb_lo": 1.11384,
+    "bb_mid": 1.1205,
+    "bar": "2026-10-18 21:00",
+    "bar_age_h": 0.2,
     "reason": null
    },
    {
     "symbol": "GBPUSD",
     "action": "HOLD",
     "rsi": 64.8,
-    "close": 1.33284,
-    "bb_lo": 1.31713,
-    "bb_mid": 1.32627,
-    "bar": "2026-10-16 17:00",
-    "bar_age_h": 51.44,
+    "close": 1.33286,
+    "bb_lo": 1.31714,
+    "bb_mid": 1.3267,
+    "bar": "2026-10-18 21:00",
+    "bar_age_h": 0.2,
     "reason": null
    },
    {
     "symbol": "XAUUSD",
     "action": "HOLD",
-    "rsi": 52.2,
-    "close": 4165.54,
-    "bb_lo": 4096.98,
-    "bb_mid": 4149.23,
-    "bar": "2026-10-16 17:00",
-    "bar_age_h": 51.44,
+    "rsi": 54.3,
+    "close": 4173.83,
+    "bb_lo": 4096.9,
+    "bb_mid": 4150.29,
+    "bar": "2026-10-18 21:00",
+    "bar_age_h": 0.2,
     "reason": null
    },
    {
     "symbol": "XTIUSD",
     "action": "HOLD",
-    "rsi": 71.4,
-    "close": 100.806,
-    "bb_lo": 93.705,
-    "bb_mid": 96.918,
-    "bar": "2026-10-16 17:00",
-    "bar_age_h": 51.44,
+    "rsi": 59.8,
+    "close": 98.863,
+    "bb_lo": 93.8,
+    "bb_mid": 97.074,
+    "bar": "2026-10-18 21:00",
+    "bar_age_h": 0.2,
     "reason": "posicion abierta"
    }
   ],
@@ -767,7 +767,7 @@
    "mode": "off",
    "reason": "",
    "peak": 500.0,
-   "drawdown": -0.0617
+   "drawdown": -0.0676
   }
  },
  "slippage": {
@@ -865,7 +865,7 @@
   "mode": "off",
   "reason": "",
   "peak": 500.0,
-  "drawdown": -0.0617
+  "drawdown": -0.0676
  },
  "history": [
   [
@@ -2019,96 +2019,13 @@
   [
    "2026-10-19T00:26Z",
    468.67
+  ],
+  [
+   "2026-10-19T01:12Z",
+   466.68
   ]
  ],
  "cycles": [
-  {
-   "at": "2026-10-09 14:26",
-   "equity": 469.25,
-   "positions": 0,
-   "buys": 0,
-   "sells": 0,
-   "errors": 0,
-   "note": "sin cambios",
-   "decisions": [
-    {
-     "symbol": "US500",
-     "action": "HOLD",
-     "rsi": 55.3,
-     "close": 7791.2,
-     "bb_lo": 7754.28,
-     "bb_mid": 7797.29,
-     "bar": "2026-10-09 09:00",
-     "bar_age_h": 1.45,
-     "reason": null
-    },
-    {
-     "symbol": "NAS100",
-     "action": "HOLD",
-     "rsi": 50.5,
-     "close": 30969.92,
-     "bb_lo": 30733.28,
-     "bb_mid": 31075.99,
-     "bar": "2026-10-09 09:00",
-     "bar_age_h": 1.45,
-     "reason": null
-    },
-    {
-     "symbol": "EURUSD",
-     "action": "HOLD",
-     "rsi": 42.7,
-     "close": 1.1198,
-     "bb_lo": 1.11615,
-     "bb_mid": 1.12154,
-     "bar": "2026-10-09 09:00",
-     "bar_age_h": 1.45,
-     "reason": null
-    },
-    {
-     "symbol": "GBPUSD",
-     "action": "HOLD",
-     "rsi": 45.5,
-     "close": 1.32136,
-     "bb_lo": 1.31804,
-     "bb_mid": 1.32315,
-     "bar": "2026-10-09 09:00",
-     "bar_age_h": 1.45,
-     "reason": null
-    },
-    {
-     "symbol": "XAUUSD",
-     "action": "HOLD",
-     "rsi": 56.8,
-     "close": 4175.44,
-     "bb_lo": 4086.46,
-     "bb_mid": 4140.56,
-     "bar": "2026-10-09 09:00",
-     "bar_age_h": 1.45,
-     "reason": null
-    },
-    {
-     "symbol": "XTIUSD",
-     "action": "HOLD",
-     "rsi": 52.1,
-     "close": 93.034,
-     "bb_lo": 89.733,
-     "bb_mid": 92.071,
-     "bar": "2026-10-09 09:00",
-     "bar_age_h": 1.45,
-     "reason": null
-    }
-   ],
-   "orders": [],
-   "stops_moved": [],
-   "closed": [],
-   "event_window": [],
-   "guard": {
-    "mode": "off",
-    "reason": "",
-    "peak": 500.0,
-    "drawdown": -0.0615
-   }
-  },
   {
    "at": "2026-10-09 16:26",
    "equity": 467.63,
@@ -7271,6 +7188,93 @@
     "reason": "",
     "peak": 500.0,
     "drawdown": -0.0617
+   }
+  },
+  {
+   "at": "2026-10-19 01:12",
+   "equity": 466.18,
+   "positions": 1,
+   "buys": 0,
+   "sells": 0,
+   "errors": 0,
+   "note": "sin cambios",
+   "decisions": [
+    {
+     "symbol": "US500",
+     "action": "HOLD",
+     "rsi": 39.7,
+     "close": 7696.19,
+     "bb_lo": 7644.22,
+     "bb_mid": 7741.55,
+     "bar": "2026-10-18 21:00",
+     "bar_age_h": 0.2,
+     "reason": null
+    },
+    {
+     "symbol": "NAS100",
+     "action": "HOLD",
+     "rsi": 34.2,
+     "close": 29445.28,
+     "bb_lo": 29102.54,
+     "bb_mid": 29945.91,
+     "bar": "2026-10-18 21:00",
+     "bar_age_h": 0.2,
+     "reason": null
+    },
+    {
+     "symbol": "EURUSD",
+     "action": "HOLD",
+     "rsi": 54.3,
+     "close": 1.12261,
+     "bb_lo": 1.11384,
+     "bb_mid": 1.1205,
+     "bar": "2026-10-18 21:00",
+     "bar_age_h": 0.2,
+     "reason": null
+    },
+    {
+     "symbol": "GBPUSD",
+     "action": "HOLD",
+     "rsi": 64.8,
+     "close": 1.33286,
+     "bb_lo": 1.31714,
+     "bb_mid": 1.3267,
+     "bar": "2026-10-18 21:00",
+     "bar_age_h": 0.2,
+     "reason": null
+    },
+    {
+     "symbol": "XAUUSD",
+     "action": "HOLD",
+     "rsi": 54.3,
+     "close": 4173.83,
+     "bb_lo": 4096.9,
+     "bb_mid": 4150.29,
+     "bar": "2026-10-18 21:00",
+     "bar_age_h": 0.2,
+     "reason": null
+    },
+    {
+     "symbol": "XTIUSD",
+     "action": "HOLD",
+     "rsi": 59.8,
+     "close": 98.863,
+     "bb_lo": 93.8,
+     "bb_mid": 97.074,
+     "bar": "2026-10-18 21:00",
+     "bar_age_h": 0.2,
+     "reason": "posicion abierta"
+    }
+   ],
+   "orders": [],
+   "stops_moved": [],
+   "closed": [],
+   "event_window": [],
+   "guard": {
+    "mode": "off",
+    "reason": "",
+    "peak": 500.0,
+    "drawdown": -0.0676
    }
   }
  ]
