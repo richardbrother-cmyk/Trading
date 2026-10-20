@@ -1,5 +1,5 @@
 {
- "at": "2026-10-20T13:27Z",
+ "at": "2026-10-20T15:26Z",
  "label": "autotrader-sr",
  "strategy": "rebote en soporte H4 (>= 2 toques, memoria 300 barras) sobre la EMA200; stop bajo el nivel, objetivo siguiente resistencia (minimo 2 R), salida a los 7 dias",
  "equity": 329.83,
@@ -24,7 +24,7 @@
    "support": 7672.23,
    "resistance": 7689.66,
    "levels": 13,
-   "bar_age_h": 0.45
+   "bar_age_h": 2.44
   },
   {
    "symbol": "NAS100",
@@ -38,7 +38,7 @@
    "support": 29297.57,
    "resistance": 29439.29,
    "levels": 16,
-   "bar_age_h": 0.45
+   "bar_age_h": 2.44
   },
   {
    "symbol": "EURUSD",
@@ -52,7 +52,7 @@
    "support": 1.12161,
    "resistance": 1.12419,
    "levels": 19,
-   "bar_age_h": 0.45
+   "bar_age_h": 2.44
   },
   {
    "symbol": "GBPUSD",
@@ -66,7 +66,7 @@
    "support": 1.3338,
    "resistance": 1.33953,
    "levels": 18,
-   "bar_age_h": 0.45
+   "bar_age_h": 2.44
   },
   {
    "symbol": "XAUUSD",
@@ -80,7 +80,7 @@
    "support": 4105.55,
    "resistance": 4144.4,
    "levels": 17,
-   "bar_age_h": 0.45
+   "bar_age_h": 2.44
   },
   {
    "symbol": "XTIUSD",
@@ -94,7 +94,7 @@
    "support": 99.832,
    "resistance": 101.089,
    "levels": 21,
-   "bar_age_h": 0.45
+   "bar_age_h": 2.44
   }
  ],
  "orders": [],
