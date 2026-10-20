@@ -1,7 +1,7 @@
 {
- "at": "2026-10-20T13:27Z",
- "ny_time": "2026-10-20 09:27",
- "equity": 432.45,
+ "at": "2026-10-20T15:26Z",
+ "ny_time": "2026-10-20 11:26",
+ "equity": 415.01,
  "plan": {
   "week": "2026-10-19",
   "phase": "operada",
@@ -61,7 +61,7 @@
   "mode": "off",
   "reason": "",
   "peak": 500.0,
-  "drawdown": -0.1351
+  "drawdown": -0.17
  },
  "label": "autotrader-wl",
  "symbol": "XAUUSD",
