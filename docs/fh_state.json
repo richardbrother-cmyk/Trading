@@ -1,72 +1,77 @@
 {
- "at": "2026-10-19T15:15Z",
- "ny_time": "2026-10-19 11:15",
- "equity": 463.1,
+ "at": "2026-10-20T14:30Z",
+ "ny_time": "2026-10-20 10:30",
+ "equity": 432.45,
  "plans": {
   "US500": {
-   "day": "2026-10-19",
-   "phase": "late",
+   "day": "2026-10-20",
+   "phase": "ready",
    "side": 1,
-   "r": 11.25,
-   "u": 16.26,
-   "entry_ref": 7711.22,
-   "first_hour_open": 7699.97,
-   "ratio": 0.69
+   "r": 59.25,
+   "u": 25.65,
+   "entry_ref": 7744.37,
+   "first_hour_open": 7685.12,
+   "ratio": 2.31
   },
   "NAS100": {
-   "day": "2026-10-19",
-   "phase": "late",
+   "day": "2026-10-20",
+   "phase": "ready",
    "side": 1,
-   "r": 61.0,
-   "u": 108.23,
-   "entry_ref": 29657.08,
-   "first_hour_open": 29596.08,
-   "ratio": 0.56
+   "r": 283.0,
+   "u": 172.69,
+   "entry_ref": 29696.01,
+   "first_hour_open": 29413.010000000002,
+   "ratio": 1.64
   }
  },
- "open_positions": [
-  {
-   "symbol": "US500",
-   "side": "buy",
-   "units": 0.56,
-   "entry": 7710.77
-  },
-  {
-   "symbol": "NAS100",
-   "side": "buy",
-   "units": 0.08,
-   "entry": 29641.13
-  }
- ],
+ "open_positions": [],
  "last_orders": [
   {
    "symbol": "US500",
    "side": "buy",
-   "units": 0.56,
-   "entry_ref": 7711.22,
-   "stop": 7694.96,
-   "risk_usd": 9.11,
-   "first_hour_move": 11.25,
-   "u": 16.26,
+   "units": 0.33,
+   "entry_ref": 7744.37,
+   "stop": 7718.72,
+   "risk_usd": 8.46,
+   "first_hour_move": 59.25,
+   "u": 25.65,
    "status": "order_accepted"
   },
   {
    "symbol": "NAS100",
    "side": "buy",
-   "units": 0.08,
-   "entry_ref": 29657.08,
-   "stop": 29548.85,
-   "risk_usd": 8.66,
-   "first_hour_move": 61.0,
-   "u": 108.23,
+   "units": 0.05,
+   "entry_ref": 29696.01,
+   "stop": 29523.32,
+   "risk_usd": 8.63,
+   "first_hour_move": 283.0,
+   "u": 172.69,
    "status": "order_accepted"
   }
  ],
  "last_trade_day": {
-  "US500": "2026-10-19",
-  "NAS100": "2026-10-19"
+  "US500": "2026-10-20",
+  "NAS100": "2026-10-20"
  },
  "trades": [
+  {
+   "at": "2026-10-19T18:26Z",
+   "symbol": "NAS100",
+   "units": 0.08,
+   "entry": 29641.13,
+   "exit": 29532.58,
+   "net": -8.68,
+   "opened_at": "2026-10-19T14:30Z"
+  },
+  {
+   "at": "2026-10-19T17:48Z",
+   "symbol": "US500",
+   "units": 0.56,
+   "entry": 7710.77,
+   "exit": 7694.47,
+   "net": -9.13,
+   "opened_at": "2026-10-19T14:30Z"
+  },
   {
    "at": "2026-10-16T14:50Z",
    "symbol": "US500",
@@ -142,7 +147,7 @@
   "mode": "off",
   "reason": "",
   "peak": 500.0,
-  "drawdown": -0.0738
+  "drawdown": -0.1351
  },
  "label": "autotrader-fh",
  "symbols": [
@@ -150,8 +155,8 @@
   "NAS100"
  ],
  "stats": {
-  "trades": 7,
+  "trades": 9,
   "wins": 2,
-  "net_usd": -12.29
+  "net_usd": -30.1
  }
 }
