@@ -2,10 +2,10 @@
  "available": true,
  "broker": "Fusion Markets · cTrader demo · swing",
  "account": 10137828,
- "at": "2026-10-21T07:26Z",
+ "at": "2026-10-21T07:27Z",
  "balance": 477.69,
- "equity": 716.51,
- "unrealized_pnl": 238.82,
+ "equity": 713.21,
+ "unrealized_pnl": 235.52,
  "leverage": 500.0,
  "positions": [],
  "symbols": [
@@ -76,13 +76,13 @@
   "entries_before": "2026-09-15T00:00Z"
  },
  "last_run": {
-  "at": "2026-10-21 07:26",
-  "equity": 699.71,
+  "at": "2026-10-21 07:27",
+  "equity": 706.91,
   "positions": 0,
   "buys": 0,
   "sells": 0,
   "errors": 0,
-  "note": "freno freeze: drawdown -13.4 % desde el maximo de 808.31 (limite 10 %)",
+  "note": "freno freeze: drawdown -12.5 % desde el maximo de 808.31 (limite 10 %)",
   "decisions": [
    {
     "symbol": "US500",
@@ -92,7 +92,7 @@
     "bb_lo": 7655.7,
     "bb_mid": 7713.78,
     "bar": "2026-10-21 01:00",
-    "bar_age_h": 2.44,
+    "bar_age_h": 2.46,
     "reason": null
    },
    {
@@ -103,7 +103,7 @@
     "bb_lo": 29190.92,
     "bb_mid": 29601.3,
     "bar": "2026-10-21 01:00",
-    "bar_age_h": 2.44,
+    "bar_age_h": 2.46,
     "reason": null
    },
    {
@@ -114,7 +114,7 @@
     "bb_lo": 1.12056,
     "bb_mid": 1.12262,
     "bar": "2026-10-21 01:00",
-    "bar_age_h": 2.44,
+    "bar_age_h": 2.46,
     "reason": null
    },
    {
@@ -125,7 +125,7 @@
     "bb_lo": 1.32749,
     "bb_mid": 1.33329,
     "bar": "2026-10-21 01:00",
-    "bar_age_h": 2.44,
+    "bar_age_h": 2.46,
     "reason": null
    },
    {
@@ -136,7 +136,7 @@
     "bb_lo": 4100.35,
     "bb_mid": 4148.91,
     "bar": "2026-10-21 01:00",
-    "bar_age_h": 2.44,
+    "bar_age_h": 2.46,
     "reason": null
    },
    {
@@ -147,7 +147,7 @@
     "bb_lo": 97.023,
     "bb_mid": 99.344,
     "bar": "2026-10-21 01:00",
-    "bar_age_h": 2.44,
+    "bar_age_h": 2.46,
     "reason": null
    }
   ],
@@ -157,9 +157,9 @@
   "event_window": [],
   "guard": {
    "mode": "freeze",
-   "reason": "drawdown -13.4 % desde el maximo de 808.31 (limite 10 %)",
+   "reason": "drawdown -12.5 % desde el maximo de 808.31 (limite 10 %)",
    "peak": 808.31,
-   "drawdown": -0.1344
+   "drawdown": -0.1254
   }
  },
  "slippage": {
@@ -255,9 +255,9 @@
  },
  "guard": {
   "mode": "freeze",
-  "reason": "drawdown -13.4 % desde el maximo de 808.31 (limite 10 %)",
+  "reason": "drawdown -12.5 % desde el maximo de 808.31 (limite 10 %)",
   "peak": 808.31,
-  "drawdown": -0.1344
+  "drawdown": -0.1254
  },
  "history": [
   [
@@ -1573,8 +1573,8 @@
    808.31
   ],
   [
-   "2026-10-21T07:26Z",
-   716.51
+   "2026-10-21T07:27Z",
+   713.21
   ]
  ],
  "cycles": [
@@ -6716,13 +6716,13 @@
    }
   },
   {
-   "at": "2026-10-21 07:26",
-   "equity": 699.71,
+   "at": "2026-10-21 07:27",
+   "equity": 706.91,
    "positions": 0,
    "buys": 0,
    "sells": 0,
    "errors": 0,
-   "note": "freno freeze: drawdown -13.4 % desde el maximo de 808.31 (limite 10 %)",
+   "note": "freno freeze: drawdown -12.5 % desde el maximo de 808.31 (limite 10 %)",
    "decisions": [
     {
      "symbol": "US500",
@@ -6732,7 +6732,7 @@
      "bb_lo": 7655.7,
      "bb_mid": 7713.78,
      "bar": "2026-10-21 01:00",
-     "bar_age_h": 2.44,
+     "bar_age_h": 2.46,
      "reason": null
     },
     {
@@ -6743,7 +6743,7 @@
      "bb_lo": 29190.92,
      "bb_mid": 29601.3,
      "bar": "2026-10-21 01:00",
-     "bar_age_h": 2.44,
+     "bar_age_h": 2.46,
      "reason": null
     },
     {
@@ -6754,7 +6754,7 @@
      "bb_lo": 1.12056,
      "bb_mid": 1.12262,
      "bar": "2026-10-21 01:00",
-     "bar_age_h": 2.44,
+     "bar_age_h": 2.46,
      "reason": null
     },
     {
@@ -6765,7 +6765,7 @@
      "bb_lo": 1.32749,
      "bb_mid": 1.33329,
      "bar": "2026-10-21 01:00",
-     "bar_age_h": 2.44,
+     "bar_age_h": 2.46,
      "reason": null
     },
     {
@@ -6776,7 +6776,7 @@
      "bb_lo": 4100.35,
      "bb_mid": 4148.91,
      "bar": "2026-10-21 01:00",
-     "bar_age_h": 2.44,
+     "bar_age_h": 2.46,
      "reason": null
     },
     {
@@ -6787,7 +6787,7 @@
      "bb_lo": 97.023,
      "bb_mid": 99.344,
      "bar": "2026-10-21 01:00",
-     "bar_age_h": 2.44,
+     "bar_age_h": 2.46,
      "reason": null
     }
    ],
@@ -6797,9 +6797,9 @@
    "event_window": [],
    "guard": {
     "mode": "freeze",
-    "reason": "drawdown -13.4 % desde el maximo de 808.31 (limite 10 %)",
+    "reason": "drawdown -12.5 % desde el maximo de 808.31 (limite 10 %)",
     "peak": 808.31,
-    "drawdown": -0.1344
+    "drawdown": -0.1254
    }
   }
  ]
